@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unsere Leistungen – Beratung, Workshops &amp; Pakete | Berater-Kasten</title>
+  <meta name="description" content="Berater-Kasten bietet praxisnahe Beratungsleistungen für produzierende KMU: Prozessoptimierung, Betriebsorganisation, Controlling-Beratung und Workshops. BAFA-gefördert bis zu 80%.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .paket-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 28px;
+      margin-top: 48px;
+    }
+    .paket-card {
+      background: white;
+      border-radius: 18px;
+      padding: 36px 28px;
+      box-shadow: var(--shadow);
+      border-top: 4px solid var(--hellblau);
+      display: flex;
+      flex-direction: column;
+      transition: transform .22s, box-shadow .22s;
+    }
+    .paket-card.highlight {
+      border-top-color: var(--petrolblau);
+      box-shadow: var(--shadow-lg);
+    }
+    .paket-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .paket-badge {
+      display: inline-block;
+      background: #e8f4fa;
+      color: var(--petrolblau);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 20px;
+      margin-bottom: 14px;
+    }
+    .paket-card.highlight .paket-badge {
+      background: var(--petrolblau);
+      color: white;
+    }
+    .paket-card h3 { font-size: 20px; margin-bottom: 12px; }
+    .paket-card .paket-desc { color: var(--textlight); font-size: 14px; margin-bottom: 20px; flex: 1; }
+    .paket-card ul { list-style: none; margin-bottom: 24px; }
+    .paket-card ul li {
+      padding: 5px 0 5px 22px;
+      position: relative;
+      font-size: 14px;
+      color: var(--textlight);
+    }
+    .paket-card ul li::before { content: "✓"; position: absolute; left: 0; color: var(--petrolblau); font-weight: 700; }
+    @media (max-width:900px) { .paket-grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html">
+      <img src="images/logo.png" alt="Berater-Kasten Logo" class="site-logo">
+    </a>
+    <button class="nav-toggle" aria-label="Menü öffnen" onclick="this.nextElementSibling.classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="site-nav">
+      <a href="index.html">Startseite</a>
+      <a href="leistungen.html" class="active">Unsere Leistungen</a>
+      <a href="team.html">Das sind wir</a>
+      <a href="foerderung.html">Förderung</a>
+      <a href="kontakt.html" class="nav-cta">Kontakt aufnehmen</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero" aria-label="Seiteneinleitung">
+  <h1>Unsere Leistungen</h1>
+  <p>Praxisnahe Beratung, messbare Ergebnisse – direkt vor Ort in Ihrem Betrieb.</p>
+</section>
+
+<!-- LEISTUNGSBEREICHE -->
+<section aria-labelledby="leistungen-heading">
+  <div class="container">
+    <span class="eyebrow section-title-center" style="display:block;text-align:center">Was wir tun</span>
+    <h2 class="section-title section-title-center" id="leistungen-heading">Unsere Beratungsleistungen</h2>
+    <p class="section-subtitle section-subtitle-center">
+      Wir begleiten produzierende Unternehmen dabei, Ordnung in ihre Prozesse, Strukturen und Zahlen zu bringen – praxisnah und nachhaltig.
+    </p>
+    <div class="leistungen-grid">
+      <div class="leistung-card anim-up">
+        <div class="leistung-icon">⚙️</div>
+        <h3>Prozessoptimierung</h3>
+        <p>Wir analysieren Ihre Abläufe direkt vor Ort, identifizieren Engpässe und entwickeln gemeinsam mit Ihnen umsetzbare Lösungen – keine theoretischen Konzepte, sondern gelebte Praxis.</p>
+      </div>
+      <div class="leistung-card anim-up">
+        <div class="leistung-icon">📊</div>
+        <h3>Betriebsorganisation &amp; Controlling</h3>
+        <p>Zahlen, die fehlen oder nicht verständlich sind, verhindern gute Entscheidungen. Wir helfen Ihnen, aussagekräftige Kennzahlen zu definieren, zu erfassen und zu nutzen.</p>
+      </div>
+      <div class="leistung-card anim-up">
+        <div class="leistung-icon">🏗️</div>
+        <h3>Strukturentwicklung</h3>
+        <p>Strukturen, die beim Start funktionierten, passen nicht mehr zum gewachsenen Unternehmen. Wir entwickeln Verantwortlichkeiten, Rollen und Schnittstellen, die skalieren.</p>
+      </div>
+      <div class="leistung-card anim-up">
+        <div class="leistung-icon">🎯</div>
+        <h3>Shopfloor Management</h3>
+        <p>Wir etablieren schlanke, wirksame Führungsroutinen direkt am Shopfloor – tägliche Besprechungen, Visualisierungen und Eskalationspfade, die Ihr Team entlasten.</p>
+      </div>
+      <div class="leistung-card anim-up">
+        <div class="leistung-icon">🎓</div>
+        <h3>Workshops &amp; Schulungen</h3>
+        <p>Praxisnahe Workshops zu Themen wie Power BI, Prozessmanagement und Organisationsentwicklung – für Teams, die Wissen aufbauen, anwenden und verankern wollen.</p>
+      </div>
+      <div class="leistung-card anim-up">
+        <div class="leistung-icon">🚀</div>
+        <h3>Einstiegsberatung</h3>
+        <p>Sie wissen nicht, wo anfangen? Mit unserem kalkulierbaren Einstiegspaket erhalten Sie in kurzer Zeit ein klares Bild Ihrer Situation und konkrete Handlungsempfehlungen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BERATUNGSPAKETE -->
+<section style="background:var(--warmgrau)" aria-labelledby="pakete-heading">
+  <div class="container">
+    <span class="eyebrow section-title-center" style="display:block;text-align:center">Transparenz von Anfang an</span>
+    <h2 class="section-title section-title-center" id="pakete-heading">Unsere Beratungspakete</h2>
+    <p class="section-subtitle section-subtitle-center">
+      Wir glauben an transparente Zusammenarbeit. Deshalb bieten wir drei klar strukturierte Pakete – damit Sie von Anfang an wissen, was Sie erwartet.
+    </p>
+    <div class="paket-grid">
+      <div class="paket-card anim-up">
+        <span class="paket-badge">Einstieg</span>
+        <h3>Orientierung</h3>
+        <p class="paket-desc">Ideal für Unternehmen, die einen strukturierten Überblick ihrer Situation gewinnen wollen – ohne große Vorab-Investition.</p>
+        <ul>
+          <li>Strukturierter Betriebsrundgang</li>
+          <li>Analyse von 1–2 Kernprozessen</li>
+          <li>Handlungsempfehlungen schriftlich</li>
+          <li>1 Präsentationstermin</li>
+        </ul>
+        <a href="kontakt.html" class="btn-secondary">Anfragen</a>
+      </div>
+      <div class="paket-card highlight anim-up">
+        <span class="paket-badge">Empfohlen</span>
+        <h3>Umsetzung</h3>
+        <p class="paket-desc">Wir begleiten Sie nicht nur bei der Analyse, sondern auch bei der konkreten Umsetzung der Maßnahmen in Ihrem Betrieb.</p>
+        <ul>
+          <li>Tiefgehende Prozessanalyse</li>
+          <li>Entwicklung von Strukturen &amp; Rollen</li>
+          <li>Umsetzungsbegleitung vor Ort</li>
+          <li>Kennzahlen-Dashboard (Basis)</li>
+          <li>BAFA-förderfähig</li>
+        </ul>
+        <a href="kontakt.html" class="btn-primary">Anfragen</a>
+      </div>
+      <div class="paket-card anim-up">
+        <span class="paket-badge">Langfristig</span>
+        <h3>Begleitung</h3>
+        <p class="paket-desc">Für Unternehmen, die einen langfristigen Partner für Weiterentwicklung und Stabilisierung ihrer Organisation suchen.</p>
+        <ul>
+          <li>Alle Leistungen aus „Umsetzung"</li>
+          <li>Regelmäßige Review-Termine</li>
+          <li>Workshop-Modul inklusive</li>
+          <li>Individuelle Kennzahlensysteme</li>
+          <li>BAFA-förderfähig</li>
+        </ul>
+        <a href="kontakt.html" class="btn-secondary">Anfragen</a>
+      </div>
+    </div>
+    <p style="text-align:center; margin-top:32px; color:var(--textlight); font-size:14px;">
+      Alle Pakete können durch die BAFA-Förderung bis zu 80&thinsp;% bezuschusst werden. <a href="foerderung.html" style="color:var(--petrolblau); font-weight:600;">Mehr zur Förderung →</a>
+    </p>
+  </div>
+</section>
+
+<!-- WORKSHOPS PREVIEW -->
+<section aria-labelledby="workshops-heading">
+  <div class="container">
+    <div class="two-col">
+      <div class="col-text anim-up">
+        <span class="eyebrow">Workshops &amp; Schulungen</span>
+        <h2 id="workshops-heading">Wissen aufbauen, anwenden und verankern</h2>
+        <p>
+          Unsere Workshops sind praxisnah und auf produzierende Betriebe zugeschnitten. Wir kombinieren Theorie mit direkter Anwendung in Ihrem Unternehmen – damit das Gelernte nicht nach dem Workshop in der Schublade landet.
+        </p>
+        <p>
+          Aktuell in Planung und bald buchbar: Power&thinsp;BI für Produktionsbetriebe, Prozessmanagement-Workshop, Führungsroutinen im Shopfloor.
+        </p>
+        <a href="kontakt.html" class="btn-primary">Workshop anfragen</a>
+      </div>
+      <div class="col-image anim-up">
+        <img src="images/kasten_gluehbirne.png"
+             alt="Kasten mit Glühbirne – Ideen und Wissen strukturieren"
+             width="400" height="297" style="max-width:360px; margin:0 auto;">
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <img src="images/logo.png" alt="Berater-Kasten" class="footer-logo">
+      <nav class="footer-links">
+        <a href="index.html">Startseite</a>
+        <a href="leistungen.html">Leistungen</a>
+        <a href="team.html">Das sind wir</a>
+        <a href="foerderung.html">Förderung</a>
+        <a href="kontakt.html">Kontakt</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Berater-Kasten · info@berater-kasten.de</span>
+      <div class="footer-legal">
+        <a href="impressum.html">Impressum</a>
+        <a href="datenschutz.html">Datenschutz</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.anim, .anim-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

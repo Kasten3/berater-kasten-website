@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kontakt aufnehmen | Berater-Kasten – Unternehmensberatung KMU</title>
+  <meta name="description" content="Nehmen Sie jetzt Kontakt mit dem Berater-Kasten Team auf. Ein erstes Gespräch ist kostenlos und unverbindlich. Wir helfen kleinen und mittelständischen Unternehmen bei Prozessoptimierung und Betriebsorganisation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html">
+      <img src="images/logo.png" alt="Berater-Kasten Logo" class="site-logo">
+    </a>
+    <button class="nav-toggle" aria-label="Menü öffnen" onclick="this.nextElementSibling.classList.toggle('open')">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="site-nav">
+      <a href="index.html">Startseite</a>
+      <a href="leistungen.html">Unsere Leistungen</a>
+      <a href="team.html">Das sind wir</a>
+      <a href="foerderung.html">Förderung</a>
+      <a href="kontakt.html" class="nav-cta active">Kontakt aufnehmen</a>
+    </nav>
+  </div>
+</header>
+
+<section style="padding: 80px 0;" aria-labelledby="kontakt-heading">
+  <div class="container">
+    <div class="kontakt-grid">
+
+      <!-- Left: Lothar + info -->
+      <div class="anim-up">
+        <span class="eyebrow">Sprechen wir miteinander</span>
+        <h1 id="kontakt-heading" style="font-size:36px; margin-bottom:16px;">Ihr Kontakt zu uns</h1>
+        <p style="color:var(--textlight); font-size:17px; margin-bottom:32px;">
+          „Reden kostet nichts – nichts tun schon."
+        </p>
+        <img src="images/lothar_kontakt.jpg"
+             alt="Lothar Kahlert – Berater-Kasten – steht bereit für ein Gespräch"
+             style="width:100%; max-width:420px; border-radius:16px; box-shadow:var(--shadow-lg); margin-bottom:32px;">
+        <div style="display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <span style="font-size:22px;">✉️</span>
+            <a href="mailto:info@berater-kasten.de" style="color:var(--petrolblau); font-weight:600;">info@berater-kasten.de</a>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px;">
+            <span style="font-size:22px;">📍</span>
+            <span style="color:var(--textlight);">Region Uelzen / Norddeutschland</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:14px;">
+            <span style="font-size:22px;">🕐</span>
+            <span style="color:var(--textlight);">Montag – Freitag, 8–18 Uhr</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Form -->
+      <div class="anim-up">
+        <div style="background:var(--warmgrau); border-radius:20px; padding:40px 36px;">
+          <h2 style="font-size:22px; margin-bottom:8px;">Nachricht schreiben</h2>
+          <p style="color:var(--textlight); font-size:14px; margin-bottom:28px;">Wir melden uns in der Regel innerhalb eines Werktages zurück.</p>
+          <form action="https://formspree.io/f/YOURFORMID" method="POST" novalidate>
+            <div class="form-group">
+              <label for="name">Name *</label>
+              <input type="text" id="name" name="name" placeholder="Ihr Name" required autocomplete="name">
+            </div>
+            <div class="form-group">
+              <label for="email">E-Mail-Adresse *</label>
+              <input type="email" id="email" name="email" placeholder="ihre@email.de" required autocomplete="email">
+            </div>
+            <div class="form-group">
+              <label for="unternehmen">Unternehmen</label>
+              <input type="text" id="unternehmen" name="unternehmen" placeholder="Ihr Unternehmen" autocomplete="organization">
+            </div>
+            <div class="form-group">
+              <label for="thema">Worum geht es?</label>
+              <select id="thema" name="thema">
+                <option value="">– bitte wählen –</option>
+                <option>Prozessoptimierung / Betriebsorganisation</option>
+                <option>Controlling / Kennzahlen</option>
+                <option>Workshop oder Schulung</option>
+                <option>BAFA-Förderung prüfen</option>
+                <option>Allgemeine Anfrage</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="nachricht">Nachricht *</label>
+              <textarea id="nachricht" name="nachricht" placeholder="Beschreiben Sie kurz Ihr Anliegen – wir melden uns zeitnah bei Ihnen." required></textarea>
+            </div>
+            <div class="form-group" style="display:flex; align-items:flex-start; gap:12px; margin-bottom:24px;">
+              <input type="checkbox" id="datenschutz" name="datenschutz" required style="width:18px; height:18px; margin-top:2px; flex-shrink:0; accent-color:var(--petrolblau);">
+              <label for="datenschutz" style="font-size:13px; color:var(--textlight); font-family:'Open Sans',sans-serif; font-weight:400; cursor:pointer;">
+                Ich habe die <a href="datenschutz.html" style="color:var(--petrolblau);">Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner Daten zu.
+              </label>
+            </div>
+            <button type="submit" class="btn-primary" style="width:100%; font-size:16px; padding:15px;">Nachricht senden</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <img src="images/logo.png" alt="Berater-Kasten" class="footer-logo">
+      <nav class="footer-links">
+        <a href="index.html">Startseite</a>
+        <a href="leistungen.html">Leistungen</a>
+        <a href="team.html">Das sind wir</a>
+        <a href="foerderung.html">Förderung</a>
+        <a href="kontakt.html">Kontakt</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Berater-Kasten · info@berater-kasten.de</span>
+      <div class="footer-legal">
+        <a href="impressum.html">Impressum</a>
+        <a href="datenschutz.html">Datenschutz</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.anim, .anim-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
