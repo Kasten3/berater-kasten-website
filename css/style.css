@@ -571,3 +571,82 @@ section { padding: 80px 0; }
   .container { padding: 0 24px; }
   .section-title { font-size: 26px; }
 }
+
+/* ── 3D FLOATING EFFECTS ── */
+@keyframes float {
+  0%,100% { transform: translateY(0px); }
+  50%      { transform: translateY(-8px); }
+}
+@keyframes floatSlow {
+  0%,100% { transform: translateY(0px) rotate(-1deg); }
+  50%      { transform: translateY(-12px) rotate(1deg); }
+}
+
+.hero-image img {
+  animation: floatSlow 6s ease-in-out infinite;
+  filter: drop-shadow(0 24px 40px rgba(11,60,93,0.18));
+}
+
+.problem-tile {
+  transform: translateY(0) scale(1);
+  box-shadow: 0 4px 16px rgba(11,60,93,0.08), 0 1px 3px rgba(11,60,93,0.06);
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .25s;
+}
+.problem-tile:hover {
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 40px rgba(11,60,93,0.16), 0 4px 12px rgba(11,60,93,0.10);
+}
+
+.leistung-card {
+  box-shadow: 0 4px 20px rgba(11,60,93,0.08), 0 1px 4px rgba(11,60,93,0.05);
+  border: 1px solid rgba(169,214,229,0.3);
+  transition: transform .28s cubic-bezier(.34,1.56,.64,1), box-shadow .28s;
+}
+.leistung-card:hover {
+  transform: translateY(-8px) rotateX(2deg);
+  box-shadow: 0 24px 48px rgba(11,60,93,0.15), 0 8px 16px rgba(11,60,93,0.08);
+}
+
+.team-card {
+  transition: transform .28s cubic-bezier(.34,1.56,.64,1), box-shadow .28s;
+}
+.team-card:hover {
+  transform: translateY(-8px) rotateX(1deg);
+  box-shadow: 0 24px 48px rgba(11,60,93,0.15);
+}
+
+.paket-card {
+  transition: transform .28s cubic-bezier(.34,1.56,.64,1), box-shadow .28s;
+}
+.paket-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 24px 48px rgba(11,60,93,0.16);
+}
+
+.bafa-card {
+  box-shadow: 0 8px 32px rgba(11,60,93,0.12), 0 2px 8px rgba(11,60,93,0.06);
+}
+
+/* Hero glow blob behind team image */
+.hero-image {
+  position: relative;
+}
+.hero-image::before {
+  content: "";
+  position: absolute;
+  width: 90%;
+  height: 70%;
+  bottom: -5%;
+  left: 5%;
+  background: radial-gradient(ellipse, rgba(169,214,229,0.45) 0%, rgba(169,214,229,0) 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+.hero-image img { position: relative; z-index: 1; }
+
+/* Subtle hero background */
+.hero { background: linear-gradient(160deg, #f0f6fb 0%, #f7f9fb 60%, #eef3f7 100%); }
+
+/* Footer slim - remove nav */
+.footer-links { display: none; }
+.footer-top { justify-content: space-between; }
