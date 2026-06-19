@@ -59,6 +59,7 @@
     }
     .paket-card ul li::before { content: "✓"; position: absolute; left: 0; color: var(--petrolblau); font-weight: 700; }
     @media (max-width:900px) { .paket-grid { grid-template-columns:1fr; } }
+    @media (max-width:900px) { #workshops > .container > div[style*="repeat(2"] { grid-template-columns:1fr !important; } }
   </style>
 </head>
 <body>
@@ -96,6 +97,16 @@
     </p>
     <div class="leistungen-grid">
       <div class="leistung-card anim-up">
+        <div class="leistung-icon" style="background:none;padding:0;width:56px;height:56px"><img src="images/icon_einstieg.png" alt="" width="56" height="56" style="width:56px;height:56px;object-fit:contain;border-radius:8px;background:#e8f4fa;padding:6px"></div>
+        <h3>Einstiegsberatung</h3>
+        <p>Sie wissen nicht, wo anfangen? Mit unserem kalkulierbaren Einstiegspaket erhalten Sie in kurzer Zeit ein klares Bild Ihrer Situation und konkrete Handlungsempfehlungen.</p>
+      </div>
+      <div class="leistung-card anim-up">
+        <div class="leistung-icon" style="background:none;padding:0;width:56px;height:56px"><img src="images/icon_workshop.png" alt="" width="56" height="56" style="width:56px;height:56px;object-fit:contain;border-radius:8px;background:#e8f4fa;padding:6px"></div>
+        <h3>Workshops &amp; Schulungen</h3>
+        <p>Praxisnahe Workshops zu Power BI, Prozessmanagement und Organisationsentwicklung – für Teams, die Wissen aufbauen, anwenden und verankern wollen. <a href="#workshops" style="color:var(--petrolblau); font-weight:600;">Aktuelle Termine →</a></p>
+      </div>
+      <div class="leistung-card anim-up">
         <div class="leistung-icon" style="background:none;padding:0;width:56px;height:56px"><img src="images/icon_prozess.png" alt="" width="56" height="56" style="width:56px;height:56px;object-fit:contain;border-radius:8px;background:#e8f4fa;padding:6px"></div>
         <h3>Prozessoptimierung</h3>
         <p>Wir analysieren Ihre Abläufe direkt vor Ort, identifizieren Engpässe und entwickeln gemeinsam mit Ihnen umsetzbare Lösungen – keine theoretischen Konzepte, sondern gelebte Praxis.</p>
@@ -115,16 +126,6 @@
         <h3>Shopfloor Management</h3>
         <p>Wir etablieren schlanke, wirksame Führungsroutinen direkt am Shopfloor – tägliche Besprechungen, Visualisierungen und Eskalationspfade, die Ihr Team entlasten.</p>
       </div>
-      <div class="leistung-card anim-up">
-        <div class="leistung-icon" style="background:none;padding:0;width:56px;height:56px"><img src="images/icon_workshop.png" alt="" width="56" height="56" style="width:56px;height:56px;object-fit:contain;border-radius:8px;background:#e8f4fa;padding:6px"></div>
-        <h3>Workshops &amp; Schulungen</h3>
-        <p>Praxisnahe Workshops zu Themen wie Power BI, Prozessmanagement und Organisationsentwicklung – für Teams, die Wissen aufbauen, anwenden und verankern wollen.</p>
-      </div>
-      <div class="leistung-card anim-up">
-        <div class="leistung-icon" style="background:none;padding:0;width:56px;height:56px"><img src="images/icon_einstieg.png" alt="" width="56" height="56" style="width:56px;height:56px;object-fit:contain;border-radius:8px;background:#e8f4fa;padding:6px"></div>
-        <h3>Einstiegsberatung</h3>
-        <p>Sie wissen nicht, wo anfangen? Mit unserem kalkulierbaren Einstiegspaket erhalten Sie in kurzer Zeit ein klares Bild Ihrer Situation und konkrete Handlungsempfehlungen.</p>
-      </div>
     </div>
   </div>
 </section>
@@ -140,38 +141,38 @@
     <div class="paket-grid">
       <div class="paket-card anim-up">
         <span class="paket-badge">Einstieg</span>
-        <h3>Orientierung</h3>
-        <p class="paket-desc">Ideal für Unternehmen, die einen strukturierten Überblick ihrer Situation gewinnen wollen – ohne große Vorab-Investition.</p>
+        <h3>Quick-Check</h3>
+        <p class="paket-desc">Ideal für Unternehmen, die einen strukturierten Überblick ihrer Situation gewinnen wollen – kompakt und ohne große Vorab-Investition.</p>
         <ul>
+          <li>8&thinsp;h Beratung als Festpaket</li>
+          <li>Fahrtkosten inklusive</li>
           <li>Strukturierter Betriebsrundgang</li>
-          <li>Analyse von 1–2 Kernprozessen</li>
           <li>Handlungsempfehlungen schriftlich</li>
-          <li>1 Präsentationstermin</li>
         </ul>
         <a href="kontakt.html" class="btn-secondary">Anfragen</a>
       </div>
       <div class="paket-card highlight anim-up">
         <span class="paket-badge">Empfohlen</span>
-        <h3>Umsetzung</h3>
+        <h3>Basic Tarif</h3>
         <p class="paket-desc">Wir begleiten Sie nicht nur bei der Analyse, sondern auch bei der konkreten Umsetzung der Maßnahmen in Ihrem Betrieb.</p>
         <ul>
-          <li>Tiefgehende Prozessanalyse</li>
+          <li>6&thinsp;h/Woche für 4 Wochen</li>
+          <li>Fahrtkosten inklusive</li>
           <li>Entwicklung von Strukturen &amp; Rollen</li>
           <li>Umsetzungsbegleitung vor Ort</li>
-          <li>Kennzahlen-Dashboard (Basis)</li>
           <li>BAFA-förderfähig</li>
         </ul>
         <a href="kontakt.html" class="btn-primary">Anfragen</a>
       </div>
       <div class="paket-card anim-up">
         <span class="paket-badge">Langfristig</span>
-        <h3>Begleitung</h3>
+        <h3>Allrounder Tarif</h3>
         <p class="paket-desc">Für Unternehmen, die einen langfristigen Partner für Weiterentwicklung und Stabilisierung ihrer Organisation suchen.</p>
         <ul>
-          <li>Alle Leistungen aus „Umsetzung"</li>
+          <li>6&thinsp;h/Woche für 10 Wochen</li>
+          <li>Fahrtkosten inklusive</li>
+          <li>Alle Leistungen aus „Basic Tarif"</li>
           <li>Regelmäßige Review-Termine</li>
-          <li>Workshop-Modul inklusive</li>
-          <li>Individuelle Kennzahlensysteme</li>
           <li>BAFA-förderfähig</li>
         </ul>
         <a href="kontakt.html" class="btn-secondary">Anfragen</a>
@@ -183,26 +184,51 @@
   </div>
 </section>
 
-<!-- WORKSHOPS PREVIEW -->
-<section aria-labelledby="workshops-heading">
+<!-- WORKSHOPS -->
+<section id="workshops" style="background:var(--warmgrau)" aria-labelledby="workshops-heading">
   <div class="container">
-    <div class="two-col">
-      <div class="col-text anim-up">
-        <span class="eyebrow">Workshops &amp; Schulungen</span>
-        <h2 id="workshops-heading">Wissen aufbauen, anwenden und verankern</h2>
-        <p>
-          Unsere Workshops sind praxisnah und auf produzierende Betriebe zugeschnitten. Wir kombinieren Theorie mit direkter Anwendung in Ihrem Unternehmen – damit das Gelernte nicht nach dem Workshop in der Schublade landet.
-        </p>
-        <p>
-          Aktuell in Planung und bald buchbar: Power&thinsp;BI für Produktionsbetriebe, Prozessmanagement-Workshop, Führungsroutinen im Shopfloor.
-        </p>
-        <a href="kontakt.html" class="btn-primary">Workshop anfragen</a>
+    <span class="eyebrow section-title-center" style="display:block;text-align:center">Workshops &amp; Schulungen</span>
+    <h2 class="section-title section-title-center" id="workshops-heading">Wissen aufbauen, anwenden und verankern</h2>
+    <p class="section-subtitle section-subtitle-center">
+      Unsere Workshops sind praxisnah und auf produzierende Betriebe zugeschnitten. Theorie trifft direkte Anwendung – damit das Gelernte nicht in der Schublade landet.
+    </p>
+
+    <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:28px; margin-top:0;">
+      <div class="paket-card anim-up" style="border-top-color:var(--petrolblau)">
+        <span class="paket-badge">Power BI · Einstieg</span>
+        <h3>Power BI Werkzeugkasten</h3>
+        <p class="paket-desc">Der Einstieg in die Welt von Power BI – ideal für alle, die täglich mit Excel arbeiten und ihre Auswertungen endlich übersichtlich gestalten wollen.</p>
+        <table style="width:100%; font-size:14px; color:var(--textlight); margin-bottom:24px;">
+          <tr><td style="padding:5px 0; font-weight:600; color:var(--dunkelblau); width:90px;">Start</td><td style="padding:5px 0;">06.07.2026</td></tr>
+          <tr><td style="padding:5px 0; font-weight:600; color:var(--dunkelblau);">Uhrzeit</td><td style="padding:5px 0;">16:00 – 17:15 Uhr</td></tr>
+          <tr><td style="padding:5px 0; font-weight:600; color:var(--dunkelblau);">Dauer</td><td style="padding:5px 0;">1× wöchentlich, 4 Wochen</td></tr>
+          <tr><td style="padding:5px 0; font-weight:600; color:var(--dunkelblau);">Kosten</td><td style="padding:5px 0;">149&thinsp;€ pro Teilnehmer</td></tr>
+        </table>
+        <a href="kontakt.html" class="btn-primary">Jetzt anmelden</a>
       </div>
-      <div class="col-image anim-up">
-        <img src="images/kasten_gluehbirne.png"
-             alt="Kasten mit Glühbirne – Ideen und Wissen strukturieren"
-             width="400" height="297" style="max-width:360px; margin:0 auto;">
+
+      <div class="paket-card highlight anim-up">
+        <span class="paket-badge">Power BI · Vertiefung</span>
+        <h3>Power BI Werkstatt</h3>
+        <p class="paket-desc">Für alle, die tiefer einsteigen und professionelle Dashboards entwickeln möchten – mit echten Beispielen statt Frontalunterricht.</p>
+        <table style="width:100%; font-size:14px; color:var(--textlight); margin-bottom:24px;">
+          <tr><td style="padding:5px 0; font-weight:600; color:var(--dunkelblau); width:90px;">Start</td><td style="padding:5px 0;">07.07.2026</td></tr>
+          <tr><td style="padding:5px 0; font-weight:600; color:var(--dunkelblau);">Uhrzeit</td><td style="padding:5px 0;">16:00 – 17:15 Uhr</td></tr>
+          <tr><td style="padding:5px 0; font-weight:600; color:var(--dunkelblau);">Dauer</td><td style="padding:5px 0;">1× wöchentlich, 6 Wochen</td></tr>
+          <tr><td style="padding:5px 0; font-weight:600; color:var(--dunkelblau);">Kosten</td><td style="padding:5px 0;">229&thinsp;€ pro Teilnehmer</td></tr>
+        </table>
+        <a href="kontakt.html" class="btn-primary">Jetzt anmelden</a>
       </div>
+    </div>
+
+    <div style="margin-top:40px; text-align:center;">
+      <p style="font-size:14px; color:var(--textlight); margin-bottom:16px; font-weight:600;">Weitere Themen in Planung – noch ohne festen Termin:</p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <span class="bafa-tag" style="background:white;">Prozessmanagement-Workshop</span>
+        <span class="bafa-tag" style="background:white;">Führungsroutinen im Shopfloor</span>
+        <span class="bafa-tag" style="background:white;">Excel für Fortgeschrittene</span>
+      </div>
+      <p style="font-size:13px; color:var(--textlight); margin-top:20px;">Interesse an einem dieser Themen? <a href="kontakt.html" style="color:var(--petrolblau); font-weight:600;">Schreiben Sie uns</a> – wir planen Termine auch nach Bedarf.</p>
     </div>
   </div>
 </section>
