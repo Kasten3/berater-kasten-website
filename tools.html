@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <style>
     .dash-tabs { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; justify-content:center; }
     .dash-tab-btn {
@@ -21,31 +22,37 @@
     .dash-panel { display:none; }
     .dash-panel.active { display:block; }
 
+    /* Power-BI-Themes je Dashboard (Farbrahmen wie in echten PBI-Reports) */
+    .dash-theme-blue   { --pbi-border:#9fc8e8; --pbi-fill:#eaf3fb; --pbi-accent:#2868a8; --pbi-bg:#f4f8fc; }
+    .dash-theme-khaki  { --pbi-border:#d8c98a; --pbi-fill:#faf6e6; --pbi-accent:#a3873a; --pbi-bg:#fbf8ef; }
+    .dash-theme-mint   { --pbi-border:#9ed4c2; --pbi-fill:#eaf7f2; --pbi-accent:#2f8a6b; --pbi-bg:#f3faf7; }
+
     .dash-wrap {
-      background:#f7f9fb; border-radius:20px; padding:18px 20px 20px;
+      background:var(--pbi-bg,#f7f9fb); border-radius:14px; padding:18px 20px 20px;
       box-shadow:0 16px 36px rgba(11,60,93,0.12), 0 4px 10px rgba(11,60,93,0.05);
-      border:1px solid #e3ddd4; max-width:1080px; margin:0 auto;
+      border:1.5px solid var(--pbi-border,#e3ddd4); max-width:1080px; margin:0 auto;
+      font-family:'Segoe UI', 'Open Sans', sans-serif;
     }
-    .dash-filterbar { display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid #e3ddd4; }
-    .dash-filter-group { display:flex; flex-direction:column; gap:3px; }
-    .dash-filter-group label { font-size:10px; font-weight:700; color:var(--petrolblau); text-transform:uppercase; letter-spacing:.04em; }
-    .dash-filter-group input[type="date"] { border:1.5px solid #dce3ea; border-radius:7px; padding:5px 8px; font-size:12px; font-family:'Open Sans',sans-serif; color:var(--text); }
-    .dash-toggles { display:flex; gap:6px; flex-wrap:wrap; }
+    .dash-filterbar { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-bottom:14px; }
+    .dash-filter-group { display:flex; flex-direction:column; gap:3px; background:var(--pbi-fill,#fff); border:1.5px solid var(--pbi-border,#dce3ea); border-radius:8px; padding:8px 12px; }
+    .dash-filter-group label { font-size:9.5px; font-weight:700; color:var(--pbi-accent,var(--petrolblau)); text-transform:uppercase; letter-spacing:.04em; }
+    .dash-filter-group input[type="date"] { border:1px solid var(--pbi-border,#dce3ea); border-radius:5px; padding:4px 7px; font-size:12px; font-family:inherit; color:var(--text); background:white; }
+    .dash-toggles { display:flex; gap:5px; flex-wrap:wrap; }
     .dash-toggle {
-      padding:6px 13px; border-radius:18px; border:1.5px solid var(--hellblau); background:white;
-      font-size:12px; font-weight:600; color:var(--textlight); cursor:pointer; transition:all .2s; user-select:none;
+      padding:6px 13px; border-radius:6px; border:1.3px solid var(--pbi-border,#dce3ea); background:white;
+      font-size:12px; font-weight:600; color:var(--text); cursor:pointer; transition:all .15s; user-select:none;
     }
-    .dash-toggle.active { background:var(--petrolblau); border-color:var(--petrolblau); color:white; }
-    .dash-kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
-    .dash-kpi { background:white; border-radius:12px; padding:12px 10px; text-align:center; box-shadow:0 2px 6px rgba(11,60,93,0.05); }
-    .dash-kpi .num { font-family:'Montserrat',sans-serif; font-weight:800; font-size:18px; color:var(--dunkelblau); line-height:1.2; }
+    .dash-toggle.active { background:var(--pbi-accent,var(--petrolblau)); border-color:var(--pbi-accent,var(--petrolblau)); color:white; }
+    .dash-kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0; }
+    .dash-kpi { background:var(--pbi-fill,#fff); border:1.5px solid var(--pbi-border,#e3ddd4); border-radius:10px; padding:12px 10px; text-align:center; }
+    .dash-kpi .num { font-family:'Segoe UI','Montserrat',sans-serif; font-weight:700; font-size:19px; color:var(--pbi-accent,var(--dunkelblau)); line-height:1.2; }
     .dash-kpi .lbl { font-size:10.5px; color:var(--textlight); margin-top:2px; }
     .dash-charts-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
-    .dash-card { background:white; border-radius:12px; padding:12px 14px; box-shadow:0 2px 6px rgba(11,60,93,0.05); }
-    .dash-card h4 { font-size:12.5px; color:var(--dunkelblau); margin-bottom:8px; font-family:'Montserrat',sans-serif; }
+    .dash-card { background:white; border:1.5px solid var(--pbi-border,#e3ddd4); border-radius:10px; padding:12px 14px; }
+    .dash-card h4 { font-size:12px; color:var(--pbi-accent,var(--dunkelblau)); margin-bottom:8px; font-family:'Segoe UI','Montserrat',sans-serif; font-weight:700; }
     .dash-table-wrap { max-height:160px; overflow-y:auto; }
     .dash-table { width:100%; font-size:11.5px; border-collapse:collapse; }
-    .dash-table th { text-align:left; color:var(--petrolblau); font-size:10px; text-transform:uppercase; letter-spacing:.03em; padding:5px 6px; border-bottom:1px solid #e3ddd4; position:sticky; top:0; background:white; }
+    .dash-table th { text-align:left; color:var(--pbi-accent,var(--petrolblau)); font-size:10px; text-transform:uppercase; letter-spacing:.03em; padding:5px 6px; border-bottom:1.5px solid var(--pbi-border,#e3ddd4); position:sticky; top:0; background:white; }
     .dash-table td { padding:5px 6px; border-bottom:1px solid #f0ece7; color:var(--text); }
     .dash-watermark { text-align:center; font-size:10.5px; color:var(--textlight); margin-top:2px; }
 
@@ -106,7 +113,7 @@
 
     <!-- PANEL: PRODUKTION -->
     <div class="dash-panel active" id="panel-produktion">
-      <div class="dash-wrap">
+      <div class="dash-wrap dash-theme-blue">
         <div class="dash-filterbar">
           <div class="dash-filter-group">
             <label>Von</label>
@@ -145,7 +152,7 @@
 
     <!-- PANEL: TECHNIK -->
     <div class="dash-panel" id="panel-technik">
-      <div class="dash-wrap">
+      <div class="dash-wrap dash-theme-khaki">
         <div class="dash-filterbar">
           <div class="dash-filter-group">
             <label>Status</label>
@@ -176,7 +183,7 @@
 
     <!-- PANEL: HR -->
     <div class="dash-panel" id="panel-hr">
-      <div class="dash-wrap">
+      <div class="dash-wrap dash-theme-mint">
         <div class="dash-filterbar">
           <div class="dash-filter-group">
             <label>Standort</label>
@@ -222,9 +229,9 @@
         <h2 id="whatis-heading">Was ist Power BI?</h2>
         <p style="color:var(--textlight); margin-bottom:0;">Muss man für jedes Dashboard gleich einen Berater holen? Nicht unbedingt. Wer täglich mit Excel arbeitet, kennt das Problem: Sobald mehrere Dateien, Auswertungen oder Kennzahlen zusammenkommen, wird es schnell unübersichtlich. Power BI führt Daten automatisch zusammen und macht daraus verständliche, interaktive Dashboards.</p>
         <ul class="pbi-points">
-          <li>Praxisnah, verständlich, direkt anwendbar</li>
-          <li>Echte Beispiele statt Frontalunterricht</li>
-          <li>In vielen Microsoft-365-Paketen bereits enthalten</li>
+          <li>Führt Daten aus Excel, Maschinen oder Buchhaltung automatisch zusammen</li>
+          <li>Macht Kennzahlen interaktiv auswertbar statt in Tabellen vergraben</li>
+          <li>In vielen Microsoft-365-Paketen bereits enthalten oder kostenlos nutzbar</li>
         </ul>
       </div>
     </div>
@@ -290,6 +297,9 @@ const HR = [{"Mitarbeiter_ID":1001,"Name":"Anna Weber","Abteilung":"Produktion",
 const fmtEUR = n => Math.round(n).toLocaleString('de-DE') + ' €';
 const fmtNum = n => Math.round(n).toLocaleString('de-DE');
 
+Chart.register(ChartDataLabels);
+Chart.defaults.font.family = "'Segoe UI', 'Open Sans', sans-serif";
+
 // ===== TAB SWITCHING =====
 document.querySelectorAll('.dash-tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -350,15 +360,17 @@ function makeToggles(container, items, activeSet, onChange) {
     produktion.forEach(r => byProductProd[r.Produkt] += r.Produzierte_Menge);
 
     const donutData = { labels: activeList, datasets: [{ data: activeList.map(p=>byProductSold[p]), backgroundColor: activeList.map(p=>COLORS[p]), borderWidth:2, borderColor:'#fff' }] };
+    const donutOpts = { plugins:{ legend:{ position:'bottom', labels:{ font:{ size:10 }, boxWidth:10 } }, datalabels:{ color:'#fff', font:{ weight:'bold', size:11 }, formatter:(v,ctx)=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total? Math.round(v/total*100)+'%':''; } } } };
     if (donutChart) { donutChart.data = donutData; donutChart.update(); }
-    else donutChart = new Chart(document.getElementById('p_chartDonut'), { type:'doughnut', data: donutData, options:{ plugins:{ legend:{ position:'bottom', labels:{ font:{ size:10 }, boxWidth:10 } } } } });
+    else donutChart = new Chart(document.getElementById('p_chartDonut'), { type:'doughnut', data: donutData, options: donutOpts });
 
     const barData = { labels: activeList, datasets: [
-      { label:'Produziert', data: activeList.map(p=>byProductProd[p]), backgroundColor:'#0B3C5D', borderRadius:3 },
-      { label:'Verkauft', data: activeList.map(p=>byProductSold[p]), backgroundColor:'#A9D6E5', borderRadius:3 }
+      { label:'Produziert', data: activeList.map(p=>byProductProd[p]), backgroundColor:'#0B3C5D', borderRadius:2 },
+      { label:'Verkauft', data: activeList.map(p=>byProductSold[p]), backgroundColor:'#A9D6E5', borderRadius:2 }
     ] };
+    const barOpts = { plugins:{ legend:{ position:'bottom', labels:{ font:{ size:10 }, boxWidth:10 } }, datalabels:{ anchor:'end', align:'top', font:{ size:9 }, color:'#333', formatter:v=>fmtNum(v) } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:9 } } }, x:{ ticks:{ font:{ size:9 } } } } };
     if (barChart) { barChart.data = barData; barChart.update(); }
-    else barChart = new Chart(document.getElementById('p_chartBar'), { type:'bar', data: barData, options:{ plugins:{ legend:{ position:'bottom', labels:{ font:{ size:10 }, boxWidth:10 } } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:9 } } }, x:{ ticks:{ font:{ size:9 } } } } } });
+    else barChart = new Chart(document.getElementById('p_chartBar'), { type:'bar', data: barData, options: barOpts });
 
     const byLand = {};
     verkauf.forEach(r => byLand[r.Land] = (byLand[r.Land]||0) + r.Umsatz_EUR);
@@ -396,18 +408,20 @@ function makeToggles(container, items, activeSet, onChange) {
     rows.forEach(r => byStatus[r.Status] = (byStatus[r.Status]||0)+1);
     const statusLabels = Object.keys(byStatus);
     const donutData = { labels: statusLabels, datasets:[{ data: statusLabels.map(s=>byStatus[s]), backgroundColor: statusLabels.map(s=>STATUS_COLORS[s]||'#999'), borderWidth:2, borderColor:'#fff' }] };
+    const donutOpts = { plugins:{ legend:{ position:'bottom', labels:{ font:{ size:9 }, boxWidth:9 } }, datalabels:{ color:'#fff', font:{ weight:'bold', size:10 }, formatter:(v,ctx)=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total? v+' ('+Math.round(v/total*100)+'%)':''; } } } };
     if (donutChart) { donutChart.data = donutData; donutChart.update(); }
-    else donutChart = new Chart(document.getElementById('t_chartDonut'), { type:'doughnut', data: donutData, options:{ plugins:{ legend:{ position:'bottom', labels:{ font:{ size:9 }, boxWidth:9 } } } } });
+    else donutChart = new Chart(document.getElementById('t_chartDonut'), { type:'doughnut', data: donutData, options: donutOpts });
 
     const byVerant = {};
     rows.forEach(r => { if(!byVerant[r.Verantwortlicher]) byVerant[r.Verantwortlicher]={budget:0,ist:0}; byVerant[r.Verantwortlicher].budget+=r.Budget; byVerant[r.Verantwortlicher].ist+=r.Istkosten; });
     const verantLabels = Object.keys(byVerant);
     const barData = { labels: verantLabels, datasets: [
-      { label:'Budget', data: verantLabels.map(v=>byVerant[v].budget), backgroundColor:'#0B3C5D', borderRadius:3 },
-      { label:'Istkosten', data: verantLabels.map(v=>byVerant[v].ist), backgroundColor:'#A9D6E5', borderRadius:3 }
+      { label:'Budget', data: verantLabels.map(v=>byVerant[v].budget), backgroundColor:'#0B3C5D', borderRadius:2 },
+      { label:'Istkosten', data: verantLabels.map(v=>byVerant[v].ist), backgroundColor:'#d8c98a', borderRadius:2 }
     ] };
+    const barOpts = { plugins:{ legend:{ position:'bottom', labels:{ font:{ size:9 }, boxWidth:9 } }, datalabels:{ anchor:'end', align:'top', font:{ size:8 }, color:'#333', formatter:v=>fmtEUR(v) } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:9 } } }, x:{ ticks:{ font:{ size:9 } } } } };
     if (barChart) { barChart.data = barData; barChart.update(); }
-    else barChart = new Chart(document.getElementById('t_chartBar'), { type:'bar', data: barData, options:{ plugins:{ legend:{ position:'bottom', labels:{ font:{ size:9 }, boxWidth:9 } } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:9 } } }, x:{ ticks:{ font:{ size:9 } } } } } });
+    else barChart = new Chart(document.getElementById('t_chartBar'), { type:'bar', data: barData, options: barOpts });
 
     document.getElementById('t_tableProjekte').innerHTML = rows.map(r => `<tr><td>${r.Projektname}</td><td>${fmtEUR(r.Budget)}</td><td>${fmtEUR(r.Istkosten)}</td><td>${r.Status}</td></tr>`).join('') || '<tr><td colspan="4">Keine Daten</td></tr>';
   }
@@ -442,15 +456,17 @@ function makeToggles(container, items, activeSet, onChange) {
     rows.forEach(r => byDept[r.Abteilung] = (byDept[r.Abteilung]||0)+1);
     const deptLabels = Object.keys(byDept);
     const donutData = { labels: deptLabels, datasets:[{ data: deptLabels.map(d=>byDept[d]), backgroundColor: deptLabels.map(d=>DEPT_COLORS[d]||'#999'), borderWidth:2, borderColor:'#fff' }] };
+    const donutOpts = { plugins:{ legend:{ position:'bottom', labels:{ font:{ size:9 }, boxWidth:9 } }, datalabels:{ color:'#fff', font:{ weight:'bold', size:10 }, formatter:(v,ctx)=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total? v+' ('+Math.round(v/total*100)+'%)':''; } } } };
     if (donutChart) { donutChart.data = donutData; donutChart.update(); }
-    else donutChart = new Chart(document.getElementById('h_chartDonut'), { type:'doughnut', data: donutData, options:{ plugins:{ legend:{ position:'bottom', labels:{ font:{ size:9 }, boxWidth:9 } } } } });
+    else donutChart = new Chart(document.getElementById('h_chartDonut'), { type:'doughnut', data: donutData, options: donutOpts });
 
     const krankByDept = {}, countByDept = {};
     rows.forEach(r => { krankByDept[r.Abteilung]=(krankByDept[r.Abteilung]||0)+r.Krankheitstage_2025; countByDept[r.Abteilung]=(countByDept[r.Abteilung]||0)+1; });
     const krankLabels = Object.keys(krankByDept);
-    const barData = { labels: krankLabels, datasets: [{ label:'Ø Kranktage', data: krankLabels.map(d=>krankByDept[d]/countByDept[d]), backgroundColor:'#1D6996', borderRadius:3 }] };
+    const barData = { labels: krankLabels, datasets: [{ label:'Ø Kranktage', data: krankLabels.map(d=>krankByDept[d]/countByDept[d]), backgroundColor:'#2f8a6b', borderRadius:2 }] };
+    const barOpts = { plugins:{ legend:{ display:false }, datalabels:{ anchor:'end', align:'top', font:{ size:9 }, color:'#333', formatter:v=>v.toFixed(1) } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:9 } } }, x:{ ticks:{ font:{ size:9 } } } } };
     if (barChart) { barChart.data = barData; barChart.update(); }
-    else barChart = new Chart(document.getElementById('h_chartBar'), { type:'bar', data: barData, options:{ plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true, ticks:{ font:{ size:9 } } }, x:{ ticks:{ font:{ size:9 } } } } } });
+    else barChart = new Chart(document.getElementById('h_chartBar'), { type:'bar', data: barData, options: barOpts });
   }
   update();
 })();
