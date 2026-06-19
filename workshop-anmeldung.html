@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Workshop-Anmeldung | Berater-Kasten</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .toggle-group { display: flex; gap: 10px; margin-bottom: 4px; }
+    .toggle-option {
+      flex: 1;
+      text-align: center;
+      padding: 12px 16px;
+      border: 1.5px solid #dce3ea;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--textlight);
+      transition: border-color .2s, background .2s, color .2s;
+      user-select: none;
+    }
+    .toggle-option.active {
+      border-color: var(--petrolblau);
+      background: #e8f4fa;
+      color: var(--petrolblau);
+    }
+    .toggle-option input { display: none; }
+    #firmaFeld { max-height: 0; overflow: hidden; transition: max-height .3s ease; }
+    #firmaFeld.show { max-height: 120px; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html"><img src="images/logo.png" alt="Berater-Kasten Logo" class="site-logo"></a>
+    <button class="nav-toggle" aria-label="Menü öffnen" onclick="this.nextElementSibling.classList.toggle('open')"><span></span><span></span><span></span></button>
+    <nav class="site-nav">
+      <a href="index.html">Startseite</a>
+      <a href="leistungen.html">Unsere Leistungen</a>
+      <a href="team.html">Das sind wir</a>
+      <a href="foerderung.html">Förderung</a>
+      <a href="kontakt.html" class="nav-cta">Kontakt aufnehmen</a>
+    </nav>
+  </div>
+</header>
+
+<section style="padding:64px 0;">
+  <div class="container" style="max-width:640px;">
+    <span class="eyebrow section-title-center" style="display:block;text-align:center">Workshop-Anmeldung</span>
+    <h1 class="section-title section-title-center" style="font-size:30px;" id="workshop-title">Zur Power BI Werkstatt anmelden</h1>
+    <p class="section-subtitle section-subtitle-center" style="margin-bottom:32px;">
+      Füllen Sie das Formular aus – wir bestätigen Ihren Platz per E-Mail und schicken alle weiteren Infos.
+    </p>
+
+    <div style="background:var(--warmgrau); border-radius:20px; padding:40px 36px; box-shadow:var(--shadow);">
+      <form action="https://formspree.io/f/YOURFORMID" method="POST" novalidate>
+
+        <div class="form-group">
+          <label for="workshop">Workshop</label>
+          <select id="workshop" name="workshop">
+            <option value="Power BI Werkzeugkasten">Power BI Werkzeugkasten – Start 06.07.2026 (149&thinsp;€)</option>
+            <option value="Power BI Werkstatt">Power BI Werkstatt – Start 07.07.2026 (229&thinsp;€)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="name">Vollständiger Name *</label>
+          <input type="text" id="name" name="name" placeholder="Ihr Name" required autocomplete="name">
+        </div>
+
+        <div class="form-group">
+          <label for="email">E-Mail-Adresse *</label>
+          <input type="email" id="email" name="email" placeholder="ihre@email.de" required autocomplete="email">
+        </div>
+
+        <div class="form-group">
+          <label for="telefon">Telefonnummer *</label>
+          <input type="tel" id="telefon" name="telefon" placeholder="+49 ..." required autocomplete="tel">
+        </div>
+
+        <div class="form-group">
+          <label>Anmeldung als *</label>
+          <div class="toggle-group">
+            <label class="toggle-option active" id="optPrivat">
+              <input type="radio" name="anmeldeart" value="Privatperson" checked>
+              Privatperson
+            </label>
+            <label class="toggle-option" id="optFirma">
+              <input type="radio" name="anmeldeart" value="Unternehmen">
+              Unternehmen
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group" id="firmaFeld">
+          <label for="unternehmen">Unternehmen</label>
+          <input type="text" id="unternehmen" name="unternehmen" placeholder="Name des Unternehmens" autocomplete="organization">
+        </div>
+
+        <div class="form-group" style="display:flex; align-items:flex-start; gap:12px; margin-top:8px; margin-bottom:24px;">
+          <input type="checkbox" id="datenschutz" name="datenschutz" required style="width:18px; height:18px; margin-top:2px; flex-shrink:0; accent-color:var(--petrolblau);">
+          <label for="datenschutz" style="font-size:13px; color:var(--textlight); font-family:'Open Sans',sans-serif; font-weight:400; cursor:pointer;">
+            Ich habe die <a href="datenschutz.html" style="color:var(--petrolblau);">Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner Daten zu.
+          </label>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width:100%; font-size:16px; padding:15px;">Verbindlich anmelden</button>
+      </form>
+    </div>
+
+    <p style="text-align:center; margin-top:24px; font-size:14px; color:var(--textlight);">
+      Allgemeine Frage statt Anmeldung? <a href="kontakt.html" style="color:var(--petrolblau); font-weight:600;">Zum Kontaktformular →</a>
+    </p>
+  </div>
+</section>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <img src="images/logo.png" alt="Berater-Kasten" class="footer-logo">
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Berater-Kasten · info@berater-kasten.de</span>
+      <div class="footer-legal">
+        <a href="impressum.html">Impressum</a>
+        <a href="datenschutz.html">Datenschutz</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Pre-select workshop from URL ?workshop=werkzeugkasten|werkstatt
+const params = new URLSearchParams(window.location.search);
+const w = params.get('workshop');
+const select = document.getElementById('workshop');
+const title = document.getElementById('workshop-title');
+if (w === 'werkzeugkasten') {
+  select.value = 'Power BI Werkzeugkasten';
+  title.textContent = 'Zum Power BI Werkzeugkasten anmelden';
+} else if (w === 'werkstatt') {
+  select.value = 'Power BI Werkstatt';
+  title.textContent = 'Zur Power BI Werkstatt anmelden';
+}
+
+// Toggle Privatperson / Unternehmen
+const optPrivat = document.getElementById('optPrivat');
+const optFirma = document.getElementById('optFirma');
+const firmaFeld = document.getElementById('firmaFeld');
+
+function setMode(isFirma) {
+  optPrivat.classList.toggle('active', !isFirma);
+  optFirma.classList.toggle('active', isFirma);
+  firmaFeld.classList.toggle('show', isFirma);
+}
+optPrivat.addEventListener('click', () => setMode(false));
+optFirma.addEventListener('click', () => setMode(true));
+</script>
+</body>
+</html>

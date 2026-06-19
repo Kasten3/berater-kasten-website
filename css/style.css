@@ -193,19 +193,19 @@ section { padding: 80px 0; }
 /* ── HERO ── */
 .hero {
   background: #f7f9fb;
-  padding: 0;
-  overflow: hidden;
+  padding: 0 0 56px;
+  overflow: visible;
 }
 .hero-inner {
   max-width: 1200px;
   margin: 0 auto;
   padding: 60px 40px 0;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 48px;
-  min-height: 520px;
+  min-height: 460px;
 }
-.hero-text { max-width: 540px; padding-bottom: 60px; flex-shrink: 0; }
+.hero-text { max-width: 540px; flex-shrink: 0; }
 .hero-text h1 { font-size: 48px; margin-bottom: 20px; }
 .hero-text h1 em { font-style: normal; color: var(--petrolblau); }
 .hero-text .lead {
@@ -225,6 +225,22 @@ section { padding: 80px 0; }
   border-radius: var(--radius);
   border: 1px solid #f5c99a;
 }
+.workshop-tag {
+  background: #e8f4fa;
+  color: var(--petrolblau);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  padding: 9px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--hellblau);
+  transition: transform .25s, box-shadow .25s, background .2s;
+}
+.workshop-tag:hover {
+  background: var(--hellblau);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(11,60,93,0.14);
+}
 .hero-image {
   flex: 1;
   display: flex;
@@ -235,7 +251,7 @@ section { padding: 80px 0; }
 .hero-image img {
   width: 100%;
   max-width: 560px;
-  border-radius: 20px 20px 0 0;
+  border-radius: 20px;
   box-shadow: var(--shadow-lg);
   object-fit: cover;
 }
@@ -256,22 +272,25 @@ section { padding: 80px 0; }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ── TRUST STRIP ── */
+/* ── TRUST STRIP (floating card) ── */
 .trust-strip {
-  background: var(--dunkelblau);
-  padding: 22px 40px;
+  background: transparent;
+  padding: 0 40px 64px;
 }
 .trust-inner {
-  max-width: 1000px;
+  max-width: 1100px;
   margin: 0 auto;
   display: flex;
   justify-content: center;
   gap: 0;
+  background: var(--dunkelblau);
+  border-radius: 20px;
+  box-shadow: 0 20px 44px rgba(11,60,93,0.22), 0 4px 12px rgba(11,60,93,0.10);
 }
 .trust-item {
   flex: 1;
   text-align: center;
-  padding: 14px 20px;
+  padding: 22px 20px;
   border-right: 1px solid rgba(255,255,255,0.15);
   color: rgba(255,255,255,0.8);
   font-size: 13px;
@@ -328,9 +347,7 @@ section { padding: 80px 0; }
 }
 
 .hero-image img {
-  width: 100%;
   height: auto;
-  object-fit: contain;
 }
 .two-col .col-text h2 { font-size: 30px; margin-bottom: 16px; }
 .two-col .col-text p { color: var(--textlight); margin-bottom: 16px; }
