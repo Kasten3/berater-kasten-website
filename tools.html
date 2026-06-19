@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tools zum Ausprobieren – Power BI Demo-Dashboard | Berater-Kasten</title>
+  <meta name="description" content="Testen Sie ein interaktives Power-BI-Beispiel-Dashboard direkt im Browser – mit echten Filtern, Diagrammen und Kennzahlen. Sehen Sie, was Power BI für Ihr Unternehmen leisten kann.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    .dash-wrap {
+      background: #f7f9fb;
+      border-radius: 24px;
+      padding: 28px 28px 32px;
+      box-shadow: 0 20px 44px rgba(11,60,93,0.14), 0 4px 12px rgba(11,60,93,0.06);
+      border: 1px solid #e3ddd4;
+    }
+    .dash-filterbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid #e3ddd4;
+    }
+    .dash-filter-group { display: flex; flex-direction: column; gap: 4px; }
+    .dash-filter-group label { font-size: 11px; font-weight: 700; color: var(--petrolblau); text-transform: uppercase; letter-spacing: .04em; }
+    .dash-filter-group input[type="date"] {
+      border: 1.5px solid #dce3ea; border-radius: 8px; padding: 7px 10px; font-size: 13px; font-family: 'Open Sans', sans-serif; color: var(--text);
+    }
+    .dash-product-toggles { display: flex; gap: 8px; flex-wrap: wrap; }
+    .dash-toggle {
+      padding: 8px 16px; border-radius: 20px; border: 1.5px solid var(--hellblau);
+      background: white; font-size: 13px; font-weight: 600; color: var(--textlight);
+      cursor: pointer; transition: all .2s; user-select: none;
+    }
+    .dash-toggle.active { background: var(--petrolblau); border-color: var(--petrolblau); color: white; }
+    .dash-kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+    .dash-kpi {
+      background: white; border-radius: 14px; padding: 18px 16px; text-align: center;
+      box-shadow: 0 2px 8px rgba(11,60,93,0.06);
+    }
+    .dash-kpi .num { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 24px; color: var(--dunkelblau); }
+    .dash-kpi .lbl { font-size: 12px; color: var(--textlight); margin-top: 2px; }
+    .dash-charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .dash-card { background: white; border-radius: 14px; padding: 18px 20px; box-shadow: 0 2px 8px rgba(11,60,93,0.06); }
+    .dash-card h4 { font-size: 14px; color: var(--dunkelblau); margin-bottom: 12px; font-family: 'Montserrat', sans-serif; }
+    .dash-table { width: 100%; font-size: 13px; }
+    .dash-table th { text-align: left; color: var(--petrolblau); font-size: 11px; text-transform: uppercase; letter-spacing: .03em; padding-bottom: 8px; border-bottom: 1px solid #e3ddd4; }
+    .dash-table td { padding: 7px 0; border-bottom: 1px solid #f0ece7; color: var(--text); }
+    .dash-watermark {
+      text-align: center; font-size: 11px; color: var(--textlight); margin-top: 4px;
+    }
+    .preview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 40px; }
+    .preview-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid rgba(169,214,229,0.3); }
+    .preview-card img { width: 100%; display: block; filter: saturate(0.85); }
+    .preview-card .body { padding: 18px 20px; }
+    .preview-card h3 { font-size: 15px; margin-bottom: 6px; }
+    .preview-card p { font-size: 13px; color: var(--textlight); }
+    .preview-badge {
+      display: inline-block; background: #fdecd8; color: #7a4310; font-size: 11px; font-weight: 700;
+      padding: 4px 10px; border-radius: 20px; margin-top: 10px;
+    }
+    @media (max-width: 900px) {
+      .dash-kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .dash-charts-row { grid-template-columns: 1fr; }
+      .preview-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html"><img src="images/logo.png" alt="Berater-Kasten Logo" class="site-logo"></a>
+    <button class="nav-toggle" aria-label="Menü öffnen" onclick="this.nextElementSibling.classList.toggle('open')"><span></span><span></span><span></span></button>
+    <nav class="site-nav">
+      <a href="index.html">Startseite</a>
+      <a href="leistungen.html">Unsere Leistungen</a>
+      <a href="team.html">Das sind wir</a>
+      <a href="foerderung.html">Förderung</a>
+      <a href="tools.html" class="active">Tools</a>
+      <a href="faq.html">FAQ</a>
+      <a href="kontakt.html" class="nav-cta">Kontakt aufnehmen</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero" aria-label="Seiteneinleitung">
+  <h1>Tools zum Ausprobieren</h1>
+  <p>Bevor Sie sich für ein Werkzeug entscheiden, sollten Sie wissen, was es wirklich kann. Testen Sie selbst.</p>
+</section>
+
+<!-- WAS IST POWER BI -->
+<section aria-labelledby="whatis-heading">
+  <div class="container">
+    <div class="two-col">
+      <div class="col-text anim-up">
+        <span class="eyebrow">Für alle, die Power BI noch nicht kennen</span>
+        <h2 id="whatis-heading">Was ist Power BI eigentlich?</h2>
+        <p>Power BI ist ein Werkzeug, das Daten aus Excel, Buchhaltung oder Maschinen automatisch zusammenführt und als verständliche, interaktive Dashboards darstellt – statt mühsam Zahlen aus mehreren Tabellen zusammenzusuchen.</p>
+        <p>Das Besondere: Sie können live filtern, reinzoomen und Zusammenhänge entdecken, die in einer reinen Excel-Tabelle untergehen würden. Probieren Sie es direkt unten mit einem Beispiel-Dashboard aus einer fiktiven Produktionsfirma aus.</p>
+      </div>
+      <div class="col-image anim-up">
+        <img src="images/kopf_kasten.jpg" alt="Daten verstehen, Entscheidungen treffen" width="560" height="373">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTERAKTIVE DEMO -->
+<section style="background:var(--warmgrau)" aria-labelledby="demo-heading">
+  <div class="container">
+    <span class="eyebrow section-title-center" style="display:block;text-align:center">Live-Demo</span>
+    <h2 class="section-title section-title-center" id="demo-heading">Probieren Sie es selbst aus</h2>
+    <p class="section-subtitle section-subtitle-center">
+      Filtern Sie nach Zeitraum und Produkt – die Diagramme reagieren sofort. Beispieldaten einer fiktiven Firma „Musterwerk GmbH", keine echten Kundendaten.
+    </p>
+
+    <div class="dash-wrap anim-up">
+      <div class="dash-filterbar">
+        <div class="dash-filter-group">
+          <label>Von</label>
+          <input type="date" id="dateFrom" value="2025-01-01" min="2025-01-01" max="2025-02-28">
+        </div>
+        <div class="dash-filter-group">
+          <label>Bis</label>
+          <input type="date" id="dateTo" value="2025-02-28" min="2025-01-01" max="2025-02-28">
+        </div>
+        <div class="dash-filter-group" style="flex:1;">
+          <label>Produkt</label>
+          <div class="dash-product-toggles" id="productToggles"></div>
+        </div>
+      </div>
+
+      <div class="dash-kpi-row">
+        <div class="dash-kpi"><div class="num" id="kpiUmsatz">–</div><div class="lbl">Umsatz gesamt</div></div>
+        <div class="dash-kpi"><div class="num" id="kpiMenge">–</div><div class="lbl">Verkaufte Menge</div></div>
+        <div class="dash-kpi"><div class="num" id="kpiProduziert">–</div><div class="lbl">Produzierte Menge</div></div>
+        <div class="dash-kpi"><div class="num" id="kpiTaktzeit">–</div><div class="lbl">Ø Taktzeit (Min.)</div></div>
+      </div>
+
+      <div class="dash-charts-row">
+        <div class="dash-card">
+          <h4>Verkaufte Menge je Produkt</h4>
+          <canvas id="chartDonut" height="220"></canvas>
+        </div>
+        <div class="dash-card">
+          <h4>Produziert vs. verkauft je Produkt</h4>
+          <canvas id="chartBar" height="220"></canvas>
+        </div>
+      </div>
+
+      <div class="dash-card">
+        <h4>Umsatz nach Land</h4>
+        <table class="dash-table">
+          <thead><tr><th>Land</th><th>Umsatz</th></tr></thead>
+          <tbody id="tableLand"></tbody>
+        </table>
+      </div>
+
+      <p class="dash-watermark">Beispieldaten · Musterwerk GmbH (fiktiv) · zur Veranschaulichung</p>
+    </div>
+  </div>
+</section>
+
+<!-- WEITERE TOOLS -->
+<section aria-labelledby="weitere-heading">
+  <div class="container">
+    <span class="eyebrow section-title-center" style="display:block;text-align:center">In Vorbereitung</span>
+    <h2 class="section-title section-title-center" id="weitere-heading">Weitere Dashboards folgen</h2>
+    <p class="section-subtitle section-subtitle-center">
+      Wir bauen laufend weitere interaktive Beispiele aus unseren Projekten – darunter:
+    </p>
+    <div class="preview-grid">
+      <div class="preview-card anim-up">
+        <img src="images/preview_einkauf.jpg" alt="Vorschau Einkauf-Dashboard">
+        <div class="body">
+          <h3>Strategischer Einkauf</h3>
+          <p>Bestellwerte, Lieferanten und Reklamationsquoten auf einen Blick.</p>
+          <span class="preview-badge">Demo folgt in Kürze</span>
+        </div>
+      </div>
+      <div class="preview-card anim-up">
+        <img src="images/preview_hrprojekte.jpg" alt="Vorschau Projekt-Controlling Dashboard">
+        <div class="body">
+          <h3>Projekt-Controlling</h3>
+          <p>Budget, Istkosten und Status aller laufenden Projekte im Überblick.</p>
+          <span class="preview-badge">Demo folgt in Kürze</span>
+        </div>
+      </div>
+      <div class="preview-card anim-up">
+        <img src="images/preview_personal.jpg" alt="Vorschau Personalcontrolling Dashboard">
+        <div class="body">
+          <h3>Personalcontrolling</h3>
+          <p>Kranktage, Altersstruktur und Gehaltsdaten je Abteilung und Standort.</p>
+          <span class="preview-badge">Demo folgt in Kürze</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding:0 40px 80px; text-align:center;">
+  <div class="container" style="max-width:1100px; padding:0;">
+    <div style="background:var(--dunkelblau); border-radius:24px; padding:48px 40px; box-shadow:0 24px 48px rgba(11,60,93,0.20), 0 4px 12px rgba(11,60,93,0.08);">
+      <h2 style="color:white; font-size:26px; margin-bottom:14px;">Neugierig, was Power BI für Ihren Betrieb leisten könnte?</h2>
+      <p style="color:rgba(255,255,255,0.75); margin-bottom:24px; max-width:480px; margin-left:auto; margin-right:auto;">Im Power BI Werkzeugkasten zeigen wir Ihnen den Einstieg – praxisnah und ohne Vorwissen.</p>
+      <a href="leistungen.html#workshops" class="btn-primary" style="background:var(--gelb); color:var(--dunkelblau);">Zu den Power BI Workshops</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <img src="images/logo.png" alt="Berater-Kasten" class="footer-logo">
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Berater-Kasten · info@berater-kasten.de</span>
+      <div class="footer-legal">
+        <a href="impressum.html">Impressum</a>
+        <a href="datenschutz.html">Datenschutz</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const RAWDATA = {"verkauf":[{"Datum":"2025-01-01","Produkt":"Tasse","Verkaufte_Menge":37,"Stueckpreis_EUR":9.42,"Umsatz_EUR":348.54,"Land":"Deutschland"},{"Datum":"2025-01-01","Produkt":"Teller","Verkaufte_Menge":68,"Stueckpreis_EUR":15.52,"Umsatz_EUR":1055.36,"Land":"Schweiz"},{"Datum":"2025-01-02","Produkt":"Schale","Verkaufte_Menge":71,"Stueckpreis_EUR":12.78,"Umsatz_EUR":907.38,"Land":"Österreich"},{"Datum":"2025-01-02","Produkt":"Topf","Verkaufte_Menge":59,"Stueckpreis_EUR":41.85,"Umsatz_EUR":2469.15,"Land":"Polen"},{"Datum":"2025-01-03","Produkt":"Pfanne","Verkaufte_Menge":66,"Stueckpreis_EUR":51.18,"Umsatz_EUR":3377.88,"Land":"Dänemark"},{"Datum":"2025-01-04","Produkt":"Tasse","Verkaufte_Menge":74,"Stueckpreis_EUR":9.07,"Umsatz_EUR":671.18,"Land":"Deutschland"},{"Datum":"2025-01-04","Produkt":"Teller","Verkaufte_Menge":98,"Stueckpreis_EUR":14.96,"Umsatz_EUR":1466.08,"Land":"Schweiz"},{"Datum":"2025-01-04","Produkt":"Schale","Verkaufte_Menge":91,"Stueckpreis_EUR":13.07,"Umsatz_EUR":1189.37,"Land":"Deutschland"},{"Datum":"2025-01-05","Produkt":"Topf","Verkaufte_Menge":109,"Stueckpreis_EUR":39.58,"Umsatz_EUR":4314.22,"Land":"Schweiz"},{"Datum":"2025-01-05","Produkt":"Pfanne","Verkaufte_Menge":18,"Stueckpreis_EUR":52.22,"Umsatz_EUR":939.96,"Land":"Österreich"},{"Datum":"2025-01-06","Produkt":"Tasse","Verkaufte_Menge":69,"Stueckpreis_EUR":8.97,"Umsatz_EUR":618.93,"Land":"Deutschland"},{"Datum":"2025-01-07","Produkt":"Teller","Verkaufte_Menge":81,"Stueckpreis_EUR":15.02,"Umsatz_EUR":1216.62,"Land":"Schweiz"},{"Datum":"2025-01-07","Produkt":"Schale","Verkaufte_Menge":41,"Stueckpreis_EUR":12.69,"Umsatz_EUR":520.29,"Land":"Österreich"},{"Datum":"2025-01-08","Produkt":"Topf","Verkaufte_Menge":36,"Stueckpreis_EUR":41.39,"Umsatz_EUR":1490.04,"Land":"Polen"},{"Datum":"2025-01-08","Produkt":"Pfanne","Verkaufte_Menge":95,"Stueckpreis_EUR":51.8,"Umsatz_EUR":4921,"Land":"Deutschland"},{"Datum":"2025-01-09","Produkt":"Tasse","Verkaufte_Menge":66,"Stueckpreis_EUR":9.39,"Umsatz_EUR":619.74,"Land":"Schweiz"},{"Datum":"2025-01-10","Produkt":"Teller","Verkaufte_Menge":105,"Stueckpreis_EUR":15.54,"Umsatz_EUR":1631.7,"Land":"Österreich"},{"Datum":"2025-01-10","Produkt":"Schale","Verkaufte_Menge":92,"Stueckpreis_EUR":13.02,"Umsatz_EUR":1197.84,"Land":"Polen"},{"Datum":"2025-01-11","Produkt":"Topf","Verkaufte_Menge":77,"Stueckpreis_EUR":39.24,"Umsatz_EUR":3021.48,"Land":"Dänemark"},{"Datum":"2025-01-11","Produkt":"Pfanne","Verkaufte_Menge":82,"Stueckpreis_EUR":50.37,"Umsatz_EUR":4130.34,"Land":"Dänemark"},{"Datum":"2025-01-11","Produkt":"Tasse","Verkaufte_Menge":120,"Stueckpreis_EUR":8.78,"Umsatz_EUR":1053.6,"Land":"Deutschland"},{"Datum":"2025-01-12","Produkt":"Teller","Verkaufte_Menge":20,"Stueckpreis_EUR":14.66,"Umsatz_EUR":293.2,"Land":"Deutschland"},{"Datum":"2025-01-13","Produkt":"Schale","Verkaufte_Menge":36,"Stueckpreis_EUR":11.99,"Umsatz_EUR":431.64,"Land":"Schweiz"},{"Datum":"2025-01-13","Produkt":"Topf","Verkaufte_Menge":76,"Stueckpreis_EUR":40.41,"Umsatz_EUR":3071.16,"Land":"Österreich"},{"Datum":"2025-01-14","Produkt":"Pfanne","Verkaufte_Menge":62,"Stueckpreis_EUR":51.44,"Umsatz_EUR":3189.28,"Land":"Polen"},{"Datum":"2025-01-14","Produkt":"Tasse","Verkaufte_Menge":119,"Stueckpreis_EUR":8.57,"Umsatz_EUR":1019.83,"Land":"Dänemark"},{"Datum":"2025-01-14","Produkt":"Teller","Verkaufte_Menge":78,"Stueckpreis_EUR":14.78,"Umsatz_EUR":1152.84,"Land":"Schweiz"},{"Datum":"2025-01-15","Produkt":"Schale","Verkaufte_Menge":52,"Stueckpreis_EUR":12.09,"Umsatz_EUR":628.68,"Land":"Österreich"},{"Datum":"2025-01-16","Produkt":"Topf","Verkaufte_Menge":72,"Stueckpreis_EUR":38.11,"Umsatz_EUR":2743.92,"Land":"Deutschland"},{"Datum":"2025-01-17","Produkt":"Pfanne","Verkaufte_Menge":108,"Stueckpreis_EUR":51.1,"Umsatz_EUR":5518.8,"Land":"Schweiz"},{"Datum":"2025-01-17","Produkt":"Tasse","Verkaufte_Menge":52,"Stueckpreis_EUR":9.35,"Umsatz_EUR":486.2,"Land":"Österreich"},{"Datum":"2025-01-18","Produkt":"Teller","Verkaufte_Menge":50,"Stueckpreis_EUR":15.52,"Umsatz_EUR":776,"Land":"Polen"},{"Datum":"2025-01-19","Produkt":"Schale","Verkaufte_Menge":67,"Stueckpreis_EUR":13.11,"Umsatz_EUR":878.37,"Land":"Deutschland"},{"Datum":"2025-01-19","Produkt":"Topf","Verkaufte_Menge":31,"Stueckpreis_EUR":40.9,"Umsatz_EUR":1267.9,"Land":"Schweiz"},{"Datum":"2025-01-19","Produkt":"Pfanne","Verkaufte_Menge":59,"Stueckpreis_EUR":50.28,"Umsatz_EUR":2966.52,"Land":"Österreich"},{"Datum":"2025-01-20","Produkt":"Tasse","Verkaufte_Menge":89,"Stueckpreis_EUR":8.94,"Umsatz_EUR":795.66,"Land":"Polen"},{"Datum":"2025-01-20","Produkt":"Teller","Verkaufte_Menge":97,"Stueckpreis_EUR":14.55,"Umsatz_EUR":1411.35,"Land":"Dänemark"},{"Datum":"2025-01-21","Produkt":"Schale","Verkaufte_Menge":47,"Stueckpreis_EUR":13.06,"Umsatz_EUR":613.82,"Land":"Österreich"},{"Datum":"2025-01-22","Produkt":"Topf","Verkaufte_Menge":28,"Stueckpreis_EUR":38.54,"Umsatz_EUR":1079.12,"Land":"Deutschland"},{"Datum":"2025-01-22","Produkt":"Pfanne","Verkaufte_Menge":57,"Stueckpreis_EUR":47.94,"Umsatz_EUR":2732.58,"Land":"Schweiz"},{"Datum":"2025-01-23","Produkt":"Tasse","Verkaufte_Menge":54,"Stueckpreis_EUR":8.77,"Umsatz_EUR":473.58,"Land":"Österreich"},{"Datum":"2025-01-24","Produkt":"Teller","Verkaufte_Menge":22,"Stueckpreis_EUR":14.96,"Umsatz_EUR":329.12,"Land":"Polen"},{"Datum":"2025-01-24","Produkt":"Schale","Verkaufte_Menge":32,"Stueckpreis_EUR":11.96,"Umsatz_EUR":382.72,"Land":"Dänemark"},{"Datum":"2025-01-24","Produkt":"Topf","Verkaufte_Menge":85,"Stueckpreis_EUR":40.08,"Umsatz_EUR":3406.8,"Land":"Polen"},{"Datum":"2025-01-25","Produkt":"Pfanne","Verkaufte_Menge":71,"Stueckpreis_EUR":48.18,"Umsatz_EUR":3420.78,"Land":"Dänemark"},{"Datum":"2025-01-26","Produkt":"Tasse","Verkaufte_Menge":110,"Stueckpreis_EUR":8.62,"Umsatz_EUR":948.2,"Land":"Deutschland"},{"Datum":"2025-01-26","Produkt":"Teller","Verkaufte_Menge":97,"Stueckpreis_EUR":15.63,"Umsatz_EUR":1516.11,"Land":"Deutschland"},{"Datum":"2025-01-26","Produkt":"Schale","Verkaufte_Menge":113,"Stueckpreis_EUR":12.47,"Umsatz_EUR":1409.11,"Land":"Schweiz"},{"Datum":"2025-01-27","Produkt":"Topf","Verkaufte_Menge":120,"Stueckpreis_EUR":38.33,"Umsatz_EUR":4599.6,"Land":"Österreich"},{"Datum":"2025-01-28","Produkt":"Pfanne","Verkaufte_Menge":19,"Stueckpreis_EUR":50.35,"Umsatz_EUR":956.65,"Land":"Polen"},{"Datum":"2025-01-28","Produkt":"Tasse","Verkaufte_Menge":35,"Stueckpreis_EUR":9.12,"Umsatz_EUR":319.2,"Land":"Dänemark"},{"Datum":"2025-01-29","Produkt":"Teller","Verkaufte_Menge":46,"Stueckpreis_EUR":15.63,"Umsatz_EUR":718.98,"Land":"Schweiz"},{"Datum":"2025-01-30","Produkt":"Schale","Verkaufte_Menge":46,"Stueckpreis_EUR":12.46,"Umsatz_EUR":573.16,"Land":"Österreich"},{"Datum":"2025-01-31","Produkt":"Topf","Verkaufte_Menge":84,"Stueckpreis_EUR":40.37,"Umsatz_EUR":3391.08,"Land":"Deutschland"},{"Datum":"2025-02-01","Produkt":"Pfanne","Verkaufte_Menge":56,"Stueckpreis_EUR":47.71,"Umsatz_EUR":2671.76,"Land":"Schweiz"},{"Datum":"2025-02-01","Produkt":"Tasse","Verkaufte_Menge":51,"Stueckpreis_EUR":9.06,"Umsatz_EUR":462.06,"Land":"Österreich"},{"Datum":"2025-02-02","Produkt":"Teller","Verkaufte_Menge":89,"Stueckpreis_EUR":14.87,"Umsatz_EUR":1323.43,"Land":"Polen"},{"Datum":"2025-02-03","Produkt":"Schale","Verkaufte_Menge":104,"Stueckpreis_EUR":12.61,"Umsatz_EUR":1311.44,"Land":"Dänemark"},{"Datum":"2025-02-03","Produkt":"Topf","Verkaufte_Menge":27,"Stueckpreis_EUR":40.82,"Umsatz_EUR":1102.14,"Land":"Polen"},{"Datum":"2025-02-04","Produkt":"Pfanne","Verkaufte_Menge":95,"Stueckpreis_EUR":48.03,"Umsatz_EUR":4562.85,"Land":"Deutschland"},{"Datum":"2025-02-04","Produkt":"Tasse","Verkaufte_Menge":51,"Stueckpreis_EUR":9.17,"Umsatz_EUR":467.67,"Land":"Schweiz"},{"Datum":"2025-02-05","Produkt":"Teller","Verkaufte_Menge":116,"Stueckpreis_EUR":15.62,"Umsatz_EUR":1811.92,"Land":"Österreich"},{"Datum":"2025-02-05","Produkt":"Schale","Verkaufte_Menge":65,"Stueckpreis_EUR":12.8,"Umsatz_EUR":832,"Land":"Polen"},{"Datum":"2025-02-06","Produkt":"Topf","Verkaufte_Menge":88,"Stueckpreis_EUR":39.45,"Umsatz_EUR":3471.6,"Land":"Dänemark"},{"Datum":"2025-02-06","Produkt":"Pfanne","Verkaufte_Menge":27,"Stueckpreis_EUR":48.67,"Umsatz_EUR":1314.09,"Land":"Dänemark"},{"Datum":"2025-02-06","Produkt":"Tasse","Verkaufte_Menge":26,"Stueckpreis_EUR":9,"Umsatz_EUR":234,"Land":"Deutschland"},{"Datum":"2025-02-07","Produkt":"Teller","Verkaufte_Menge":76,"Stueckpreis_EUR":14.53,"Umsatz_EUR":1104.28,"Land":"Deutschland"},{"Datum":"2025-02-07","Produkt":"Schale","Verkaufte_Menge":62,"Stueckpreis_EUR":13.04,"Umsatz_EUR":808.48,"Land":"Schweiz"},{"Datum":"2025-02-08","Produkt":"Topf","Verkaufte_Menge":103,"Stueckpreis_EUR":38.44,"Umsatz_EUR":3959.32,"Land":"Österreich"},{"Datum":"2025-02-09","Produkt":"Pfanne","Verkaufte_Menge":59,"Stueckpreis_EUR":47.8,"Umsatz_EUR":2820.2,"Land":"Polen"},{"Datum":"2025-02-09","Produkt":"Tasse","Verkaufte_Menge":87,"Stueckpreis_EUR":9.3,"Umsatz_EUR":809.1,"Land":"Dänemark"},{"Datum":"2025-02-10","Produkt":"Teller","Verkaufte_Menge":17,"Stueckpreis_EUR":15.3,"Umsatz_EUR":260.1,"Land":"Schweiz"},{"Datum":"2025-02-11","Produkt":"Schale","Verkaufte_Menge":77,"Stueckpreis_EUR":12.29,"Umsatz_EUR":946.33,"Land":"Österreich"},{"Datum":"2025-02-11","Produkt":"Topf","Verkaufte_Menge":27,"Stueckpreis_EUR":38.48,"Umsatz_EUR":1038.96,"Land":"Polen"},{"Datum":"2025-02-12","Produkt":"Pfanne","Verkaufte_Menge":111,"Stueckpreis_EUR":47.82,"Umsatz_EUR":5308.02,"Land":"Deutschland"},{"Datum":"2025-02-12","Produkt":"Tasse","Verkaufte_Menge":76,"Stueckpreis_EUR":8.82,"Umsatz_EUR":670.32,"Land":"Schweiz"},{"Datum":"2025-02-13","Produkt":"Teller","Verkaufte_Menge":26,"Stueckpreis_EUR":14.94,"Umsatz_EUR":388.44,"Land":"Österreich"},{"Datum":"2025-02-14","Produkt":"Schale","Verkaufte_Menge":20,"Stueckpreis_EUR":12.78,"Umsatz_EUR":255.6,"Land":"Polen"},{"Datum":"2025-02-15","Produkt":"Topf","Verkaufte_Menge":34,"Stueckpreis_EUR":40.5,"Umsatz_EUR":1377,"Land":"Dänemark"},{"Datum":"2025-02-15","Produkt":"Pfanne","Verkaufte_Menge":73,"Stueckpreis_EUR":49.46,"Umsatz_EUR":3610.58,"Land":"Dänemark"},{"Datum":"2025-02-15","Produkt":"Tasse","Verkaufte_Menge":52,"Stueckpreis_EUR":8.88,"Umsatz_EUR":461.76,"Land":"Deutschland"},{"Datum":"2025-02-16","Produkt":"Teller","Verkaufte_Menge":99,"Stueckpreis_EUR":14.85,"Umsatz_EUR":1470.15,"Land":"Deutschland"},{"Datum":"2025-02-17","Produkt":"Schale","Verkaufte_Menge":19,"Stueckpreis_EUR":12.37,"Umsatz_EUR":235.03,"Land":"Schweiz"},{"Datum":"2025-02-18","Produkt":"Topf","Verkaufte_Menge":79,"Stueckpreis_EUR":39.35,"Umsatz_EUR":3108.65,"Land":"Österreich"},{"Datum":"2025-02-18","Produkt":"Pfanne","Verkaufte_Menge":22,"Stueckpreis_EUR":50.62,"Umsatz_EUR":1113.64,"Land":"Polen"},{"Datum":"2025-02-19","Produkt":"Tasse","Verkaufte_Menge":54,"Stueckpreis_EUR":9.2,"Umsatz_EUR":496.8,"Land":"Dänemark"},{"Datum":"2025-02-20","Produkt":"Teller","Verkaufte_Menge":41,"Stueckpreis_EUR":14.72,"Umsatz_EUR":603.52,"Land":"Schweiz"},{"Datum":"2025-02-21","Produkt":"Schale","Verkaufte_Menge":112,"Stueckpreis_EUR":12.96,"Umsatz_EUR":1451.52,"Land":"Österreich"},{"Datum":"2025-02-21","Produkt":"Topf","Verkaufte_Menge":40,"Stueckpreis_EUR":41.79,"Umsatz_EUR":1671.6,"Land":"Deutschland"},{"Datum":"2025-02-22","Produkt":"Pfanne","Verkaufte_Menge":65,"Stueckpreis_EUR":49.77,"Umsatz_EUR":3235.05,"Land":"Schweiz"},{"Datum":"2025-02-22","Produkt":"Tasse","Verkaufte_Menge":46,"Stueckpreis_EUR":9.43,"Umsatz_EUR":433.78,"Land":"Österreich"},{"Datum":"2025-02-23","Produkt":"Teller","Verkaufte_Menge":23,"Stueckpreis_EUR":14.54,"Umsatz_EUR":334.42,"Land":"Polen"},{"Datum":"2025-02-23","Produkt":"Schale","Verkaufte_Menge":81,"Stueckpreis_EUR":12.23,"Umsatz_EUR":990.63,"Land":"Dänemark"},{"Datum":"2025-02-24","Produkt":"Topf","Verkaufte_Menge":75,"Stueckpreis_EUR":41.23,"Umsatz_EUR":3092.25,"Land":"Polen"},{"Datum":"2025-02-25","Produkt":"Pfanne","Verkaufte_Menge":76,"Stueckpreis_EUR":47.66,"Umsatz_EUR":3622.16,"Land":"Dänemark"},{"Datum":"2025-02-25","Produkt":"Tasse","Verkaufte_Menge":48,"Stueckpreis_EUR":8.96,"Umsatz_EUR":430.08,"Land":"Deutschland"},{"Datum":"2025-02-26","Produkt":"Teller","Verkaufte_Menge":35,"Stueckpreis_EUR":15.23,"Umsatz_EUR":533.05,"Land":"Deutschland"},{"Datum":"2025-02-26","Produkt":"Schale","Verkaufte_Menge":118,"Stueckpreis_EUR":12.86,"Umsatz_EUR":1517.48,"Land":"Schweiz"},{"Datum":"2025-02-27","Produkt":"Topf","Verkaufte_Menge":32,"Stueckpreis_EUR":38.19,"Umsatz_EUR":1222.08,"Land":"Österreich"},{"Datum":"2025-02-27","Produkt":"Pfanne","Verkaufte_Menge":77,"Stueckpreis_EUR":50.72,"Umsatz_EUR":3905.44,"Land":"Polen"},{"Datum":"2025-02-28","Produkt":"Tasse","Verkaufte_Menge":49,"Stueckpreis_EUR":9.06,"Umsatz_EUR":443.94,"Land":"Dänemark"},{"Datum":"2025-02-28","Produkt":"Teller","Verkaufte_Menge":120,"Stueckpreis_EUR":14.62,"Umsatz_EUR":1754.4,"Land":"Deutschland"}],"produktion":[{"Datum":"2025-01-01","Produkt":"Tasse","Produzierte_Menge":134,"Taktzeit_Minute":35,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-01-01","Produkt":"Teller","Produzierte_Menge":138,"Taktzeit_Minute":29,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-01-02","Produkt":"Schale","Produzierte_Menge":61,"Taktzeit_Minute":23,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-01-02","Produkt":"Topf","Produzierte_Menge":44,"Taktzeit_Minute":15,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-01-03","Produkt":"Pfanne","Produzierte_Menge":144,"Taktzeit_Minute":6,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-01-04","Produkt":"Tasse","Produzierte_Menge":150,"Taktzeit_Minute":37,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-01-04","Produkt":"Teller","Produzierte_Menge":100,"Taktzeit_Minute":26,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-01-04","Produkt":"Schale","Produzierte_Menge":43,"Taktzeit_Minute":28,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-01-05","Produkt":"Topf","Produzierte_Menge":87,"Taktzeit_Minute":7,"Mitarbeiter":2,"Maschine":"C"},{"Datum":"2025-01-05","Produkt":"Pfanne","Produzierte_Menge":92,"Taktzeit_Minute":4,"Mitarbeiter":2,"Maschine":"B"},{"Datum":"2025-01-06","Produkt":"Tasse","Produzierte_Menge":142,"Taktzeit_Minute":36,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-01-07","Produkt":"Teller","Produzierte_Menge":60,"Taktzeit_Minute":36,"Mitarbeiter":2,"Maschine":"B"},{"Datum":"2025-01-07","Produkt":"Schale","Produzierte_Menge":79,"Taktzeit_Minute":24,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-01-08","Produkt":"Topf","Produzierte_Menge":100,"Taktzeit_Minute":10,"Mitarbeiter":2,"Maschine":"C"},{"Datum":"2025-01-08","Produkt":"Pfanne","Produzierte_Menge":116,"Taktzeit_Minute":7,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-01-09","Produkt":"Tasse","Produzierte_Menge":103,"Taktzeit_Minute":34,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-01-10","Produkt":"Teller","Produzierte_Menge":130,"Taktzeit_Minute":32,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-01-10","Produkt":"Schale","Produzierte_Menge":69,"Taktzeit_Minute":25,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-01-11","Produkt":"Topf","Produzierte_Menge":86,"Taktzeit_Minute":15,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-01-11","Produkt":"Pfanne","Produzierte_Menge":147,"Taktzeit_Minute":8,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-01-11","Produkt":"Tasse","Produzierte_Menge":89,"Taktzeit_Minute":45,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-01-12","Produkt":"Teller","Produzierte_Menge":132,"Taktzeit_Minute":33,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-01-13","Produkt":"Schale","Produzierte_Menge":45,"Taktzeit_Minute":29,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-01-13","Produkt":"Topf","Produzierte_Menge":85,"Taktzeit_Minute":14,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-01-14","Produkt":"Pfanne","Produzierte_Menge":115,"Taktzeit_Minute":6,"Mitarbeiter":2,"Maschine":"B"},{"Datum":"2025-01-14","Produkt":"Tasse","Produzierte_Menge":109,"Taktzeit_Minute":34,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-01-14","Produkt":"Teller","Produzierte_Menge":128,"Taktzeit_Minute":35,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-01-15","Produkt":"Schale","Produzierte_Menge":67,"Taktzeit_Minute":26,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-01-16","Produkt":"Topf","Produzierte_Menge":118,"Taktzeit_Minute":15,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-01-17","Produkt":"Pfanne","Produzierte_Menge":146,"Taktzeit_Minute":7,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-01-17","Produkt":"Tasse","Produzierte_Menge":67,"Taktzeit_Minute":42,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-01-18","Produkt":"Teller","Produzierte_Menge":94,"Taktzeit_Minute":36,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-01-19","Produkt":"Schale","Produzierte_Menge":108,"Taktzeit_Minute":31,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-01-19","Produkt":"Topf","Produzierte_Menge":52,"Taktzeit_Minute":12,"Mitarbeiter":2,"Maschine":"C"},{"Datum":"2025-01-19","Produkt":"Pfanne","Produzierte_Menge":120,"Taktzeit_Minute":7,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-01-20","Produkt":"Tasse","Produzierte_Menge":140,"Taktzeit_Minute":33,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-01-20","Produkt":"Teller","Produzierte_Menge":52,"Taktzeit_Minute":32,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-01-21","Produkt":"Schale","Produzierte_Menge":120,"Taktzeit_Minute":26,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-01-22","Produkt":"Topf","Produzierte_Menge":89,"Taktzeit_Minute":12,"Mitarbeiter":2,"Maschine":"C"},{"Datum":"2025-01-22","Produkt":"Pfanne","Produzierte_Menge":81,"Taktzeit_Minute":7,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-01-23","Produkt":"Tasse","Produzierte_Menge":96,"Taktzeit_Minute":43,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-01-24","Produkt":"Teller","Produzierte_Menge":127,"Taktzeit_Minute":33,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-01-24","Produkt":"Schale","Produzierte_Menge":79,"Taktzeit_Minute":24,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-01-24","Produkt":"Topf","Produzierte_Menge":129,"Taktzeit_Minute":14,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-01-25","Produkt":"Pfanne","Produzierte_Menge":113,"Taktzeit_Minute":7,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-01-26","Produkt":"Tasse","Produzierte_Menge":101,"Taktzeit_Minute":36,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-01-26","Produkt":"Teller","Produzierte_Menge":88,"Taktzeit_Minute":30,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-01-26","Produkt":"Schale","Produzierte_Menge":59,"Taktzeit_Minute":27,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-01-27","Produkt":"Topf","Produzierte_Menge":68,"Taktzeit_Minute":14,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-01-28","Produkt":"Pfanne","Produzierte_Menge":93,"Taktzeit_Minute":4,"Mitarbeiter":2,"Maschine":"B"},{"Datum":"2025-01-28","Produkt":"Tasse","Produzierte_Menge":103,"Taktzeit_Minute":39,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-01-29","Produkt":"Teller","Produzierte_Menge":118,"Taktzeit_Minute":25,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-01-30","Produkt":"Schale","Produzierte_Menge":70,"Taktzeit_Minute":27,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-01-31","Produkt":"Topf","Produzierte_Menge":56,"Taktzeit_Minute":10,"Mitarbeiter":2,"Maschine":"C"},{"Datum":"2025-02-01","Produkt":"Pfanne","Produzierte_Menge":58,"Taktzeit_Minute":3,"Mitarbeiter":2,"Maschine":"B"},{"Datum":"2025-02-01","Produkt":"Tasse","Produzierte_Menge":140,"Taktzeit_Minute":35,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-02-02","Produkt":"Teller","Produzierte_Menge":111,"Taktzeit_Minute":28,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-02-03","Produkt":"Schale","Produzierte_Menge":78,"Taktzeit_Minute":22,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-02-03","Produkt":"Topf","Produzierte_Menge":68,"Taktzeit_Minute":14,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-02-04","Produkt":"Pfanne","Produzierte_Menge":73,"Taktzeit_Minute":6,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-02-04","Produkt":"Tasse","Produzierte_Menge":90,"Taktzeit_Minute":38,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-02-05","Produkt":"Teller","Produzierte_Menge":141,"Taktzeit_Minute":35,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-02-05","Produkt":"Schale","Produzierte_Menge":91,"Taktzeit_Minute":24,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-02-06","Produkt":"Topf","Produzierte_Menge":47,"Taktzeit_Minute":12,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-02-06","Produkt":"Pfanne","Produzierte_Menge":135,"Taktzeit_Minute":6,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-02-06","Produkt":"Tasse","Produzierte_Menge":109,"Taktzeit_Minute":39,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-02-07","Produkt":"Teller","Produzierte_Menge":112,"Taktzeit_Minute":31,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-02-07","Produkt":"Schale","Produzierte_Menge":51,"Taktzeit_Minute":24,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-02-08","Produkt":"Topf","Produzierte_Menge":136,"Taktzeit_Minute":13,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-02-09","Produkt":"Pfanne","Produzierte_Menge":104,"Taktzeit_Minute":6,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-02-09","Produkt":"Tasse","Produzierte_Menge":63,"Taktzeit_Minute":34,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-02-10","Produkt":"Teller","Produzierte_Menge":133,"Taktzeit_Minute":31,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-02-11","Produkt":"Schale","Produzierte_Menge":67,"Taktzeit_Minute":31,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-02-11","Produkt":"Topf","Produzierte_Menge":146,"Taktzeit_Minute":13,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-02-12","Produkt":"Pfanne","Produzierte_Menge":133,"Taktzeit_Minute":5,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-02-12","Produkt":"Tasse","Produzierte_Menge":113,"Taktzeit_Minute":39,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-02-13","Produkt":"Teller","Produzierte_Menge":58,"Taktzeit_Minute":30,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-02-14","Produkt":"Schale","Produzierte_Menge":137,"Taktzeit_Minute":25,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-02-15","Produkt":"Topf","Produzierte_Menge":82,"Taktzeit_Minute":12,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-02-15","Produkt":"Pfanne","Produzierte_Menge":103,"Taktzeit_Minute":6,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-02-15","Produkt":"Tasse","Produzierte_Menge":45,"Taktzeit_Minute":37,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-02-16","Produkt":"Teller","Produzierte_Menge":57,"Taktzeit_Minute":32,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-02-17","Produkt":"Schale","Produzierte_Menge":77,"Taktzeit_Minute":26,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-02-18","Produkt":"Topf","Produzierte_Menge":72,"Taktzeit_Minute":10,"Mitarbeiter":2,"Maschine":"C"},{"Datum":"2025-02-18","Produkt":"Pfanne","Produzierte_Menge":73,"Taktzeit_Minute":4,"Mitarbeiter":2,"Maschine":"B"},{"Datum":"2025-02-19","Produkt":"Tasse","Produzierte_Menge":96,"Taktzeit_Minute":36,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-02-20","Produkt":"Teller","Produzierte_Menge":111,"Taktzeit_Minute":32,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-02-21","Produkt":"Schale","Produzierte_Menge":76,"Taktzeit_Minute":27,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-02-21","Produkt":"Topf","Produzierte_Menge":114,"Taktzeit_Minute":12,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-02-22","Produkt":"Pfanne","Produzierte_Menge":59,"Taktzeit_Minute":6,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-02-22","Produkt":"Tasse","Produzierte_Menge":121,"Taktzeit_Minute":38,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-02-23","Produkt":"Teller","Produzierte_Menge":135,"Taktzeit_Minute":31,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-02-23","Produkt":"Schale","Produzierte_Menge":113,"Taktzeit_Minute":25,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-02-24","Produkt":"Topf","Produzierte_Menge":71,"Taktzeit_Minute":13,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-02-25","Produkt":"Pfanne","Produzierte_Menge":144,"Taktzeit_Minute":7,"Mitarbeiter":3,"Maschine":"B"},{"Datum":"2025-02-25","Produkt":"Tasse","Produzierte_Menge":85,"Taktzeit_Minute":39,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-02-26","Produkt":"Teller","Produzierte_Menge":97,"Taktzeit_Minute":33,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-02-26","Produkt":"Schale","Produzierte_Menge":121,"Taktzeit_Minute":26,"Mitarbeiter":2,"Maschine":"A"},{"Datum":"2025-02-27","Produkt":"Topf","Produzierte_Menge":89,"Taktzeit_Minute":14,"Mitarbeiter":3,"Maschine":"C"},{"Datum":"2025-02-27","Produkt":"Tasse","Produzierte_Menge":121,"Taktzeit_Minute":38,"Mitarbeiter":1,"Maschine":"A"},{"Datum":"2025-02-28","Produkt":"Teller","Produzierte_Menge":135,"Taktzeit_Minute":31,"Mitarbeiter":1,"Maschine":"B"},{"Datum":"2025-02-28","Produkt":"Schale","Produzierte_Menge":113,"Taktzeit_Minute":25,"Mitarbeiter":2,"Maschine":"A"}],"stamm":[{"Produkt":"Tasse","Soll_Taktzeit_Minute":40,"Soll_Mitarbeiter":1,"Maschine":"A","Materialkosten":3.7},{"Produkt":"Teller","Soll_Taktzeit_Minute":30,"Soll_Mitarbeiter":1,"Maschine":"B","Materialkosten":6.4},{"Produkt":"Schale","Soll_Taktzeit_Minute":25,"Soll_Mitarbeiter":2,"Maschine":"A","Materialkosten":5.3},{"Produkt":"Topf","Soll_Taktzeit_Minute":12,"Soll_Mitarbeiter":3,"Maschine":"C","Materialkosten":15.9},{"Produkt":"Pfanne","Soll_Taktzeit_Minute":6,"Soll_Mitarbeiter":3,"Maschine":"B","Materialkosten":18.9}]};
+
+const COLORS = {
+  'Tasse': '#1D6996', 'Teller': '#A9D6E5', 'Schale': '#0B3C5D', 'Topf': '#F4A261', 'Pfanne': '#FFD166'
+};
+const PRODUCTS = Object.keys(COLORS);
+
+// build toggle buttons
+const toggleWrap = document.getElementById('productToggles');
+let activeProducts = new Set(PRODUCTS);
+PRODUCTS.forEach(p => {
+  const btn = document.createElement('div');
+  btn.className = 'dash-toggle active';
+  btn.textContent = p;
+  btn.onclick = () => {
+    if (activeProducts.has(p)) { activeProducts.delete(p); btn.classList.remove('active'); }
+    else { activeProducts.add(p); btn.classList.add('active'); }
+    update();
+  };
+  toggleWrap.appendChild(btn);
+});
+
+const fmtEUR = n => n.toLocaleString('de-DE', {maximumFractionDigits:0}) + ' €';
+const fmtNum = n => n.toLocaleString('de-DE', {maximumFractionDigits:0});
+
+let donutChart, barChart;
+
+function update() {
+  const from = document.getElementById('dateFrom').value;
+  const to = document.getElementById('dateTo').value;
+
+  const verkauf = RAWDATA.verkauf.filter(r => r.Datum >= from && r.Datum <= to && activeProducts.has(r.Produkt));
+  const produktion = RAWDATA.produktion.filter(r => r.Datum >= from && r.Datum <= to && activeProducts.has(r.Produkt));
+
+  const totalUmsatz = verkauf.reduce((s,r) => s + r.Umsatz_EUR, 0);
+  const totalMenge = verkauf.reduce((s,r) => s + r.Verkaufte_Menge, 0);
+  const totalProduziert = produktion.reduce((s,r) => s + r.Produzierte_Menge, 0);
+  const avgTakt = produktion.length ? produktion.reduce((s,r)=>s+r.Taktzeit_Minute,0)/produktion.length : 0;
+
+  document.getElementById('kpiUmsatz').textContent = fmtEUR(totalUmsatz);
+  document.getElementById('kpiMenge').textContent = fmtNum(totalMenge);
+  document.getElementById('kpiProduziert').textContent = fmtNum(totalProduziert);
+  document.getElementById('kpiTaktzeit').textContent = avgTakt.toFixed(1);
+
+  // donut: verkaufte menge je produkt
+  const byProductSold = {};
+  PRODUCTS.forEach(p => byProductSold[p] = 0);
+  verkauf.forEach(r => byProductSold[r.Produkt] += r.Verkaufte_Menge);
+  const activeList = PRODUCTS.filter(p => activeProducts.has(p));
+
+  const donutData = {
+    labels: activeList,
+    datasets: [{ data: activeList.map(p => byProductSold[p]), backgroundColor: activeList.map(p => COLORS[p]), borderWidth: 2, borderColor: '#fff' }]
+  };
+  if (donutChart) { donutChart.data = donutData; donutChart.update(); }
+  else {
+    donutChart = new Chart(document.getElementById('chartDonut'), {
+      type: 'doughnut', data: donutData,
+      options: { plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } } }
+    });
+  }
+
+  // bar: produziert vs verkauft je produkt
+  const byProductProd = {};
+  PRODUCTS.forEach(p => byProductProd[p] = 0);
+  produktion.forEach(r => byProductProd[r.Produkt] += r.Produzierte_Menge);
+
+  const barData = {
+    labels: activeList,
+    datasets: [
+      { label: 'Produziert', data: activeList.map(p => byProductProd[p]), backgroundColor: '#0B3C5D', borderRadius: 4 },
+      { label: 'Verkauft', data: activeList.map(p => byProductSold[p]), backgroundColor: '#A9D6E5', borderRadius: 4 }
+    ]
+  };
+  if (barChart) { barChart.data = barData; barChart.update(); }
+  else {
+    barChart = new Chart(document.getElementById('chartBar'), {
+      type: 'bar',
+      data: barData,
+      options: {
+        plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
+
+  // table: umsatz nach land
+  const byLand = {};
+  verkauf.forEach(r => { byLand[r.Land] = (byLand[r.Land]||0) + r.Umsatz_EUR; });
+  const sorted = Object.entries(byLand).sort((a,b) => b[1]-a[1]);
+  const tbody = document.getElementById('tableLand');
+  tbody.innerHTML = sorted.map(([land, umsatz]) => `<tr><td>${land}</td><td>${fmtEUR(umsatz)}</td></tr>`).join('') || '<tr><td colspan="2" style="color:var(--textlight)">Keine Daten im gewählten Zeitraum/Filter</td></tr>';
+}
+
+document.getElementById('dateFrom').addEventListener('change', update);
+document.getElementById('dateTo').addEventListener('change', update);
+update();
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.anim, .anim-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
