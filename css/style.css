@@ -305,13 +305,13 @@ section { padding: 80px 0; }
   margin-bottom: 2px;
 }
 
-/* ── PROBLEM TILES ── */
+/* ── PROBLEM TILES (Variante B: Icon + Titel) ── */
 .problem-section { background: var(--warmgrau); }
 .problem-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 .problem-tile {
@@ -327,6 +327,16 @@ section { padding: 80px 0; }
   box-shadow: var(--shadow-lg);
 }
 .problem-tile img { width: 100%; height: auto; display: block; }
+.problem-icon-box {
+  width: 44px;
+  height: 44px;
+  background: #fdecd8;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+}
 
 /* ── TWO-COL CONTENT (image + text) ── */
 .two-col {
@@ -532,18 +542,31 @@ section { padding: 80px 0; }
 }
 .footer-legal a:hover { color: white; }
 
-/* ── PAGE HERO (inner pages) ── */
+/* ── PAGE HERO (inner pages) — floating card ── */
 .page-hero {
   background: linear-gradient(135deg, var(--dunkelblau) 0%, var(--petrolblau) 100%);
-  padding: 72px 40px;
+  padding: 64px 40px;
   color: white;
   text-align: center;
+  width: calc(100% - 48px);
+  max-width: 1200px;
+  margin: 24px auto 40px;
+  border-radius: 24px;
+  box-shadow: 0 20px 44px rgba(11,60,93,0.22), 0 4px 12px rgba(11,60,93,0.10);
 }
 .page-hero h1 { color: white; font-size: 42px; margin-bottom: 14px; }
 .page-hero p { color: rgba(255,255,255,0.82); font-size: 18px; max-width: 580px; margin: 0 auto; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
+  .page-hero {
+    width: calc(100% - 32px);
+    margin: 16px auto 28px;
+    padding: 44px 24px;
+    border-radius: 18px;
+  }
+  .page-hero h1 { font-size: 28px; }
+  .page-hero p { font-size: 15px; }
   section[aria-label="Schnellzugriff Workshops und Förderung"] .container > div {
     grid-template-columns: 1fr !important;
   }
@@ -576,7 +599,7 @@ section { padding: 80px 0; }
   .trust-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.12); }
   .trust-item:last-child { border-bottom: none; }
 
-  .problem-grid { grid-template-columns: 1fr; max-width: 500px; }
+  .problem-grid { grid-template-columns: 1fr; max-width: 420px; margin-left:auto; margin-right:auto; }
   .two-col { flex-direction: column; gap: 36px; }
   .two-col.reverse { flex-direction: column; }
   .bafa-card { flex-direction: column; padding: 32px 28px; }
