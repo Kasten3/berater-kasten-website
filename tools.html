@@ -12,10 +12,10 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
   <style>
-    .dash-tabs { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; justify-content:center; }
+    .dash-tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; justify-content:center; }
     .dash-tab-btn {
-      padding:10px 20px; border-radius:24px; border:1.5px solid var(--hellblau); background:white;
-      font-family:'Montserrat',sans-serif; font-weight:700; font-size:13px; color:var(--textlight);
+      padding:7px 16px; border-radius:20px; border:1.5px solid var(--hellblau); background:white;
+      font-family:'Montserrat',sans-serif; font-weight:700; font-size:12px; color:var(--textlight);
       cursor:pointer; transition:all .2s;
     }
     .dash-tab-btn.active { background:var(--petrolblau); border-color:var(--petrolblau); color:white; }
@@ -28,33 +28,38 @@
     .dash-theme-mint   { --pbi-border:#9ed4c2; --pbi-fill:#eaf7f2; --pbi-accent:#2f8a6b; --pbi-bg:#f3faf7; }
 
     .dash-wrap {
-      background:var(--pbi-bg,#f7f9fb); border-radius:14px; padding:18px 20px 20px;
-      box-shadow:0 16px 36px rgba(11,60,93,0.12), 0 4px 10px rgba(11,60,93,0.05);
-      border:1.5px solid var(--pbi-border,#e3ddd4); max-width:1080px; margin:0 auto;
+      background:var(--pbi-bg,#f7f9fb); border-radius:12px; padding:12px 14px 14px;
+      box-shadow:0 10px 24px rgba(11,60,93,0.10), 0 3px 8px rgba(11,60,93,0.04);
+      border:1.5px solid var(--pbi-border,#e3ddd4); max-width:680px; margin:0 auto;
       font-family:'Segoe UI', 'Open Sans', sans-serif;
     }
-    .dash-filterbar { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-bottom:14px; }
-    .dash-filter-group { display:flex; flex-direction:column; gap:3px; background:var(--pbi-fill,#fff); border:1.5px solid var(--pbi-border,#dce3ea); border-radius:8px; padding:8px 12px; }
-    .dash-filter-group label { font-size:9.5px; font-weight:700; color:var(--pbi-accent,var(--petrolblau)); text-transform:uppercase; letter-spacing:.04em; }
-    .dash-filter-group input[type="date"] { border:1px solid var(--pbi-border,#dce3ea); border-radius:5px; padding:4px 7px; font-size:12px; font-family:inherit; color:var(--text); background:white; }
-    .dash-toggles { display:flex; gap:5px; flex-wrap:wrap; }
+    .dash-filterbar { display:flex; flex-wrap:wrap; gap:7px; align-items:flex-end; margin-bottom:9px; }
+    .dash-filter-group { display:flex; flex-direction:column; gap:2px; background:var(--pbi-fill,#fff); border:1.3px solid var(--pbi-border,#dce3ea); border-radius:6px; padding:5px 8px; }
+    .dash-filter-group label { font-size:8px; font-weight:700; color:var(--pbi-accent,var(--petrolblau)); text-transform:uppercase; letter-spacing:.03em; }
+    .dash-filter-group input[type="date"] { border:1px solid var(--pbi-border,#dce3ea); border-radius:4px; padding:2px 5px; font-size:10px; font-family:inherit; color:var(--text); background:white; }
+    .dash-toggles { display:flex; gap:4px; flex-wrap:wrap; }
     .dash-toggle {
-      padding:6px 13px; border-radius:6px; border:1.3px solid var(--pbi-border,#dce3ea); background:white;
-      font-size:12px; font-weight:600; color:var(--text); cursor:pointer; transition:all .15s; user-select:none;
+      padding:4px 9px; border-radius:5px; border:1.2px solid var(--pbi-border,#dce3ea); background:white;
+      font-size:10px; font-weight:600; color:var(--text); cursor:pointer; transition:all .15s; user-select:none;
     }
     .dash-toggle.active { background:var(--pbi-accent,var(--petrolblau)); border-color:var(--pbi-accent,var(--petrolblau)); color:white; }
-    .dash-kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0; }
-    .dash-kpi { background:var(--pbi-fill,#fff); border:1.5px solid var(--pbi-border,#e3ddd4); border-radius:10px; padding:12px 10px; text-align:center; }
-    .dash-kpi .num { font-family:'Segoe UI','Montserrat',sans-serif; font-weight:700; font-size:19px; color:var(--pbi-accent,var(--dunkelblau)); line-height:1.2; }
-    .dash-kpi .lbl { font-size:10.5px; color:var(--textlight); margin-top:2px; }
-    .dash-charts-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:12px; }
-    .dash-card { background:white; border:1.5px solid var(--pbi-border,#e3ddd4); border-radius:10px; padding:12px 14px; }
-    .dash-card h4 { font-size:12px; color:var(--pbi-accent,var(--dunkelblau)); margin-bottom:8px; font-family:'Segoe UI','Montserrat',sans-serif; font-weight:700; }
-    .dash-table-wrap { max-height:160px; overflow-y:auto; }
-    .dash-table { width:100%; font-size:11.5px; border-collapse:collapse; }
-    .dash-table th { text-align:left; color:var(--pbi-accent,var(--petrolblau)); font-size:10px; text-transform:uppercase; letter-spacing:.03em; padding:5px 6px; border-bottom:1.5px solid var(--pbi-border,#e3ddd4); position:sticky; top:0; background:white; }
-    .dash-table td { padding:5px 6px; border-bottom:1px solid #f0ece7; color:var(--text); }
-    .dash-watermark { text-align:center; font-size:10.5px; color:var(--textlight); margin-top:2px; }
+    .dash-kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin:9px 0; }
+    .dash-kpi { background:var(--pbi-fill,#fff); border:1.3px solid var(--pbi-border,#e3ddd4); border-radius:7px; padding:7px 6px; text-align:center; }
+    .dash-kpi .num { font-family:'Segoe UI','Montserrat',sans-serif; font-weight:700; font-size:14px; color:var(--pbi-accent,var(--dunkelblau)); line-height:1.2; }
+    .dash-kpi .lbl { font-size:8.5px; color:var(--textlight); margin-top:1px; }
+    .dash-charts-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+    .dash-card { background:white; border:1.3px solid var(--pbi-border,#e3ddd4); border-radius:7px; padding:8px 10px; }
+    .dash-card h4 { font-size:9.5px; color:var(--pbi-accent,var(--dunkelblau)); margin-bottom:5px; font-family:'Segoe UI','Montserrat',sans-serif; font-weight:700; }
+    .dash-card canvas { max-height:95px !important; }
+    .dash-table-wrap { max-height:100px; overflow-y:auto; }
+    .dash-table { width:100%; font-size:9.5px; border-collapse:collapse; }
+    .dash-table th { text-align:left; color:var(--pbi-accent,var(--petrolblau)); font-size:8px; text-transform:uppercase; letter-spacing:.02em; padding:3px 4px; border-bottom:1.3px solid var(--pbi-border,#e3ddd4); position:sticky; top:0; background:white; }
+    .dash-table td { padding:3px 4px; border-bottom:1px solid #f0ece7; color:var(--text); }
+    .dash-watermark { text-align:center; font-size:9px; color:var(--textlight); margin-top:2px; }
+    .dash-disclaimer {
+      max-width:680px; margin:0 auto 18px; text-align:center; font-size:12px; color:var(--textlight);
+      background:#fdecd8; border:1px solid #f5c99a; border-radius:10px; padding:10px 16px;
+    }
 
     .pbi-explain { display:flex; align-items:center; gap:48px; }
     .pbi-graphic { flex-shrink:0; width:220px; }
@@ -74,8 +79,12 @@
       .dash-kpi-row { grid-template-columns:repeat(2,1fr); }
       .dash-charts-row { grid-template-columns:1fr; }
       .preview-grid { grid-template-columns:1fr; }
+      .gallery-grid { grid-template-columns:1fr 1fr !important; }
       .pbi-explain { flex-direction:column; text-align:center; }
       .pbi-graphic { width:160px; }
+    }
+    @media (max-width:560px) {
+      .gallery-grid { grid-template-columns:1fr !important; }
     }
   </style>
 </head>
@@ -97,14 +106,17 @@
   </div>
 </header>
 
-<section class="page-hero" aria-label="Seiteneinleitung">
+<section class="page-hero page-hero-compact" aria-label="Seiteneinleitung">
   <h1>Tools zum Ausprobieren</h1>
-  <p>Drei Beispiel-Dashboards mit echten Filtern – direkt im Browser.</p>
+  <p>Bevor Sie sich für ein Werkzeug entscheiden, sollten Sie wissen, was es wirklich kann.</p>
 </section>
 
 <!-- INTERAKTIVE DEMOS -->
 <section aria-labelledby="demo-heading" style="padding-top:0;">
   <div class="container">
+    <p class="dash-disclaimer">
+      Hinweis: Diese Demo ist eine vereinfachte Nachbildung zur Veranschaulichung – sie entspricht optisch nicht exakt einem echten Power-BI-Dashboard. Echte Beispiele sehen Sie weiter unten in der Bildergalerie.
+    </p>
     <div class="dash-tabs">
       <button class="dash-tab-btn active" data-tab="produktion">Produktion &amp; Vertrieb</button>
       <button class="dash-tab-btn" data-tab="technik">Technik-Projekte</button>
@@ -208,6 +220,25 @@
       </div>
     </div>
 
+  </div>
+</section>
+
+<!-- ECHTE SCREENSHOTS -->
+<section style="background:var(--warmgrau)" aria-labelledby="gallery-heading">
+  <div class="container">
+    <span class="eyebrow section-title-center" style="display:block;text-align:center">Zur Einordnung</span>
+    <h2 class="section-title section-title-center" id="gallery-heading">So sehen echte Dashboards aus</h2>
+    <p class="section-subtitle section-subtitle-center">
+      Ausschnitte aus echten Power-BI-Projekten – hier nicht interaktiv, nur zur Veranschaulichung.
+    </p>
+    <div class="gallery-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:18px; margin-top:36px;">
+      <img src="images/gallery_vertrieb1.jpg" alt="Echtes Power BI Dashboard: Vertrieb Haushaltsprodukte" style="width:100%; border-radius:10px; box-shadow:var(--shadow);" class="anim-up">
+      <img src="images/gallery_vertrieb2.jpg" alt="Echtes Power BI Dashboard: Produktion Haushaltsprodukte" style="width:100%; border-radius:10px; box-shadow:var(--shadow);" class="anim-up">
+      <img src="images/gallery_technik.jpg" alt="Echtes Power BI Dashboard: Projekt-Controlling" style="width:100%; border-radius:10px; box-shadow:var(--shadow);" class="anim-up">
+      <img src="images/gallery_hr.jpg" alt="Echtes Power BI Dashboard: Personalcontrolling" style="width:100%; border-radius:10px; box-shadow:var(--shadow);" class="anim-up">
+      <img src="images/gallery_hrprojekte.jpg" alt="Echtes Power BI Dashboard: HR-Projektportfolio" style="width:100%; border-radius:10px; box-shadow:var(--shadow);" class="anim-up">
+      <img src="images/gallery_einkauf.jpg" alt="Echtes Power BI Dashboard: Strategischer Einkauf" style="width:100%; border-radius:10px; box-shadow:var(--shadow);" class="anim-up">
+    </div>
   </div>
 </section>
 
