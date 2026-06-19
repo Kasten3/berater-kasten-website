@@ -1,0 +1,20 @@
+# Berater-Kasten
+
+> Praxisnahe Unternehmensberatung für kleine und mittelständische, produzierende Unternehmen in Deutschland. Spezialisiert auf Prozessoptimierung, Betriebsorganisation, Controlling und Shopfloor Management. BAFA-gelistete Berater – Beratungsleistungen sind für KMU bis zu 80% förderfähig.
+
+Der Berater-Kasten besteht aus drei Beratern mit unterschiedlichen, sich ergänzenden Schwerpunkten: Führungs- und Produktionserfahrung (Lothar Kahlert), Controlling und Prozessoptimierung (Freya Stradtmann Kembel), und Prozesstechnik mit Produktionscontrolling (Pascal Engelbrecht).
+
+## Leistungen
+- [Unsere Leistungen](https://www.berater-kasten.de/leistungen.html): Prozessoptimierung, Betriebsorganisation & Controlling, Strukturentwicklung, Shopfloor Management, Einstiegsberatung, sowie Power BI Workshops und Schulungen.
+
+## Förderung
+- [BAFA-Förderung](https://www.berater-kasten.de/foerderung.html): Informationen zur staatlichen Förderung von Unternehmensberatung für KMU, bis zu 80% der Kosten.
+
+## Team
+- [Das sind wir](https://www.berater-kasten.de/team.html): Profile der drei Berater.
+
+## FAQ
+- [Häufige Fragen](https://www.berater-kasten.de/faq.html): Antworten zu Kosten, Ablauf, Förderung und Workshops.
+
+## Kontakt
+- [Kontakt](https://www.berater-kasten.de/kontakt.html): info@berater-kasten.de, Region Uelzen / Norddeutschland.

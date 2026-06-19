@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FAQ &amp; Erfahrungen – Häufige Fragen zur Beratung | Berater-Kasten</title>
+  <meta name="description" content="Antworten auf häufige Fragen zu Unternehmensberatung, Kosten, BAFA-Förderung und unseren Power-BI-Workshops. Plus Erfahrungen bisheriger Teilnehmer.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .faq-item {
+      border-bottom: 1px solid #e3ddd4;
+      padding: 22px 0;
+    }
+    .faq-question {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      font-size: 16px;
+      color: var(--dunkelblau);
+      gap: 16px;
+    }
+    .faq-question .chev {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      transition: transform .25s;
+      color: var(--petrolblau);
+    }
+    .faq-item.open .chev { transform: rotate(180deg); }
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .3s ease;
+      color: var(--textlight);
+      font-size: 14.5px;
+      line-height: 1.7;
+    }
+    .faq-answer-inner { padding-top: 14px; }
+    .faq-item.open .faq-answer { max-height: 400px; }
+
+    .testimonial-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 40px;
+    }
+    .testimonial-card {
+      background: white;
+      border-radius: 16px;
+      padding: 28px 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(169,214,229,0.3);
+    }
+    .testimonial-stars { color: var(--gelb); font-size: 15px; margin-bottom: 12px; letter-spacing: 2px; }
+    .testimonial-text { font-size: 14px; color: var(--text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
+    .testimonial-author { font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 13px; color: var(--dunkelblau); }
+    .testimonial-role { font-size: 12px; color: var(--textlight); }
+    .placeholder-banner {
+      background: #fdecd8;
+      border: 1px solid #f5c99a;
+      color: #7a4310;
+      border-radius: 12px;
+      padding: 14px 18px;
+      font-size: 13px;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+    @media (max-width: 900px) { .testimonial-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html"><img src="images/logo.png" alt="Berater-Kasten Logo" class="site-logo"></a>
+    <button class="nav-toggle" aria-label="Menü öffnen" onclick="this.nextElementSibling.classList.toggle('open')"><span></span><span></span><span></span></button>
+    <nav class="site-nav">
+      <a href="index.html">Startseite</a>
+      <a href="leistungen.html">Unsere Leistungen</a>
+      <a href="team.html">Das sind wir</a>
+      <a href="foerderung.html">Förderung</a>
+      <a href="faq.html" class="active">FAQ</a>
+      <a href="kontakt.html" class="nav-cta">Kontakt aufnehmen</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero" aria-label="Seiteneinleitung">
+  <h1>Häufige Fragen &amp; Erfahrungen</h1>
+  <p>Antworten auf die Fragen, die uns am häufigsten erreichen – und was bisherige Teilnehmer sagen.</p>
+</section>
+
+<!-- KUNDENSTIMMEN -->
+<section aria-labelledby="stimmen-heading">
+  <div class="container">
+    <span class="eyebrow section-title-center" style="display:block;text-align:center">Erfahrungen</span>
+    <h2 class="section-title section-title-center" id="stimmen-heading">Was Teilnehmer sagen</h2>
+    <p class="section-subtitle section-subtitle-center">
+      Stimmen aus unserer Power BI Werkstatt.
+    </p>
+
+    <!--
+      PLATZHALTER-HINWEIS FÜR DEN BETREIBER:
+      Die folgenden 3 Kundenstimmen sind FREI ERFUNDENE PLATZHALTER zur Layout-Vorschau.
+      Sie dürfen NICHT als echte Bewertungen veröffentlicht werden — das wäre eine
+      irreführende geschäftliche Handlung nach §5 UWG (gefälschte Kundenbewertungen).
+      Vor dem Live-Schalten durch echte Teilnehmer-Rückmeldungen ersetzen!
+    -->
+    <div class="placeholder-banner">
+      ⚠️ Platzhalter-Texte zur Layout-Vorschau – bitte vor Veröffentlichung durch echte Teilnehmerstimmen ersetzen.
+    </div>
+
+    <div class="testimonial-grid">
+      <div class="testimonial-card anim-up">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">„Endlich verstehe ich, warum unsere Dashboards vorher nie so aussahen, wie ich es brauchte. Die Werkstatt war praxisnah und ohne unnötige Theorie."</p>
+        <div class="testimonial-author">– Platzhalter-Name</div>
+        <div class="testimonial-role">Teilnehmer/in, Power BI Werkstatt</div>
+      </div>
+      <div class="testimonial-card anim-up">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">„Sehr gutes Tempo, viele echte Beispiele aus dem Produktionsalltag statt generischer Übungen. Ich konnte direkt am nächsten Tag etwas in unserem Betrieb umsetzen."</p>
+        <div class="testimonial-author">– Platzhalter-Name</div>
+        <div class="testimonial-role">Teilnehmer/in, Power BI Werkstatt</div>
+      </div>
+      <div class="testimonial-card anim-up">
+        <div class="testimonial-stars">★★★★☆</div>
+        <p class="testimonial-text">„Kleine Gruppe, viel Austausch statt Frontalunterricht – genau das, was ich gesucht habe. Hätte gern noch eine Woche mehr gehabt."</p>
+        <div class="testimonial-author">– Platzhalter-Name</div>
+        <div class="testimonial-role">Teilnehmer/in, Power BI Werkstatt</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section style="background:var(--warmgrau)" aria-labelledby="faq-heading">
+  <div class="container" style="max-width:780px;">
+    <span class="eyebrow section-title-center" style="display:block;text-align:center">Häufige Fragen</span>
+    <h2 class="section-title section-title-center" id="faq-heading">Bevor Sie uns kontaktieren</h2>
+    <p class="section-subtitle section-subtitle-center" style="margin-bottom:8px;">
+      Die Fragen, die uns am häufigsten gestellt werden. Etwas fehlt? <a href="kontakt.html" style="color:var(--petrolblau); font-weight:600;">Einfach fragen.</a>
+    </p>
+
+    <div itemscope itemtype="https://schema.org/FAQPage" style="margin-top:32px;">
+
+      <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          <span itemprop="name">Was kostet eine Beratung bei Berater-Kasten?</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div class="faq-answer-inner" itemprop="text">
+            Das hängt vom Umfang ab. Wir bieten gestaffelte Pakete von einem kompakten Quick-Check bis zur langfristigen Begleitung an – die genauen Inhalte finden Sie auf unserer <a href="leistungen.html" style="color:var(--petrolblau);">Leistungsseite</a>. Viele Unternehmen nutzen außerdem die BAFA-Förderung, die bis zu 80&thinsp;% der Kosten übernimmt.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          <span itemprop="name">Lohnt sich das auch für ein kleines Unternehmen?</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div class="faq-answer-inner" itemprop="text">
+            Ja. Wir arbeiten gezielt mit kleinen und mittelständischen Produktionsbetrieben – oft macht sich Unordnung in Prozessen bei kleineren Teams sogar besonders schnell bemerkbar, weil jede Person mehrere Rollen übernimmt.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          <span itemprop="name">Wie schnell sehen wir erste Ergebnisse?</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div class="faq-answer-inner" itemprop="text">
+            Erste konkrete Handlungsempfehlungen erhalten Sie bereits nach dem Quick-Check, oft innerhalb von ein bis zwei Wochen. Strukturelle Veränderungen brauchen naturgemäß länger – wie lange, besprechen wir transparent im Erstgespräch.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          <span itemprop="name">Wie läuft das Erstgespräch ab?</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div class="faq-answer-inner" itemprop="text">
+            Unverbindlich und kostenlos. Sie schildern uns Ihre Situation, wir stellen Rückfragen und geben eine erste Einschätzung, wo wir ansetzen würden – inklusive möglicher Förderung. Danach entscheiden Sie in Ruhe, ob und wie wir weitermachen.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          <span itemprop="name">Was passiert, wenn ein Workshop nicht genug Anmeldungen hat?</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div class="faq-answer-inner" itemprop="text">
+            Unsere Workshops finden ab mindestens 3 Teilnehmern statt. Sollte diese Zahl nicht erreicht werden, informieren wir Sie rechtzeitig vor Beginn und erstatten bereits geleistete Zahlungen vollständig.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          <span itemprop="name">Finden die Workshops online oder vor Ort statt?</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div class="faq-answer-inner" itemprop="text">
+            Unsere Power-BI-Workshops finden komplett online statt – Sie brauchen lediglich einen Laptop und eine stabile Internetverbindung. Beratungsleistungen führen wir dagegen bevorzugt direkt vor Ort in Ihrem Betrieb durch.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          <span itemprop="name">Wie funktioniert die BAFA-Förderung genau?</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div class="faq-answer-inner" itemprop="text">
+            Als BAFA-gelistete Berater prüfen wir zunächst, ob Ihr Unternehmen die KMU-Kriterien erfüllt, begleiten dann die Antragstellung und die Kommunikation mit den zuständigen Stellen. Mehr Details finden Sie auf unserer <a href="foerderung.html" style="color:var(--petrolblau);">Förderseite</a>.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+        <div class="faq-question" onclick="this.parentElement.classList.toggle('open')">
+          <span itemprop="name">Wer genau berät uns – immer dieselbe Person?</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="faq-answer" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+          <div class="faq-answer-inner" itemprop="text">
+            Wir arbeiten zu dritt mit unterschiedlichen Schwerpunkten – Führung, Controlling und Technik. Je nach Thema bringen wir die passende Perspektive ein, Sie haben aber durchgehend feste Ansprechpartner. Mehr dazu auf der Seite <a href="team.html" style="color:var(--petrolblau);">Das sind wir</a>.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section style="padding:0 40px 80px; text-align:center;">
+  <div class="container" style="max-width:1100px; padding:0;">
+    <div style="background:var(--dunkelblau); border-radius:24px; padding:48px 40px; box-shadow:0 24px 48px rgba(11,60,93,0.20), 0 4px 12px rgba(11,60,93,0.08);">
+      <h2 style="color:white; font-size:26px; margin-bottom:14px;">Frage nicht beantwortet?</h2>
+      <p style="color:rgba(255,255,255,0.75); margin-bottom:24px; max-width:440px; margin-left:auto; margin-right:auto;">Schreiben Sie uns direkt – wir antworten in der Regel innerhalb eines Werktages.</p>
+      <a href="kontakt.html" class="btn-primary" style="background:var(--gelb); color:var(--dunkelblau);">Zum Kontaktformular</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <img src="images/logo.png" alt="Berater-Kasten" class="footer-logo">
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Berater-Kasten · info@berater-kasten.de</span>
+      <div class="footer-legal">
+        <a href="impressum.html">Impressum</a>
+        <a href="datenschutz.html">Datenschutz</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.12 });
+document.querySelectorAll('.anim, .anim-up').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
