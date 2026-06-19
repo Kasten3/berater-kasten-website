@@ -459,12 +459,32 @@ section { padding: 80px 0; }
   color: var(--petrolblau);
   font-weight: 700;
 }
-.team-icon {
-  display: block;
-  height: 44px;
-  margin: 16px auto 4px;
-  opacity: 0.9;
+.team-badge {
+  display: inline-block;
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  padding: 3px 7px;
+  border-radius: 6px;
+  margin-right: 6px;
+  vertical-align: middle;
+  letter-spacing: .02em;
 }
+.team-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.team-tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--petrolblau);
+  background: #e8f4fa;
+  border: 1px solid var(--hellblau);
+  border-radius: 14px;
+  padding: 4px 11px;
+}
+.team-card { border-top: 4px solid var(--hellblau); }
+.team-card:nth-child(1) { border-top-color: #5b85ab; }
+.team-card:nth-child(2) { border-top-color: var(--dunkelblau); }
+.team-card:nth-child(3) { border-top-color: var(--orange); }
 
 /* ── LEISTUNGEN CARDS ── */
 .leistungen-grid {

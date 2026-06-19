@@ -391,7 +391,7 @@ function makeToggles(container, items, activeSet, onChange) {
     produktion.forEach(r => byProductProd[r.Produkt] += r.Produzierte_Menge);
 
     const donutData = { labels: activeList, datasets: [{ data: activeList.map(p=>byProductSold[p]), backgroundColor: activeList.map(p=>COLORS[p]), borderWidth:2, borderColor:'#fff' }] };
-    const donutOpts = { plugins:{ legend:{ position:'bottom', labels:{ font:{ size:10 }, boxWidth:10 } }, datalabels:{ color:'#fff', font:{ weight:'bold', size:11 }, formatter:(v,ctx)=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total? Math.round(v/total*100)+'%':''; } } } };
+    const donutOpts = { plugins:{ legend:{ position:'bottom', labels:{ font:{ size:10 }, boxWidth:10 } }, datalabels:{ color:'#fff', textStrokeColor:'rgba(0,0,0,0.55)', textStrokeWidth:2, font:{ weight:'bold', size:8 }, formatter:(v,ctx)=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); const pct=total? Math.round(v/total*100):0; return pct<6? '':pct+'%'; } } } };
     if (donutChart) { donutChart.data = donutData; donutChart.update(); }
     else donutChart = new Chart(document.getElementById('p_chartDonut'), { type:'doughnut', data: donutData, options: donutOpts });
 
@@ -439,7 +439,7 @@ function makeToggles(container, items, activeSet, onChange) {
     rows.forEach(r => byStatus[r.Status] = (byStatus[r.Status]||0)+1);
     const statusLabels = Object.keys(byStatus);
     const donutData = { labels: statusLabels, datasets:[{ data: statusLabels.map(s=>byStatus[s]), backgroundColor: statusLabels.map(s=>STATUS_COLORS[s]||'#999'), borderWidth:2, borderColor:'#fff' }] };
-    const donutOpts = { plugins:{ legend:{ position:'bottom', labels:{ font:{ size:9 }, boxWidth:9 } }, datalabels:{ color:'#fff', font:{ weight:'bold', size:10 }, formatter:(v,ctx)=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total? v+' ('+Math.round(v/total*100)+'%)':''; } } } };
+    const donutOpts = { plugins:{ legend:{ position:'bottom', labels:{ font:{ size:9 }, boxWidth:9 } }, datalabels:{ color:'#fff', textStrokeColor:'rgba(0,0,0,0.55)', textStrokeWidth:2, font:{ weight:'bold', size:7.5 }, formatter:(v,ctx)=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); const pct=total? Math.round(v/total*100):0; return pct<6? '':pct+'%'; } } } };
     if (donutChart) { donutChart.data = donutData; donutChart.update(); }
     else donutChart = new Chart(document.getElementById('t_chartDonut'), { type:'doughnut', data: donutData, options: donutOpts });
 
@@ -487,7 +487,7 @@ function makeToggles(container, items, activeSet, onChange) {
     rows.forEach(r => byDept[r.Abteilung] = (byDept[r.Abteilung]||0)+1);
     const deptLabels = Object.keys(byDept);
     const donutData = { labels: deptLabels, datasets:[{ data: deptLabels.map(d=>byDept[d]), backgroundColor: deptLabels.map(d=>DEPT_COLORS[d]||'#999'), borderWidth:2, borderColor:'#fff' }] };
-    const donutOpts = { plugins:{ legend:{ position:'bottom', labels:{ font:{ size:9 }, boxWidth:9 } }, datalabels:{ color:'#fff', font:{ weight:'bold', size:10 }, formatter:(v,ctx)=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); return total? v+' ('+Math.round(v/total*100)+'%)':''; } } } };
+    const donutOpts = { plugins:{ legend:{ position:'bottom', labels:{ font:{ size:9 }, boxWidth:9 } }, datalabels:{ color:'#fff', textStrokeColor:'rgba(0,0,0,0.55)', textStrokeWidth:2, font:{ weight:'bold', size:7.5 }, formatter:(v,ctx)=>{ const total=ctx.dataset.data.reduce((a,b)=>a+b,0); const pct=total? Math.round(v/total*100):0; return pct<6? '':pct+'%'; } } } };
     if (donutChart) { donutChart.data = donutData; donutChart.update(); }
     else donutChart = new Chart(document.getElementById('h_chartDonut'), { type:'doughnut', data: donutData, options: donutOpts });
 
