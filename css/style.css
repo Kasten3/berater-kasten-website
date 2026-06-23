@@ -629,7 +629,7 @@ section { padding: 80px 0; }
   padding-bottom: 36px;
   border-bottom: 1px solid rgba(255,255,255,0.12);
 }
-.footer-logo { height: 38px; filter: brightness(0) invert(1); opacity: .85; }
+.footer-logo { height: 38px; opacity: .9; }
 .footer-links { display: flex; gap: 28px; flex-wrap: wrap; align-items: center; }
 .footer-links a {
   color: rgba(255,255,255,0.7);
