@@ -439,7 +439,8 @@ section { padding: 80px 0; }
   padding: 14px 16px 10px;
   color: var(--petrolblau);
 }
-.team-card-body h3 { font-size: 17px; margin-bottom: 8px; }
+.team-card-body h3 { font-size: 17px; margin-bottom: 4px; }
+.team-age { font-size: 13px; color: var(--textlight); font-weight: 600; margin-bottom: 10px; }
 .team-card-body p { font-size: 14px; color: var(--textlight); }
 .team-bullets {
   list-style: none;

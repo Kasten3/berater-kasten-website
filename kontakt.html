@@ -71,8 +71,7 @@
         <div style="background:var(--warmgrau); border-radius:20px; padding:40px 36px;">
           <h2 style="font-size:22px; margin-bottom:8px;">Nachricht schreiben</h2>
           <p style="color:var(--textlight); font-size:14px; margin-bottom:28px;">Wir melden uns in der Regel innerhalb eines Werktages zurück.</p>
-          <form action="https://formspree.io/f/xojovrqq" method="POST" novalidate>
-            <input type="hidden" name="_next" value="https://www.berater-kasten.de/danke.html">
+          <form action="https://formspree.io/f/xojovrqq" method="POST" id="kontaktForm">
             <div class="form-group">
               <label for="name">Name *</label>
               <input type="text" id="name" name="name" placeholder="Ihr Name" required autocomplete="name">
@@ -103,11 +102,35 @@
             <div class="form-group" style="display:flex; align-items:flex-start; gap:12px; margin-bottom:24px;">
               <input type="checkbox" id="datenschutz" name="datenschutz" required style="width:18px; height:18px; margin-top:2px; flex-shrink:0; accent-color:var(--petrolblau);">
               <label for="datenschutz" style="font-size:13px; color:var(--textlight); font-family:'Open Sans',sans-serif; font-weight:400; cursor:pointer;">
-                Ich habe die <a href="datenschutz.html" style="color:var(--petrolblau);">Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner Daten zu.
+                Ich habe die <a href="datenschutz.html" style="color:var(--petrolblau);">Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner Daten zu. *
               </label>
             </div>
             <button type="submit" class="btn-primary" style="width:100%; font-size:16px; padding:15px;">Nachricht senden</button>
+            <p id="kontaktError" style="color:#c0392b; font-size:13px; margin-top:12px; display:none;">Bitte alle Pflichtfelder (*) ausfüllen und der Datenschutzerklärung zustimmen.</p>
           </form>
+          <script>
+            document.getElementById('kontaktForm').addEventListener('submit', function(e){
+              const form = e.target;
+              if (!form.checkValidity()) {
+                e.preventDefault();
+                form.reportValidity();
+                document.getElementById('kontaktError').style.display = 'block';
+                return;
+              }
+              e.preventDefault();
+              document.getElementById('kontaktError').style.display = 'none';
+              const data = new FormData(form);
+              fetch(form.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } })
+                .then(res => {
+                  if (res.ok) { window.location.href = 'danke.html'; }
+                  else { document.getElementById('kontaktError').textContent = 'Senden leider nicht möglich. Bitte versuchen Sie es erneut oder schreiben Sie uns direkt an info@berater-kasten.de.'; document.getElementById('kontaktError').style.display = 'block'; }
+                })
+                .catch(() => {
+                  document.getElementById('kontaktError').textContent = 'Senden leider nicht möglich. Bitte versuchen Sie es erneut oder schreiben Sie uns direkt an info@berater-kasten.de.';
+                  document.getElementById('kontaktError').style.display = 'block';
+                });
+            });
+          </script>
         </div>
       </div>
 
