@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personalplanung Demo</title>
+<style>
+  :root {
+    --blau: #0B3C5D; --petrol: #1D6996; --hellblau: #A9D6E5;
+    --grau: #F4F1EE; --orange: #F4A261; --gelb: #FFD166;
+    --gruen: #4CAF50; --rot: #E53935; --text: #1a1a2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Open Sans', sans-serif; background: var(--grau); color: var(--text); font-size: 14px; }
+  .wrapper { max-width: 820px; margin: 0 auto; padding: 16px; }
+
+  /* Header */
+  .demo-header {
+    background: var(--blau); color: white; padding: 10px 18px;
+    border-radius: 10px 10px 0 0; display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo-text { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 15px; letter-spacing: 1px; }
+  .subtitle { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+
+  /* Toolbar */
+  .toolbar {
+    background: #0a2e47; color: white; padding: 8px 18px;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
+  .schicht-btn {
+    padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: 2px solid transparent; font-family: inherit;
+    background: rgba(255,255,255,0.1); color: white; transition: all 0.15s;
+  }
+  .schicht-btn:hover { background: rgba(255,255,255,0.2); }
+  .schicht-btn.active { background: white; color: var(--blau); }
+
+  .btn-calc {
+    margin-left: auto; padding: 7px 18px; border-radius: 8px; border: none;
+    background: var(--gelb); color: var(--blau); font-weight: 700; font-size: 12px;
+    cursor: pointer; font-family: inherit; transition: all 0.15s;
+  }
+  .btn-calc:hover { filter: brightness(0.92); }
+
+  /* Body */
+  .body { background: white; border: 1px solid #ddd; border-top: none; border-radius: 0 0 10px 10px; padding: 16px; }
+
+  /* KPI row */
+  .kpi-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .kpi { flex: 1; min-width: 80px; background: var(--grau); border-radius: 8px; padding: 10px 14px; border: 1px solid #e0ddd9; text-align: center; }
+  .kv { font-family: 'Montserrat', sans-serif; font-size: 26px; font-weight: 800; color: var(--blau); line-height: 1; }
+  .kv.g { color: var(--gruen); } .kv.r { color: var(--rot); } .kv.o { color: var(--orange); }
+  .kl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: #888; margin-top: 3px; }
+
+  /* Status banner */
+  .status-banner {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+    border-radius: 8px; margin-bottom: 16px; font-size: 13px; font-weight: 600;
+    transition: all 0.3s;
+  }
+  .status-banner.ok { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+  .status-banner.warn { background: #fff8e1; color: #e65100; border: 1px solid #ffe082; }
+  .status-banner.crit { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+
+  /* Section label */
+  .sec-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--petrol); font-weight: 700; margin-bottom: 10px; }
+
+  /* MA List */
+  .ma-list { display: flex; flex-direction: column; gap: 6px; }
+  .ma-row {
+    display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+    background: var(--grau); border-radius: 8px; border: 1px solid #e0ddd9;
+    transition: all 0.2s;
+  }
+  .ma-row.krank { background: #fff0f0; border-color: #ef9a9a; }
+  .ma-row.ersatz-row { background: #fff8e1; border-color: #ffe082; }
+
+  .ma-name { font-weight: 600; font-size: 13px; flex: 1; }
+  .ma-name.durchgestrichen { text-decoration: line-through; color: #bbb; }
+  .qual-badge {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 10px; flex-shrink: 0;
+  }
+  .q1 { background: #e3f2fd; color: #1565c0; }
+  .q2 { background: #e8f5e9; color: #2e7d32; }
+  .q3 { background: #fff8e1; color: #f57f17; }
+
+  .status-tag {
+    font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 600; flex-shrink: 0;
+  }
+  .tag-verfuegbar { background: #e8f5e9; color: #2e7d32; }
+  .tag-krank { background: #ffebee; color: #c62828; }
+  .tag-ersatz { background: #fff8e1; color: #e65100; }
+  .tag-frei { background: #f3f3f3; color: #999; }
+
+  .btn { padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+  .btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
+  .btn:active { transform: none; }
+  .btn-krank { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+  .btn-gh { background: #e0ddd9; color: var(--blau); }
+
+  /* Ersatz-Box */
+  .ersatz-box {
+    display: none; background: #fff8e1; border: 1px solid #ffe082;
+    border-radius: 10px; padding: 16px; margin-top: 12px;
+  }
+  .ersatz-box.open { display: block; }
+  .ersatz-box h4 { font-size: 13px; color: #e65100; margin-bottom: 4px; font-family: 'Montserrat', sans-serif; }
+  .ersatz-box .hint { font-size: 12px; color: #888; margin-bottom: 12px; }
+
+  .ersatz-option {
+    display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+    background: white; border-radius: 8px; border: 2px solid #ffe082;
+    margin-bottom: 8px; cursor: pointer; transition: all 0.15s;
+  }
+  .ersatz-option:hover { border-color: var(--orange); background: #fff3e0; }
+  .ersatz-option.sel { border-color: var(--gruen); background: #e8f5e9; }
+  .eo-name { font-weight: 600; font-size: 13px; flex: 1; }
+  .eo-info { font-size: 11px; color: #888; }
+  .eo-check { font-size: 18px; }
+
+  .ersatz-btns { display: flex; gap: 8px; margin-top: 12px; }
+  .btn-confirm { padding: 8px 16px; border: none; border-radius: 8px; background: var(--gruen); color: white; font-weight: 700; font-size: 12px; cursor: pointer; font-family: inherit; }
+  .btn-confirm:hover { filter: brightness(0.9); }
+
+  /* Auftraege */
+  .auftrag-item {
+    display: flex; gap: 8px; align-items: center; padding: 8px 12px;
+    border-radius: 6px; background: var(--grau); border-left: 4px solid var(--petrol);
+    margin-bottom: 6px; flex-wrap: wrap;
+  }
+  .ai-block { flex: 1; min-width: 80px; }
+  .ai-lbl { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+  .ai-val { font-weight: 600; font-size: 12px; }
+
+  .divider { border: none; border-top: 1px solid #eee; margin: 16px 0; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 20px; right: 20px; background: var(--blau); color: white;
+    padding: 10px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2); animation: slideUp 0.3s ease; z-index: 200;
+  }
+  @keyframes slideUp { from{transform:translateY(20px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+  /* Modal */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+  .overlay.open { display: flex; }
+  .modal { background: white; border-radius: 12px; padding: 22px; width: 360px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal h3 { font-family: 'Montserrat', sans-serif; font-size: 15px; margin-bottom: 6px; color: var(--blau); }
+  .modal .msub { font-size: 12px; color: #888; margin-bottom: 14px; }
+  .fg { margin-bottom: 11px; }
+  .fg label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #555; }
+  .fg select { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; font-family: inherit; }
+  .mbtns { display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end; }
+
+  .disc { font-size: 11px; color: #888; text-align: center; margin-top: 8px; font-style: italic; }
+
+  @media (max-width: 540px) {
+    .kv { font-size: 20px; }
+    .ma-row { flex-wrap: wrap; }
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="wrapper">
+  <div class="demo-header">
+    <div>
+      <div class="logo-text">KA&middot;ST&middot;EN Personalplanung</div>
+      <div class="subtitle">KW 27 &middot; 30.06.&ndash;06.07.2026 &middot; Beispielwerk GmbH (Demo)</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <span style="font-size:12px;opacity:0.7;">Schicht:</span>
+    <button class="schicht-btn active" onclick="setSchicht('frueh',this)">Fruehschicht</button>
+    <button class="schicht-btn" onclick="setSchicht('spaet',this)">Spaetschicht</button>
+    <button class="schicht-btn" onclick="setSchicht('nacht',this)">Nachtschicht</button>
+    <button class="btn-calc" onclick="berechne()">Planung berechnen</button>
+  </div>
+
+  <div class="body">
+    <!-- KPIs -->
+    <div class="kpi-row">
+      <div class="kpi"><div class="kv" id="kGeplant">8</div><div class="kl">Geplant</div></div>
+      <div class="kpi"><div class="kv g" id="kVerfueg">7</div><div class="kl">Verfuegbar</div></div>
+      <div class="kpi"><div class="kv r" id="kKrank">1</div><div class="kl">Krank</div></div>
+      <div class="kpi"><div class="kv" id="kMin">6</div><div class="kl">Minimum</div></div>
+      <div class="kpi"><div class="kv" id="kAmpel">&#128993;</div><div class="kl">Status</div></div>
+    </div>
+
+    <!-- Status -->
+    <div class="status-banner warn" id="statusBanner">
+      &#9888; Mindestbesetzung noch nicht berechnet &ndash; Planung berechnen klicken
+    </div>
+
+    <!-- MA-Liste -->
+    <div class="sec-lbl">Mitarbeiter</div>
+    <div class="ma-list" id="maListe"></div>
+
+    <!-- Ersatz-Box -->
+    <div class="ersatz-box" id="ersatzBox">
+      <h4>Ersatz fuer: <span id="ersatzFuer"></span></h4>
+      <p class="hint">Verfuegbare Mitarbeiter mit passender Qualifikation:</p>
+      <div id="ersatzListe"></div>
+      <div class="ersatz-btns">
+        <button class="btn-confirm" onclick="ersatzOK()">Auswahl uebernehmen</button>
+        <button class="btn btn-gh" onclick="closeErsatz()">Abbrechen</button>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Auftraege -->
+    <div class="sec-lbl">Auftraege der Woche</div>
+    <div id="auftragListe"></div>
+  </div>
+  <div class="disc">Beispieldaten &middot; keine echten Mitarbeiter &middot; Demo berater-kasten.de</div>
+</div>
+
+<!-- Krank-Modal -->
+<div class="overlay" id="krankModal">
+  <div class="modal">
+    <h3>Krank melden</h3>
+    <p class="msub" id="krankSub"></p>
+    <div class="fg"><label>Grund</label>
+      <select id="krankGrund">
+        <option>Krankheit (Attest folgt)</option>
+        <option>Arztbesuch</option>
+        <option>Kind krank</option>
+        <option>Unfall</option>
+      </select>
+    </div>
+    <div class="fg"><label>Voraussichtliche Dauer</label>
+      <select id="krankDauer">
+        <option>1 Tag</option><option>2&ndash;3 Tage</option><option>1 Woche</option><option>Unbekannt</option>
+      </select>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-gh" onclick="closeM()">Abbrechen</button>
+      <button class="btn btn-krank" onclick="doKrank()">Krank melden &amp; Ersatz suchen</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  frueh: [
+    {id:1, name:'Anna Meier',     qual:'Q1', krank:false},
+    {id:2, name:'Klaus Bauer',    qual:'Q2', krank:true},
+    {id:3, name:'Sabine Koch',    qual:'Q1', krank:false},
+    {id:4, name:'Markus Wolf',    qual:'Q3', krank:false},
+    {id:5, name:'Lisa Braun',     qual:'Q2', krank:false},
+    {id:6, name:'Tobias Schulz',  qual:'Q1', krank:false},
+    {id:7, name:'Maria Gruber',   qual:'Q2', krank:false},
+    {id:8, name:'Stefan Richter', qual:'Q3', krank:false},
+  ],
+  spaet: [
+    {id:9,  name:'Petra Vogel',   qual:'Q2', krank:false},
+    {id:10, name:'Daniel Braun',  qual:'Q1', krank:false},
+    {id:11, name:'Eva Schmitt',   qual:'Q1', krank:false},
+    {id:12, name:'Jonas Weber',   qual:'Q2', krank:false},
+    {id:13, name:'Claudia Huber', qual:'Q3', krank:false},
+    {id:14, name:'Frank Mueller', qual:'Q1', krank:false},
+  ],
+  nacht: [
+    {id:15, name:'Heinrich Lang', qual:'Q2', krank:false},
+    {id:16, name:'Sina Berger',   qual:'Q1', krank:false},
+    {id:17, name:'Ralf Zimmer',   qual:'Q2', krank:false},
+    {id:18, name:'Ute Fischer',   qual:'Q3', krank:false},
+  ]
+};
+
+const AUFTRAEGE = [
+  {nr:'AU-2026-051', art:'Dinkelmehl 1kg',  menge:600, schicht:'Frueh',  anlage:'Linie 1'},
+  {nr:'AU-2026-052', art:'Hafermehl 500g',  menge:400, schicht:'Frueh',  anlage:'Linie 2'},
+  {nr:'AU-2026-053', art:'Roggenmehl 500g', menge:300, schicht:'Spaet',  anlage:'Linie 1'},
+  {nr:'AU-2026-054', art:'Muesli Mix 750g', menge:200, schicht:'Nacht',  anlage:'Linie 2'},
+];
+
+let schicht = 'frueh';
+let krankId = null;
+let ersatzGewaehlt = null;
+let ersatzFuerMa = null;
+const ERSATZ_POOL = ['Werner Hof (Springer)', 'Gabi Stein (Springer)', 'Thomas Lenz (Teilzeit)'];
+
+function setSchicht(s, btn) {
+  schicht = s;
+  document.querySelectorAll('.schicht-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  closeErsatz();
+  render();
+}
+
+function render() {
+  const mas = DATA[schicht];
+  const krank = mas.filter(m => m.krank).length;
+  const verf = mas.length - krank;
+  const min = Math.ceil(mas.length * 0.75);
+
+  document.getElementById('kGeplant').textContent = mas.length;
+  document.getElementById('kVerfueg').textContent = verf;
+  document.getElementById('kKrank').textContent = krank;
+  document.getElementById('kMin').textContent = min;
+
+  const el = document.getElementById('maListe');
+  el.innerHTML = '';
+  mas.forEach(ma => {
+    const div = document.createElement('div');
+    div.className = 'ma-row' + (ma.krank ? ' krank' : '') + (ma.ersatz ? ' ersatz-row' : '');
+    div.innerHTML = `
+      <span class="ma-name${ma.krank ? ' durchgestrichen':''}">
+        ${ma.name}${ma.ersatz ? ' <span style="font-size:11px;color:#e65100;">&rarr; Ersatz: '+ma.ersatz+'</span>' : ''}
+      </span>
+      <span class="qual-badge ${ma.qual.toLowerCase()}">${ma.qual}</span>
+      <span class="status-tag ${ma.krank ? 'tag-krank' : 'tag-verfuegbar'}">${ma.krank ? 'krank' : 'verfuegbar'}</span>
+      ${!ma.krank ? `<button class="btn btn-krank" onclick="openKrank(${ma.id})">Krank melden</button>` : '<span style="font-size:11px;color:#c62828;">krank gemeldet</span>'}
+    `;
+    el.appendChild(div);
+  });
+
+  // Auftraege
+  const al = document.getElementById('auftragListe');
+  al.innerHTML = '';
+  AUFTRAEGE.forEach(a => {
+    const d = document.createElement('div');
+    d.className = 'auftrag-item';
+    d.innerHTML = `
+      <div class="ai-block"><div class="ai-lbl">Auftrag</div><div class="ai-val">${a.nr}</div></div>
+      <div class="ai-block"><div class="ai-lbl">Artikel</div><div class="ai-val">${a.art}</div></div>
+      <div class="ai-block"><div class="ai-lbl">Menge</div><div class="ai-val">${a.menge} Stk</div></div>
+      <div class="ai-block"><div class="ai-lbl">Schicht</div><div class="ai-val">${a.schicht}</div></div>
+      <div class="ai-block"><div class="ai-lbl">Anlage</div><div class="ai-val">${a.anlage}</div></div>
+    `;
+    al.appendChild(d);
+  });
+}
+
+function updateAmpel(verf, min, total) {
+  const ampel = document.getElementById('kAmpel');
+  const banner = document.getElementById('statusBanner');
+  if (verf >= total) {
+    ampel.textContent = '\uD83D\uDFE2'; ampel.className = 'kv g';
+    banner.className = 'status-banner ok';
+    banner.textContent = 'Vollstaendig besetzt \u2013 alle Mitarbeiter verfuegbar';
+  } else if (verf >= min) {
+    ampel.textContent = '\uD83D\uDFE1'; ampel.className = 'kv o';
+    banner.className = 'status-banner warn';
+    banner.textContent = 'Mindestbesetzung erreicht \u2013 ' + verf + ' von ' + total + ' Mitarbeitern verfuegbar';
+  } else {
+    ampel.textContent = '\uD83D\uDD34'; ampel.className = 'kv r';
+    banner.className = 'status-banner crit';
+    banner.textContent = 'Unterbesetzt! Nur ' + verf + ' von ' + total + ' verfuegbar \u2013 Mindestbesetzung ' + min;
+  }
+}
+
+function berechne() {
+  const mas = DATA[schicht];
+  const krank = mas.filter(m => m.krank).length;
+  const verf = mas.length - krank;
+  const min = Math.ceil(mas.length * 0.75);
+  updateAmpel(verf, min, mas.length);
+  toast('Planung berechnet: ' + verf + ' von ' + mas.length + ' Mitarbeitern verfuegbar');
+}
+
+function openKrank(id) {
+  krankId = id;
+  const ma = getMa(id);
+  document.getElementById('krankSub').textContent = 'Mitarbeiter: ' + ma.name + ' \u00b7 ' + ma.qual;
+  document.getElementById('krankModal').classList.add('open');
+}
+
+function getMa(id) {
+  for (const s of Object.values(DATA)) { const m = s.find(x=>x.id===id); if(m) return m; }
+}
+
+function doKrank() {
+  const ma = getMa(krankId);
+  ma.krank = true;
+  ersatzFuerMa = ma;
+  closeM();
+  render();
+  zeigeErsatz(ma);
+}
+
+function zeigeErsatz(ma) {
+  const qNum = {Q1:1, Q2:2, Q3:3};
+  const box = document.getElementById('ersatzBox');
+  box.classList.add('open');
+  document.getElementById('ersatzFuer').textContent = ma.name;
+
+  // Kandidaten: gleiche Schicht, nicht krank, frei (nur erster Treffer pro Person, simuliert)
+  const mas = DATA[schicht];
+  const kandidaten = [];
+  mas.filter(m => !m.krank && m.id !== ma.id && qNum[m.qual] >= qNum[ma.qual])
+     .slice(0,2).forEach(m => kandidaten.push({name: m.name, info: 'Gleiche Schicht \u00b7 ' + m.qual + ' \u00b7 hat heute frei'}));
+
+  // Springer auffuellen
+  while (kandidaten.length < 3) {
+    kandidaten.push({name: ERSATZ_POOL[kandidaten.length], info: 'Springerpool \u00b7 sofort verfuegbar'});
+  }
+
+  const liste = document.getElementById('ersatzListe');
+  liste.innerHTML = '';
+  ersatzGewaehlt = null;
+  kandidaten.slice(0,3).forEach((k, i) => {
+    const d = document.createElement('div');
+    d.className = 'ersatz-option';
+    d.id = 'eopt_'+i;
+    d.onclick = () => waehle(i, k, d);
+    d.innerHTML = `<div class="eo-name">${k.name}</div><div class="eo-info">${k.info}</div><span class="eo-check">\u25CB</span>`;
+    liste.appendChild(d);
+  });
+}
+
+function waehle(i, k, el) {
+  document.querySelectorAll('.ersatz-option').forEach(e => { e.classList.remove('sel'); e.querySelector('.eo-check').textContent = '\u25CB'; });
+  el.classList.add('sel');
+  el.querySelector('.eo-check').textContent = '\u2713';
+  ersatzGewaehlt = k;
+}
+
+function ersatzOK() {
+  if (!ersatzGewaehlt) { toast('Bitte zuerst einen Ersatz auswaehlen'); return; }
+  const zielMa = ersatzFuerMa;
+  const zielErsatz = ersatzGewaehlt;
+  closeErsatz();
+  if (zielMa) zielMa.ersatz = zielErsatz.name;
+  render();
+  toast(zielErsatz.name + ' als Ersatz eingeplant');
+}
+
+function closeErsatz() { document.getElementById('ersatzBox').classList.remove('open'); ersatzFuerMa = null; ersatzGewaehlt = null; }
+function closeM() { document.getElementById('krankModal').classList.remove('open'); }
+
+function toast(msg) {
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2800);
+}
+
+render();
+</script>
+</body>
+</html>

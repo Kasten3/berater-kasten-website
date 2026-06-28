@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KaStEn-Logger Demo</title>
+<style>
+  :root {
+    --blau: #0B3C5D; --petrol: #1D6996; --grau: #F4F1EE;
+    --orange: #F4A261; --gruen: #4CAF50; --rot: #E53935; --text: #1a1a2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Open Sans', sans-serif; background: var(--grau); color: var(--text); font-size: 14px; }
+  .wrapper { max-width: 800px; margin: 0 auto; padding: 16px; }
+
+  .demo-header {
+    background: var(--blau); color: white; padding: 10px 18px;
+    border-radius: 10px 10px 0 0; display: flex; align-items: center; justify-content: space-between;
+  }
+  .logo-text { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 15px; letter-spacing: 1px; }
+  .subtitle { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+  .conn { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .dot.g { background: var(--gruen); box-shadow: 0 0 6px var(--gruen); }
+  .dot.r { background: var(--rot); box-shadow: 0 0 6px var(--rot); animation: blink 1s infinite; }
+  .dot.o { background: var(--orange); box-shadow: 0 0 6px var(--orange); animation: blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .status-bar {
+    background: #0a2e47; color: white; padding: 7px 18px;
+    display: flex; align-items: center; gap: 10px; font-size: 12px;
+  }
+  .clock { margin-left: auto; opacity: 0.6; font-size: 11px; }
+
+  .body { background: white; border: 1px solid #ddd; border-top: none; border-radius: 0 0 10px 10px; padding: 16px; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; }
+  .kpi { background: var(--grau); border-radius: 8px; padding: 12px 14px; border: 1px solid #e0ddd9; text-align: center; }
+  .kv { font-family: 'Montserrat', sans-serif; font-size: 28px; font-weight: 800; color: var(--blau); line-height: 1; }
+  .kv.g { color: var(--gruen); } .kv.r { color: var(--rot); } .kv.o { color: var(--orange); }
+  .kl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: #888; margin-top: 4px; }
+  .ks { font-size: 11px; color: #aaa; margin-top: 2px; }
+
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card { background: var(--grau); border-radius: 8px; padding: 14px; border: 1px solid #e0ddd9; }
+  .cl { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--petrol); font-weight: 700; margin-bottom: 10px; }
+
+  .mstate { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 6px; font-weight: 600; font-size: 13px; margin-bottom: 12px; transition: all 0.3s; }
+  .mstate.laufen { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+  .mstate.stoerung { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+  .mstate.pause { background: #fff8e1; color: #e65100; border: 1px solid #ffe082; }
+  .stag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; background: #ffebee; color: #c62828; margin-bottom: 10px; }
+
+  .ar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+  .ar .al { font-size: 12px; color: #666; } .ar .av { font-weight: 600; font-size: 13px; }
+  .pbar { background: #e0e0e0; border-radius: 4px; height: 8px; margin-top: 8px; overflow: hidden; }
+  .pfill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+
+  .btn { padding: 7px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; font-family: inherit; transition: all 0.15s; }
+  .btn:hover { filter: brightness(0.9); transform: translateY(-1px); }
+  .btn:active { transform: none; }
+  .btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  .btn-d { background: var(--rot); color: white; }
+  .btn-s { background: var(--gruen); color: white; }
+  .btn-w { background: var(--orange); color: white; }
+  .btn-gh { background: #e0ddd9; color: var(--blau); }
+  .btn-p { background: var(--petrol); color: white; }
+  .brow { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+  .overlay.open { display: flex; }
+  .modal { background: white; border-radius: 12px; padding: 22px; width: 340px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+  .modal h3 { font-family: 'Montserrat', sans-serif; font-size: 15px; margin-bottom: 14px; color: var(--blau); }
+  .fg { margin-bottom: 11px; }
+  .fg label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: #555; }
+  .fg select, .fg input { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 13px; font-family: inherit; }
+  .mbtns { display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end; }
+  .disc { font-size: 11px; color: #888; text-align: center; margin-top: 8px; font-style: italic; }
+
+  @media (max-width: 520px) {
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+    .cols { grid-template-columns: 1fr; }
+    .kv { font-size: 22px; }
+  }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="wrapper">
+  <div class="demo-header">
+    <div>
+      <div class="logo-text">KA&middot;ST&middot;EN Logger</div>
+      <div class="subtitle">Verpackungslinie 1 &middot; Fruehschicht 06:00&ndash;14:00</div>
+    </div>
+    <div class="conn"><span class="dot g"></span><span>verbunden</span></div>
+  </div>
+
+  <div class="status-bar">
+    <span class="dot g" id="sDot"></span>
+    <span id="sTxt" style="font-weight:600;">Maschine laeuft</span>
+    <span class="clock" id="clk"></span>
+  </div>
+
+  <div class="body">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kv" id="kStueck">0</div><div class="kl">Stueck / Schicht</div><div class="ks">Ziel: 480</div></div>
+      <div class="kpi"><div class="kv g" id="kTakt">&mdash;</div><div class="kl">Taktzeit</div><div class="ks">Soll: 45 s</div></div>
+      <div class="kpi"><div class="kv" id="kOee">&mdash;</div><div class="kl">OEE</div><div class="ks">Verfuegbarkeit</div></div>
+      <div class="kpi"><div class="kv" id="kStoer">0</div><div class="kl">Stoerungen</div><div class="ks">heute</div></div>
+    </div>
+
+    <div class="cols">
+      <div class="card">
+        <div class="cl">Maschinenstatus</div>
+        <div class="mstate laufen" id="mBox">
+          <span class="dot g" id="mDot"></span><span id="mLbl">Laeuft</span>
+        </div>
+        <div id="stagWrap" style="display:none;"><span class="stag" id="stagTxt"></span></div>
+        <div class="brow">
+          <button class="btn btn-s" id="btnSt" onclick="doStart()" disabled>&#9654; Start</button>
+          <button class="btn btn-d" id="btnSt2" onclick="openM('stoer')">&#9632; Stoerung</button>
+          <button class="btn btn-gh" onclick="openM('pause')">&#9646;&#9646; Pause</button>
+        </div>
+        <div style="margin-top:12px;">
+          <button class="btn btn-gh" onclick="doExport()" style="width:100%;font-size:11px;">&#11015; log.csv exportieren</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cl">Aktueller Auftrag</div>
+        <div class="ar"><span class="al">Auftragsnr.</span><span class="av" id="aufNr">AU-2026-047</span></div>
+        <div class="ar"><span class="al">Artikel</span><span class="av" id="aufArt">Hafermehl 500g</span></div>
+        <div class="ar"><span class="al">Menge</span><span class="av"><span id="aufIst">0</span> / <span id="aufSoll">240</span> Stk</span></div>
+        <div class="pbar"><div class="pfill" id="aufProg" style="width:0%;background:var(--orange);"></div></div>
+        <div class="brow"><button class="btn btn-w" onclick="openM('auftrag')">+ Neuer Auftrag</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="disc">Beispieldaten &middot; keine echte Maschine &middot; Demo berater-kasten.de</div>
+</div>
+
+<!-- Stoerung -->
+<div class="overlay" id="stoerModal">
+  <div class="modal">
+    <h3>Stoerung erfassen</h3>
+    <div class="fg"><label>Stoerungsgrund</label>
+      <select id="sGrund"><option value="">-- bitte waehlen --</option><option>Materialstau</option><option>Folie gerissen</option><option>Sensor ausgeloest</option><option>Wartung / Reinigung</option><option>Werkzeugwechsel</option><option>Sonstiges</option></select>
+    </div>
+    <div class="fg"><label>Bemerkung (optional)</label><input type="text" id="sBem" placeholder="z. B. Station 3"></div>
+    <div class="mbtns">
+      <button class="btn btn-gh" onclick="closeM('stoer')">Abbrechen</button>
+      <button class="btn btn-d" onclick="doStoer()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pause -->
+<div class="overlay" id="pauseModal">
+  <div class="modal">
+    <h3>Pause erfassen</h3>
+    <div class="fg"><label>Pausenart</label>
+      <select id="pGrund"><option>Fruehstueckspause</option><option>Mittagspause</option><option>Schichtwechsel</option><option>Ruesten</option></select>
+    </div>
+    <div class="mbtns">
+      <button class="btn btn-gh" onclick="closeM('pause')">Abbrechen</button>
+      <button class="btn btn-w" onclick="doPause()">Pause starten</button>
+    </div>
+  </div>
+</div>
+
+<!-- Auftrag -->
+<div class="overlay" id="auftragModal">
+  <div class="modal">
+    <h3>Neuer Auftrag</h3>
+    <div class="fg"><label>Artikel</label>
+      <select id="aArt"><option>Hafermehl 500g</option><option>Dinkelmehl 1kg</option><option>Roggenmehl 500g</option><option>Muesli Mix 750g</option></select>
+    </div>
+    <div class="fg"><label>Sollmenge</label><input type="number" id="aSoll" value="200" min="50" max="999"></div>
+    <div class="mbtns">
+      <button class="btn btn-gh" onclick="closeM('auftrag')">Abbrechen</button>
+      <button class="btn btn-p" onclick="doAuftrag()">Starten</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let laeuft = true, stueck = 0, aufIst = 0, aufSoll = 240, aufNr = 47;
+  let takte = [], letzter = Date.now(), stoerCount = 0, betriebMs = 0, lastT = Date.now();
+  const RSTART = Date.now();
+  const SOFF = new Date().setHours(8,0,0,0) - Date.now();
+  function simNow() { return new Date(Date.now()+SOFF+(Date.now()-RSTART)*5); }
+  function ft(d) { return d.toTimeString().slice(0,8); }
+
+  setInterval(() => { document.getElementById('clk').textContent = ft(simNow()); }, 500);
+
+  setInterval(() => {
+    const now = Date.now(), dt = now - lastT; lastT = now;
+    if (laeuft) betriebMs += dt;
+    if (!laeuft) return;
+    const takt = dt/1000*6;
+    takte.push(takt); if (takte.length>10) takte.shift();
+    stueck++; aufIst = Math.min(aufIst+1, aufSoll);
+    const avg = (takte.reduce((a,b)=>a+b,0)/takte.length).toFixed(1);
+    document.getElementById('kStueck').textContent = stueck;
+    document.getElementById('kTakt').textContent = avg+' s';
+    document.getElementById('aufIst').textContent = aufIst;
+    document.getElementById('aufProg').style.width = (aufIst/aufSoll*100)+'%';
+    const tot = Date.now()-RSTART;
+    const oee = tot>0 ? Math.min(99, Math.round(betriebMs/tot*100)) : 0;
+    document.getElementById('kOee').textContent = oee+' %';
+    if (aufIst>=aufSoll) { laeuft=false; setZ('pause'); document.getElementById('btnSt').disabled=false; }
+  }, 1800);
+
+  function setZ(z) {
+    const sd=document.getElementById('sDot'), st=document.getElementById('sTxt');
+    const mb=document.getElementById('mBox'), md=document.getElementById('mDot'), ml=document.getElementById('mLbl');
+    const sw=document.getElementById('stagWrap');
+    sd.className='dot'; md.className='dot'; mb.className='mstate';
+    if(z==='laufen'){sd.classList.add('g');md.classList.add('g');mb.classList.add('laufen');st.textContent='Maschine laeuft';ml.textContent='Laeuft';sw.style.display='none';}
+    else if(z==='stoerung'){sd.classList.add('r');md.classList.add('r');mb.classList.add('stoerung');st.textContent='Stoerung – Maschine steht';ml.textContent='Stoerung';sw.style.display='block';}
+    else{sd.classList.add('o');md.classList.add('o');mb.classList.add('pause');st.textContent='Pause';ml.textContent='Pause';sw.style.display='none';}
+  }
+
+  function doStart() { laeuft=true; letzter=Date.now(); setZ('laufen'); document.getElementById('btnSt').disabled=true; document.getElementById('btnSt2').disabled=false; }
+  function openM(id) { document.getElementById(id+'Modal').classList.add('open'); }
+  function closeM(id) { document.getElementById(id+'Modal').classList.remove('open'); }
+
+  function doStoer() {
+    const g=document.getElementById('sGrund').value;
+    if(!g){alert('Bitte Stoerungsgrund waehlen.');return;}
+    laeuft=false; stoerCount++;
+    document.getElementById('kStoer').textContent=stoerCount;
+    document.getElementById('kStoer').className='kv r';
+    setZ('stoerung');
+    document.getElementById('stagTxt').textContent=g;
+    document.getElementById('btnSt').disabled=false;
+    document.getElementById('btnSt2').disabled=true;
+    closeM('stoer');
+    document.getElementById('sGrund').value=''; document.getElementById('sBem').value='';
+  }
+  function doPause() { laeuft=false; setZ('pause'); document.getElementById('btnSt').disabled=false; closeM('pause'); }
+  function doAuftrag() {
+    const art=document.getElementById('aArt').value, soll=parseInt(document.getElementById('aSoll').value)||200;
+    aufNr++; aufIst=0; aufSoll=soll;
+    document.getElementById('aufNr').textContent='AU-2026-0'+aufNr;
+    document.getElementById('aufArt').textContent=art;
+    document.getElementById('aufSoll').textContent=soll;
+    document.getElementById('aufIst').textContent=0;
+    document.getElementById('aufProg').style.width='0%';
+    laeuft=true; letzter=Date.now(); setZ('laufen');
+    document.getElementById('btnSt').disabled=true; document.getElementById('btnSt2').disabled=false;
+    closeM('auftrag');
+  }
+  function doExport() {
+    const csv='Zeitstempel;Stueckzahl;Zustand\n'+ft(simNow())+';'+stueck+';laufen';
+    const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv); a.download='log.csv'; a.click();
+  }
+</script>
+</body>
+</html>

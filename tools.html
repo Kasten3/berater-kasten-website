@@ -119,6 +119,8 @@
       <button class="dash-tab-btn active" data-tab="produktion">Produktion &amp; Vertrieb</button>
       <button class="dash-tab-btn" data-tab="technik">Technik-Projekte</button>
       <button class="dash-tab-btn" data-tab="hr">Personalcontrolling</button>
+      <button class="dash-tab-btn" data-tab="logger">KaStEn-Logger</button>
+      <button class="dash-tab-btn" data-tab="personalplanung">Personalplanung</button>
     </div>
 
     <!-- PANEL: PRODUKTION -->
@@ -215,6 +217,51 @@
           <div class="dash-card"><h4>Ø Kranktage je Abteilung</h4><canvas id="h_chartBar" height="140"></canvas></div>
         </div>
         <p class="dash-watermark">Beispieldaten · fiktive Namen, keine echten Mitarbeiter</p>
+      </div>
+    </div>
+
+    <!-- PANEL: KASTEN-LOGGER -->
+    <div class="dash-panel" id="panel-logger">
+      <div style="max-width:680px; margin:0 auto;">
+        <div class="dash-disclaimer" style="margin-bottom:14px;">
+          Simulierte Demo mit Beispieldaten &ndash; keine echte Maschine. Der KaStEn-Logger erfasst Produktionsdaten direkt am ESP32-Ger&auml;t in Ihrer Anlage.
+        </div>
+        <!-- Eingebettete Logger-Demo -->
+        <div style="border-radius:12px; overflow:hidden; box-shadow:0 10px 24px rgba(11,60,93,0.10); border:1.5px solid #e3ddd4;">
+          <iframe src="logger-demo.html" title="KaStEn-Logger Demo" style="width:100%; height:520px; border:none; display:block;" loading="lazy"></iframe>
+        </div>
+        <div style="margin-top:24px; background:white; border-radius:12px; padding:20px 24px; border:1.5px solid #e3ddd4;">
+          <span class="eyebrow">Was ist der KaStEn-Logger?</span>
+          <h3 style="margin:8px 0 10px;">Produktionsdaten erfassen &ndash; ohne SPS, ohne IT-Abteilung</h3>
+          <ul class="pbi-points" style="margin:0;">
+            <li>Nachr&uuml;stbar an bestehenden Maschinen &ndash; induktive Sensoren oder Lichtschranken</li>
+            <li>Webober&shy;fl&auml;che direkt im Browser &ndash; kein Softwareinstall n&ouml;tig</li>
+            <li>CSV-Export f&uuml;r Excel und Power BI</li>
+            <li>Ideal f&uuml;r Pilotprojekte und OEE-Erfassung</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL: PERSONALPLANUNG -->
+    <div class="dash-panel" id="panel-personalplanung">
+      <div style="max-width:680px; margin:0 auto;">
+        <div class="dash-disclaimer" style="margin-bottom:14px;">
+          Simulierte Demo mit fiktiven Mitarbeitern und Beispieldaten. Das Tool wird auf die Schichtstruktur Ihres Betriebs angepasst.
+        </div>
+        <div style="border-radius:12px; overflow:hidden; box-shadow:0 10px 24px rgba(11,60,93,0.10); border:1.5px solid #e3ddd4;">
+          <iframe src="personalplanung-demo.html" title="Personalplanung Demo" style="width:100%; height:580px; border:none; display:block;" loading="lazy"></iframe>
+        </div>
+        <div style="margin-top:24px; background:white; border-radius:12px; padding:20px 24px; border:1.5px solid #e3ddd4;">
+          <span class="eyebrow">Was kann das Personalplanungstool?</span>
+          <h3 style="margin:8px 0 10px;">Schichtplanung &ndash; &uuml;bersichtlich und direkt im Browser</h3>
+          <ul class="pbi-points" style="margin:0;">
+            <li>Schichtmatrix f&uuml;r Fr&uuml;h-, Sp&auml;t- und Nachtschicht</li>
+            <li>Krankmeldung mit automatischem Ersatzvorschlag</li>
+            <li>Qualifikationslevel je Mitarbeiter (Q1/Q2/Q3)</li>
+            <li>Auftrags&uuml;bersicht mit Anlage und Schichtzuordnung</li>
+          </ul>
+        </div>
       </div>
     </div>
 
