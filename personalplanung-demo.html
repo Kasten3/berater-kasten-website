@@ -135,7 +135,7 @@
       <div class="kpi-chip"><div class="kpi-num" id="kMin">6</div><div class="kpi-lbl">Minimum</div></div>
       <div class="kpi-chip"><div class="kpi-num" id="kAmpel">&mdash;</div><div class="kpi-lbl">Status</div></div>
     </div>
-    <div class="banner idle" id="banner">Planung berechnen um Besetzungsstatus zu pr&uuml;fen</div>
+    <div class="banner warn" id="banner" style="background:#eaf3fb;color:#1D6996;border-color:#A9D6E5;">&#8505; Klicken Sie auf <strong>&nbsp;&#9889; Planung berechnen&nbsp;</strong> oben rechts, um den Besetzungsstatus zu pr&uuml;fen. Danach k&ouml;nnen Sie Krankmeldungen erfassen.</div>
     <div class="plan-wrap">
       <table class="plan-table">
         <thead>
@@ -160,6 +160,7 @@
       <div class="ersatz-opts" id="ersatzOpts"></div>
       <div class="ersatz-btns">
         <button class="btn btn-ok" onclick="ersatzOK()">&#10003; Auswahl &uuml;bernehmen</button>
+        <button class="btn" id="btnOhneErsatz" onclick="ersatzOhneErsatz()" style="display:none;background:#fff3cd;color:#856404;border:1px solid #ffe082;">&#9888; Ohne Ersatz &ndash; Anlage ungeplant</button>
         <button class="btn btn-gh" onclick="ersatzAbbrechen()">Abbrechen</button>
       </div>
     </div>
@@ -234,6 +235,9 @@ const SPRINGER_POOL = [
   {name:'Werner Hof',   qual:'Q2', info:'Springerpool'},
   {name:'Gabi Stein',   qual:'Q1', info:'Springerpool'},
   {name:'Thomas Lenz',  qual:'Q2', info:'Springerpool (Teilzeit)'},
+  {name:'Nina Krause',  qual:'Q1', info:'Springerpool'},
+  {name:'Bernd Huber',  qual:'Q3', info:'Springerpool'},
+  {name:'Sandra Wolff', qual:'Q2', info:'Springerpool'},
 ];
 const TAGE = ['Mo','Di','Mi','Do','Fr','Sa','So'];
 const SCHICHT_LABELS = {F:'Fr\u00fchschicht',S:'Sp\u00e4tschicht',N:'Nachtschicht'};
@@ -334,6 +338,9 @@ function setBanner(cls, txt) {
 // ===== BERECHNEN =====
 function berechne() {
   planBerechnet = true;
+  // Reset banner to idle after first calculation so it doesn't persist as instruction
+  const b = document.getElementById('banner');
+  if (b && b.style.background) { b.style.background=''; b.style.color=''; b.style.borderColor=''; }
   const mas = SCHICHTEN[akt].filter(m => !m.springer);
   const krank = mas.reduce((n,m) => n + (m.krankTage.length > 0 ? 1 : 0), 0);
   const verf = mas.length - krank;
@@ -403,17 +410,20 @@ function zeigeErsatz(ma, tagIdx) {
   // Springer auffuellen
   const springerOpts = SPRINGER_POOL
     .filter(sp => qNum[sp.qual] >= qNum[ma.qual])
-    .slice(0, 3 - kandidaten.length)
+    .slice(0, 4 - kandidaten.length)
     .map(sp => ({name:sp.name, qual:sp.qual, info:sp.info, maId:null, isSpringer:true}));
 
-  const alle = [...kandidaten, ...springerOpts].slice(0, 3);
+  const alle = [...kandidaten, ...springerOpts].slice(0, 4);
 
   const opts = document.getElementById('ersatzOpts');
   opts.innerHTML = '';
   if (alle.length === 0) {
-    opts.innerHTML = '<div style="padding:10px;font-size:12px;color:#888;">Keine verf\u00fcgbaren Mitarbeiter gefunden \u2013 bitte Springer kontaktieren.</div>';
+    opts.innerHTML = '<div style="padding:10px 10px 6px;font-size:12px;color:#c62828;font-weight:600;">&#9888; Kein Ersatz verf\u00fcgbar</div><div style="padding:0 10px 10px;font-size:11px;color:#888;">Alle Mitarbeiter sind eingeplant oder ebenfalls krank. Die Anlage muss ggf. ungeplant stillstehen.</div>';
+    // Show confirm-without-replacement button
+    document.getElementById('btnOhneErsatz').style.display = 'inline-block';
     return;
   }
+  document.getElementById('btnOhneErsatz').style.display = 'none';
   alle.forEach(k => {
     const d = document.createElement('div');
     d.className = 'ersatz-opt';
@@ -467,6 +477,20 @@ function ersatzAbbrechen() {
   }
   closeErsatz();
   renderTable(); updateKPIs();
+}
+
+function ersatzOhneErsatz() {
+  // Confirm sick without replacement - mark shift as unplanned
+  const ma = getMa(ersatzFuerMaId);
+  const tagIdx = ersatzFuerTag;
+  if (ma && tagIdx !== null) {
+    if (!ma.ungeplantTage) ma.ungeplantTage = [];
+    ma.ungeplantTage.push(tagIdx);
+  }
+  closeErsatz();
+  renderTable(); updateKPIs();
+  if (planBerechnet) berechne();
+  toast('\u26A0 Anlage ungeplant am ' + TAGE[tagIdx] + ' \u2013 bitte Produktionsplanung informieren!', true);
 }
 
 function closeErsatz() {
