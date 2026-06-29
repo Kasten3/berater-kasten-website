@@ -124,6 +124,361 @@
   </div>
 </section>
 
+<section aria-labelledby="rechner-heading" style="background:var(--warmgrau);">
+  <div class="container">
+    <span class="eyebrow section-title-center" style="display:block;text-align:center">Interaktiver Rechner</span>
+    <h2 class="section-title section-title-center" id="rechner-heading">Was kostet uns die Beratung wirklich?</h2>
+    <p class="section-subtitle section-subtitle-center">Prüfen Sie zuerst Ihre Förderfähigkeit – dann sehen Sie sofort, wie viel unser Paket nach Förderung wirklich kostet.</p>
+
+    <div class="bkr-rechner">
+
+      <!-- Schritt 1: KMU-Check -->
+      <div class="bkr-body">
+        <p class="bkr-step-title">Schritt 1 – Förderfähigkeit prüfen</p>
+        <p class="bkr-step-sub">Alle vier Kriterien müssen zutreffen, damit Ihr Unternehmen als KMU im Sinne der EU gilt.</p>
+
+        <div class="bkr-kmu-items">
+          <div class="bkr-kmu-item" id="bkr-kmu-0" onclick="bkrToggleKmu(0)">
+            <div class="bkr-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <span class="bkr-kmu-label"><strong>Weniger als 250 Mitarbeitende</strong> (Vollzeitäquivalente)</span>
+          </div>
+          <div class="bkr-kmu-item" id="bkr-kmu-1" onclick="bkrToggleKmu(1)">
+            <div class="bkr-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <span class="bkr-kmu-label"><strong>Jahresumsatz unter 50 Mio. €</strong> oder <strong>Jahresbilanzsumme unter 43 Mio. €</strong> (eines genügt)</span>
+          </div>
+          <div class="bkr-kmu-item" id="bkr-kmu-2" onclick="bkrToggleKmu(2)">
+            <div class="bkr-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <span class="bkr-kmu-label"><strong>Unabhängig:</strong> Kein anderes Unternehmen hält mehr als 25 % der Anteile</span>
+          </div>
+          <div class="bkr-kmu-item" id="bkr-kmu-3" onclick="bkrToggleKmu(3)">
+            <div class="bkr-checkbox"><svg width="12" height="10" viewBox="0 0 12 10" fill="none"><path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <span class="bkr-kmu-label"><strong>Betriebsstätte in Deutschland</strong> (gewerbliche Wirtschaft oder Freier Beruf)</span>
+          </div>
+        </div>
+
+        <div class="bkr-hint bkr-hint-warn" id="bkr-hint-warn">Nicht alle Kriterien erfüllt. Die BAFA-Förderung steht nur KMU gemäß EU-Definition offen. Sprechen Sie uns an – wir prüfen Ihren Fall gerne gemeinsam.</div>
+        <div class="bkr-hint bkr-hint-ok" id="bkr-hint-ok">Ihr Unternehmen erfüllt die KMU-Kriterien. Wählen Sie jetzt Ihr Paket.</div>
+
+        <hr class="bkr-divider">
+
+        <!-- Schritt 2: Paket & Region -->
+        <div class="bkr-rechner-section" id="bkr-rechner-section">
+
+          <p class="bkr-step-title">Schritt 2 – Paket wählen</p>
+          <div class="bkr-paket-grid">
+
+            <button class="bkr-paket-btn" data-paket="quickcheck" onclick="bkrSelectPaket(this)">
+              <div class="bkr-radio"><div class="bkr-radio-dot"></div></div>
+              <div class="bkr-paket-info">
+                <p class="bkr-paket-name">Quick-Check</p>
+                <p class="bkr-paket-desc">8h Beratung als Festpaket · Betriebsrundgang · Handlungsempfehlungen schriftlich</p>
+              </div>
+              <div class="bkr-paket-preis">
+                <p class="bkr-preis-gesamt">965 €</p>
+                <p class="bkr-preis-statt">statt 1.200 €</p>
+              </div>
+            </button>
+
+            <button class="bkr-paket-btn" data-paket="basic" onclick="bkrSelectPaket(this)">
+              <div class="bkr-radio"><div class="bkr-radio-dot"></div></div>
+              <div class="bkr-paket-info">
+                <p class="bkr-paket-name">Basic Tarif</p>
+                <p class="bkr-paket-desc">6h/Woche · 4 Wochen · Umsetzungsbegleitung vor Ort · Fahrtkosten inklusive</p>
+              </div>
+              <div class="bkr-paket-preis">
+                <p class="bkr-preis-gesamt">3.050 €</p>
+                <p class="bkr-preis-statt">statt 3.600 €</p>
+              </div>
+            </button>
+
+            <button class="bkr-paket-btn" data-paket="allrounder" onclick="bkrSelectPaket(this)">
+              <div class="bkr-radio"><div class="bkr-radio-dot"></div></div>
+              <div class="bkr-paket-info">
+                <p class="bkr-paket-name">Allrounder Tarif</p>
+                <p class="bkr-paket-desc">6h/Woche · 10 Wochen · Review-Termine · Fahrtkosten inklusive</p>
+              </div>
+              <div class="bkr-paket-preis">
+                <p class="bkr-preis-gesamt">8.100 €</p>
+                <p class="bkr-preis-statt">statt 9.000 €</p>
+              </div>
+            </button>
+
+          </div>
+
+          <div class="bkr-allrounder-hinweis" id="bkr-allrounder-hinweis">
+            Der Allrounder Tarif umfasst 60h Beratung. Förderfähig sind maximal 30h (5 Tage × 6h) im Wert von 4.050 € – der Rest liegt außerhalb der BAFA-Förderung.
+          </div>
+
+          <hr class="bkr-divider">
+
+          <p class="bkr-step-title">Schritt 3 – Standort wählen</p>
+          <div class="bkr-region-selector">
+            <button class="bkr-region-btn bkr-active" data-rate="0.5" data-cap="1750" onclick="bkrSelectRegion(this)">
+              Alte Bundesländer + Berlin + Leipzig
+              <span class="bkr-rate">50 % Förderung</span>
+              <span class="bkr-cap">max. 1.750 €</span>
+            </button>
+            <button class="bkr-region-btn" data-rate="0.8" data-cap="2800" onclick="bkrSelectRegion(this)">
+              Neue Bundesländer + Lüneburg + Trier
+              <span class="bkr-rate">80 % Förderung</span>
+              <span class="bkr-cap">max. 2.800 €</span>
+            </button>
+          </div>
+
+          <hr class="bkr-divider">
+
+          <div class="bkr-result-box" id="bkr-result-box" style="display:none;">
+            <p class="bkr-result-label">Ihre Kalkulation</p>
+            <div class="bkr-result-grid">
+              <div class="bkr-result-item">
+                <div class="bkr-result-value" id="bkr-gesamtkosten">–</div>
+                <div class="bkr-result-desc">Paketpreis gesamt</div>
+              </div>
+              <div class="bkr-result-divider"></div>
+              <div class="bkr-result-item">
+                <div class="bkr-result-value" id="bkr-foerderung">–</div>
+                <div class="bkr-result-desc">BAFA-Zuschuss</div>
+              </div>
+              <div class="bkr-result-divider"></div>
+              <div class="bkr-result-item">
+                <div class="bkr-result-value bkr-highlight" id="bkr-eigenanteil">–</div>
+                <div class="bkr-result-desc"><strong>Ihr Eigenanteil</strong></div>
+              </div>
+            </div>
+            <div class="bkr-deckel-hinweis" id="bkr-deckel-hinweis">
+              Der BAFA-Zuschuss ist gedeckelt: Bei Ihrem Standort sind maximal <strong id="bkr-deckel-max"></strong> förderbar – auch wenn <strong id="bkr-deckel-ohne"></strong> rechnerisch möglich wären.
+            </div>
+            <p class="bkr-hinweis-text" id="bkr-hinweis-text"></p>
+            <div class="bkr-rahmenbedingungen">
+              <strong>Wichtige Rahmenbedingungen:</strong> Antrag muss vor Beratungsbeginn gestellt und bewilligt sein. Pro Unternehmen maximal 2 Beratungen pro Jahr, insgesamt 5 bis 31.12.2026. Seminare und Workshops sind nicht förderfähig.
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .bkr-rechner {
+    max-width: 680px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .bkr-body { padding: 2rem 2.5rem; }
+  .bkr-step-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #555;
+    margin-bottom: 0.6rem;
+  }
+  .bkr-step-sub { font-size: 0.82rem; color: #7a8f9e; margin-bottom: 1rem; line-height: 1.45; }
+  .bkr-divider { border: none; border-top: 1px solid #eee; margin: 1.5rem 0; }
+
+  /* KMU */
+  .bkr-kmu-items { display: flex; flex-direction: column; gap: 0.5rem; }
+  .bkr-kmu-item {
+    display: flex; align-items: flex-start; gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid #e5e9ec; border-radius: 4px;
+    background: #fafafa; cursor: pointer;
+    transition: all 0.15s; user-select: none;
+  }
+  .bkr-kmu-item:hover { border-color: var(--petrolblau, #1c2b3a); background: #f5f8fb; }
+  .bkr-kmu-item.bkr-checked { border-color: var(--petrolblau, #1c2b3a); background: #f0f7fb; }
+  .bkr-checkbox {
+    width: 20px; height: 20px; min-width: 20px;
+    border: 2px solid #c0cdd6; border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 1px; transition: all 0.15s;
+  }
+  .bkr-kmu-item.bkr-checked .bkr-checkbox { background: var(--petrolblau, #1c2b3a); border-color: var(--petrolblau, #1c2b3a); }
+  .bkr-checkbox svg { display: none; }
+  .bkr-kmu-item.bkr-checked .bkr-checkbox svg { display: block; }
+  .bkr-kmu-label { font-size: 0.88rem; color: #1a1a1a; line-height: 1.4; }
+  .bkr-kmu-label strong { font-weight: 700; }
+
+  .bkr-hint { margin-top: 0.75rem; padding: 0.75rem 1rem; border-radius: 3px; font-size: 0.82rem; line-height: 1.45; display: none; }
+  .bkr-hint.bkr-show { display: block; }
+  .bkr-hint-warn { background: #fef6ed; border-left: 3px solid #e67e22; color: #7a4a10; }
+  .bkr-hint-ok   { background: #edfaf2; border-left: 3px solid #27ae60; color: #1a5c30; }
+
+  /* Rechner gesperrt */
+  .bkr-rechner-section { transition: opacity 0.2s; }
+  .bkr-rechner-section.bkr-locked { opacity: 0.3; pointer-events: none; }
+
+  /* Pakete */
+  .bkr-paket-grid { display: flex; flex-direction: column; gap: 0.55rem; margin-bottom: 1rem; }
+  .bkr-paket-btn {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 0.9rem 1rem;
+    border: 1.5px solid #d0d5da; border-radius: 4px;
+    background: #f9f9f8; cursor: pointer; text-align: left;
+    transition: all 0.15s; width: 100%;
+  }
+  .bkr-paket-btn:hover { border-color: var(--petrolblau, #1c2b3a); background: #f5f8fb; }
+  .bkr-paket-btn.bkr-active { border-color: var(--petrolblau, #1c2b3a); background: #f0f7fb; }
+  .bkr-radio {
+    width: 18px; height: 18px; min-width: 18px;
+    border: 2px solid #c0cdd6; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+  .bkr-paket-btn.bkr-active .bkr-radio { border-color: var(--petrolblau, #1c2b3a); }
+  .bkr-radio-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--petrolblau, #1c2b3a); display: none; }
+  .bkr-paket-btn.bkr-active .bkr-radio-dot { display: block; }
+  .bkr-paket-info { flex: 1; }
+  .bkr-paket-name { font-size: 0.92rem; font-weight: 700; color: #1a1a1a; }
+  .bkr-paket-desc { font-size: 0.76rem; color: #7a8f9e; margin-top: 0.1rem; line-height: 1.35; }
+  .bkr-paket-preis { text-align: right; flex-shrink: 0; }
+  .bkr-preis-gesamt { font-size: 1rem; font-weight: 800; color: var(--petrolblau, #1c2b3a); }
+  .bkr-preis-statt { font-size: 0.72rem; color: #aaa; text-decoration: line-through; }
+
+  .bkr-allrounder-hinweis {
+    font-size: 0.78rem; color: #6a8099;
+    background: #f0f7fb; border-radius: 3px;
+    padding: 0.6rem 0.85rem; margin-bottom: 0.5rem;
+    line-height: 1.45; display: none;
+  }
+  .bkr-allrounder-hinweis.bkr-show { display: block; }
+
+  /* Region */
+  .bkr-region-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-top: 0.6rem; }
+  .bkr-region-btn {
+    padding: 0.7rem 0.9rem;
+    border: 1.5px solid #d0d5da; border-radius: 4px;
+    background: #f9f9f8; font-size: 0.8rem;
+    cursor: pointer; text-align: center;
+    transition: all 0.15s; line-height: 1.4;
+  }
+  .bkr-region-btn:hover { border-color: var(--petrolblau, #1c2b3a); }
+  .bkr-region-btn.bkr-active { background: var(--petrolblau, #1c2b3a); color: #fff; border-color: var(--petrolblau, #1c2b3a); font-weight: 600; }
+  .bkr-rate { display: block; font-size: 1rem; font-weight: 700; margin-top: 0.15rem; }
+  .bkr-cap { display: block; font-size: 0.7rem; opacity: 0.75; }
+
+  /* Ergebnis */
+  .bkr-result-box {
+    background: #f0f7fb;
+    border-left: 4px solid var(--petrolblau, #1c2b3a);
+    border-radius: 2px; padding: 1.5rem 1.75rem;
+  }
+  .bkr-result-label {
+    font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: #6a8099; margin-bottom: 1rem;
+  }
+  .bkr-result-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+  .bkr-result-item { text-align: center; }
+  .bkr-result-value { font-size: 1.55rem; font-weight: 800; color: var(--petrolblau, #1c2b3a); line-height: 1; }
+  .bkr-highlight { color: #1a6a32; font-size: 1.9rem; }
+  .bkr-result-desc { font-size: 0.74rem; color: #6a8099; margin-top: 0.3rem; line-height: 1.3; }
+  .bkr-result-divider { border: none; border-left: 1px solid #c8dcea; }
+
+  .bkr-deckel-hinweis {
+    margin-top: 0.9rem; padding: 0.6rem 0.85rem;
+    background: #fff8e6; border-left: 3px solid #e6a817;
+    border-radius: 2px; font-size: 0.8rem; color: #7a5a10;
+    line-height: 1.45; display: none;
+  }
+  .bkr-deckel-hinweis.bkr-show { display: block; }
+  .bkr-hinweis-text { margin-top: 0.9rem; font-size: 0.8rem; color: #7a909f; line-height: 1.5; }
+  .bkr-hinweis-text strong { color: var(--petrolblau, #1c2b3a); }
+  .bkr-rahmenbedingungen {
+    margin-top: 1rem; padding: 0.8rem 1rem;
+    background: #f5f5f3; border-radius: 3px;
+    font-size: 0.76rem; color: #6a8099; line-height: 1.55;
+  }
+  .bkr-rahmenbedingungen strong { color: var(--petrolblau, #1c2b3a); font-weight: 600; }
+
+  @media (max-width: 560px) {
+    .bkr-body { padding: 1.5rem; }
+    .bkr-result-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+    .bkr-result-divider { display: none; }
+    .bkr-region-selector { grid-template-columns: 1fr; }
+    .bkr-preis-statt { display: none; }
+  }
+</style>
+
+<script>
+  (function() {
+    const PAKETE = {
+      quickcheck: { gesamt: 965,  foerderBasis: 965  },
+      basic:      { gesamt: 3050, foerderBasis: 3050 },
+      allrounder: { gesamt: 8100, foerderBasis: 4050 }
+    };
+    let bkrKmu = [false,false,false,false];
+    let bkrPaket = null;
+    let bkrRate = 0.5;
+    let bkrCap  = 1750;
+
+    window.bkrToggleKmu = function(i) {
+      bkrKmu[i] = !bkrKmu[i];
+      document.getElementById('bkr-kmu-'+i).classList.toggle('bkr-checked', bkrKmu[i]);
+      const allOk = bkrKmu.every(v=>v);
+      const anyOn = bkrKmu.some(v=>v);
+      document.getElementById('bkr-hint-warn').classList.toggle('bkr-show', anyOn && !allOk);
+      document.getElementById('bkr-hint-ok').classList.toggle('bkr-show', allOk);
+      document.getElementById('bkr-rechner-section').classList.toggle('bkr-locked', !allOk);
+    };
+
+    window.bkrSelectPaket = function(btn) {
+      document.querySelectorAll('.bkr-paket-btn').forEach(b => b.classList.remove('bkr-active'));
+      btn.classList.add('bkr-active');
+      bkrPaket = btn.dataset.paket;
+      document.getElementById('bkr-allrounder-hinweis').classList.toggle('bkr-show', bkrPaket === 'allrounder');
+      bkrCalc();
+    };
+
+    window.bkrSelectRegion = function(btn) {
+      document.querySelectorAll('.bkr-region-btn').forEach(b => b.classList.remove('bkr-active'));
+      btn.classList.add('bkr-active');
+      bkrRate = parseFloat(btn.dataset.rate);
+      bkrCap  = parseInt(btn.dataset.cap);
+      bkrCalc();
+    };
+
+    function bkrFmt(v) {
+      return v.toLocaleString('de-DE',{minimumFractionDigits:0,maximumFractionDigits:0}) + '\u202F€';
+    }
+
+    function bkrCalc() {
+      if (!bkrPaket) return;
+      const p = PAKETE[bkrPaket];
+      const roh = Math.round(p.foerderBasis * bkrRate);
+      const foerd = Math.min(roh, bkrCap);
+      const eigen = p.gesamt - foerd;
+      const gedeckelt = roh > bkrCap;
+      const proz = Math.round(bkrRate * 100);
+
+      document.getElementById('bkr-result-box').style.display = '';
+      document.getElementById('bkr-gesamtkosten').textContent = bkrFmt(p.gesamt);
+      document.getElementById('bkr-foerderung').textContent   = bkrFmt(foerd);
+      document.getElementById('bkr-eigenanteil').textContent  = bkrFmt(eigen);
+
+      const deckelEl = document.getElementById('bkr-deckel-hinweis');
+      if (gedeckelt) {
+        document.getElementById('bkr-deckel-max').textContent  = bkrFmt(bkrCap);
+        document.getElementById('bkr-deckel-ohne').textContent = bkrFmt(roh);
+        deckelEl.classList.add('bkr-show');
+      } else { deckelEl.classList.remove('bkr-show'); }
+
+      let txt = bkrPaket === 'allrounder'
+        ? `Vom Gesamtpaket (${bkrFmt(p.gesamt)}) sind ${bkrFmt(p.foerderBasis)} förderfähig. Das BAFA übernimmt davon <strong>${proz}\u202F%</strong> – gedeckelt auf <strong>${bkrFmt(foerd)}</strong>. Ihr Eigenanteil: <strong>${bkrFmt(eigen)}</strong>.`
+        : `Das BAFA übernimmt <strong>${proz}\u202F%</strong> der Paketkosten${gedeckelt ? ` – gedeckelt auf <strong>${bkrFmt(foerd)}</strong>` : ` = <strong>${bkrFmt(foerd)}</strong>`}. Sie zahlen <strong>${bkrFmt(eigen)}</strong>.`;
+      document.getElementById('bkr-hinweis-text').innerHTML = txt;
+    }
+
+    // Init: Rechner gesperrt
+    document.getElementById('bkr-rechner-section').classList.add('bkr-locked');
+  })();
+</script>
+
 <section style="padding:0 40px 80px; text-align:center;">
   <div class="container" style="max-width:1100px; padding:0;">
     <div style="background:var(--dunkelblau); border-radius:24px; padding:56px 40px; box-shadow:0 24px 48px rgba(11,60,93,0.20), 0 4px 12px rgba(11,60,93,0.08);">
