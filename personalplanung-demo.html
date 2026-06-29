@@ -38,6 +38,7 @@
   .plan-table th{background:var(--blau);color:white;padding:8px 6px;font-size:11px;font-weight:700;text-align:center;white-space:nowrap;}
   .plan-table th.col-name{text-align:left;min-width:130px;padding-left:10px;}
   .plan-table th.col-qual{min-width:46px;}
+  .plan-table td.col-anlage{padding:6px 8px;font-size:11px;color:#888;font-weight:600;white-space:nowrap;}
   .plan-table td{padding:0;border-bottom:1px solid #f0ede9;vertical-align:middle;}
   .plan-table tr:hover td{background:#faf7f4;}
   .plan-table tr.krank-row td{background:#fff5f5!important;}
@@ -142,6 +143,7 @@
           <tr>
             <th class="col-name">Mitarbeiter</th>
             <th class="col-qual">Qual.</th>
+            <th style="min-width:72px;">Anlage</th>
             <th>Mo<br><small style="font-weight:400;opacity:.8;">30.06.</small></th>
             <th>Di<br><small style="font-weight:400;opacity:.8;">01.07.</small></th>
             <th>Mi<br><small style="font-weight:400;opacity:.8;">02.07.</small></th>
@@ -207,28 +209,28 @@
 <script>
 const SCHICHTEN = {
   F:[
-    {id:1,name:'Anna Meier',    qual:'Q1',plan:['F','F','F','F','F','-','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:2,name:'Klaus Bauer',   qual:'Q2',plan:['F','F','F','-','F','F','-'],krankTage:[0],ersatzTage:{},springer:false},
-    {id:3,name:'Sabine Koch',   qual:'Q1',plan:['F','F','F','F','F','-','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:4,name:'Markus Wolf',   qual:'Q3',plan:['-','F','F','F','F','F','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:5,name:'Lisa Braun',    qual:'Q2',plan:['F','F','-','F','F','-','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:6,name:'Tobias Schulz', qual:'Q1',plan:['F','-','F','F','-','F','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:7,name:'Maria Gruber',  qual:'Q2',plan:['-','-','F','F','F','F','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:8,name:'Stefan Richter',qual:'Q3',plan:['F','F','F','-','-','F','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:1,name:'Anna Meier',    qual:'Q1',anlage:'Linie 1',plan:['F','F','F','F','F','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:2,name:'Klaus Bauer',   qual:'Q2',anlage:'Linie 1',plan:['F','F','F','-','F','F','-'],krankTage:[0],ersatzTage:{},springer:false},
+    {id:3,name:'Sabine Koch',   qual:'Q1',anlage:'Linie 2',plan:['F','F','F','F','F','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:4,name:'Markus Wolf',   qual:'Q3',anlage:'Linie 2',plan:['-','F','F','F','F','F','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:5,name:'Lisa Braun',    qual:'Q2',anlage:'Linie 3',plan:['F','F','-','F','F','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:6,name:'Tobias Schulz', qual:'Q1',anlage:'Linie 3',plan:['F','-','F','F','-','F','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:7,name:'Maria Gruber',  qual:'Q2',anlage:'Linie 4',plan:['-','-','F','F','F','F','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:8,name:'Stefan Richter',qual:'Q3',anlage:'Linie 4',plan:['F','F','F','-','-','F','-'],krankTage:[],ersatzTage:{},springer:false},
   ],
   S:[
-    {id:9, name:'Petra Vogel',   qual:'Q2',plan:['S','S','S','S','-','-','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:10,name:'Daniel Braun',  qual:'Q1',plan:['S','S','-','S','S','S','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:11,name:'Eva Schmitt',   qual:'Q1',plan:['-','S','S','S','S','-','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:12,name:'Jonas Weber',   qual:'Q2',plan:['S','-','S','S','S','-','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:13,name:'Claudia Huber', qual:'Q3',plan:['S','S','-','-','S','S','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:14,name:'Frank Mueller', qual:'Q1',plan:['S','S','S','-','S','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:9, name:'Petra Vogel',   qual:'Q2',anlage:'Linie 1',plan:['S','S','S','S','-','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:10,name:'Daniel Braun',  qual:'Q1',anlage:'Linie 1',plan:['S','S','-','S','S','S','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:11,name:'Eva Schmitt',   qual:'Q1',anlage:'Linie 2',plan:['-','S','S','S','S','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:12,name:'Jonas Weber',   qual:'Q2',anlage:'Linie 2',plan:['S','-','S','S','S','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:13,name:'Claudia Huber', qual:'Q3',anlage:'Linie 3',plan:['S','S','-','-','S','S','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:14,name:'Frank Mueller', qual:'Q1',anlage:'Linie 3',plan:['S','S','S','-','S','-','-'],krankTage:[],ersatzTage:{},springer:false},
   ],
   N:[
-    {id:15,name:'Heinrich Lang', qual:'Q2',plan:['N','N','N','-','N','-','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:16,name:'Sina Berger',   qual:'Q1',plan:['-','N','N','N','-','N','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:17,name:'Ralf Zimmer',   qual:'Q2',plan:['N','-','-','N','N','N','-'],krankTage:[],ersatzTage:{},springer:false},
-    {id:18,name:'Ute Fischer',   qual:'Q3',plan:['N','N','-','N','N','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:15,name:'Heinrich Lang', qual:'Q2',anlage:'Linie 1',plan:['N','N','N','-','N','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:16,name:'Sina Berger',   qual:'Q1',anlage:'Linie 2',plan:['-','N','N','N','-','N','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:17,name:'Ralf Zimmer',   qual:'Q2',anlage:'Linie 3',plan:['N','-','-','N','N','N','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:18,name:'Ute Fischer',   qual:'Q3',anlage:'Linie 4',plan:['N','N','-','N','N','-','-'],krankTage:[],ersatzTage:{},springer:false},
   ]
 };
 const SPRINGER_POOL = [
@@ -282,6 +284,12 @@ function renderTable() {
     const tdQ = document.createElement('td');
     tdQ.innerHTML = `<div style="padding:6px 8px;text-align:center;"><span class="qual ${ma.qual.toLowerCase()}">${ma.qual}</span></div>`;
     tr.appendChild(tdQ);
+
+    // Anlage
+    const tdA = document.createElement('td');
+    tdA.className = 'col-anlage';
+    tdA.textContent = ma.anlage || (ma.springer ? 'Springer' : '–');
+    tr.appendChild(tdA);
 
     // Tage
     TAGE.forEach((tag, i) => {
@@ -407,9 +415,12 @@ function zeigeErsatz(ma, tagIdx) {
     .filter(m => m.id !== ma.id && !m.springer && m.plan[tagIdx] === '-' && !m.krankTage.includes(tagIdx) && qNum[m.qual] >= qNum[ma.qual])
     .map(m => ({name:m.name, qual:m.qual, info:'Hat ' + TAGE[tagIdx] + ' frei \u00b7 gleiche Schicht', maId:m.id, isSpringer:false}));
 
-  // Springer auffuellen
+  // Springer auffuellen – nur wenn noch nicht in dieser Schicht eingeplant
+  const springerBereitsEingeplant = new Set(
+    SCHICHTEN[akt].filter(m => m.springer).map(m => m.name)
+  );
   const springerOpts = SPRINGER_POOL
-    .filter(sp => qNum[sp.qual] >= qNum[ma.qual])
+    .filter(sp => qNum[sp.qual] >= qNum[ma.qual] && !springerBereitsEingeplant.has(sp.name))
     .slice(0, 4 - kandidaten.length)
     .map(sp => ({name:sp.name, qual:sp.qual, info:sp.info, maId:null, isSpringer:true}));
 
@@ -445,7 +456,7 @@ function ersatzOK() {
   const e = ersatzGewaehlt;
 
   if (e.isSpringer) {
-    // Springer: neue Zeile anlegen oder vorhandene aktualisieren
+    // Springer: neue Zeile anlegen – nur einmal pro Schicht
     const existing = SCHICHTEN[akt].find(m => m.springer && m.name === e.name);
     if (existing) {
       existing.ersatzTage[tagIdx] = ma.name;
@@ -454,6 +465,7 @@ function ersatzOK() {
       const newPlan = ['-','-','-','-','-','-','-'];
       SCHICHTEN[akt].push({
         id: newId, name: e.name, qual: e.qual,
+        anlage: ma.anlage || '–',
         plan: newPlan, krankTage: [], ersatzTage: {[tagIdx]: ma.name}, springer: true
       });
     }
