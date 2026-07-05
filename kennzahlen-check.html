@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kennzahlen-Selbstcheck – Berater-Kasten</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f7f7f5;
+      color: #1a1a1a;
+      padding: 2rem 1rem;
+    }
+
+    .bk-widget {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .bk-header {
+      background: #1c2b3a;
+      color: #fff;
+      padding: 2rem 2.5rem;
+    }
+    .bk-header .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a8c4d8;
+      margin-bottom: 0.5rem;
+    }
+    .bk-header h2 { font-size: 1.55rem; font-weight: 700; }
+    .bk-header p { margin-top: 0.5rem; font-size: 0.9rem; color: #c8d8e4; line-height: 1.5; }
+
+    .bk-body { padding: 2rem 2.5rem; }
+
+    /* Kategorie-Tabs */
+    .cat-tabs {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.75rem;
+    }
+    .cat-tab {
+      padding: 0.4rem 0.85rem;
+      border-radius: 2rem;
+      border: 1.5px solid #d0d5da;
+      background: #f9f9f8;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .cat-tab.active { background: #1c2b3a; color: #fff; border-color: #1c2b3a; }
+
+    /* KPI-Liste */
+    .kpi-list { display: flex; flex-direction: column; gap: 0.55rem; }
+
+    .kpi-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.85rem 1rem;
+      border: 1.5px solid #e5e9ec;
+      border-radius: 3px;
+      background: #fafafa;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+    }
+    .kpi-row:hover { border-color: #b0bfc9; background: #f5f8fb; }
+    .kpi-row.checked { border-color: #1c2b3a; background: #f0f7fb; }
+
+    .kpi-check {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #c0cdd6;
+      border-radius: 3px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .kpi-row.checked .kpi-check {
+      background: #1c2b3a;
+      border-color: #1c2b3a;
+    }
+    .kpi-check svg { display: none; }
+    .kpi-row.checked .kpi-check svg { display: block; }
+
+    .kpi-info { flex: 1; }
+    .kpi-name { font-size: 0.92rem; font-weight: 600; color: #1a1a1a; }
+    .kpi-desc { font-size: 0.78rem; color: #7a8f9e; margin-top: 0.15rem; line-height: 1.35; }
+
+    .kpi-wichtig {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border-radius: 2rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .kpi-wichtig.basis { background: #edf2f5; color: #6a8099; }
+    .kpi-wichtig.wichtig { background: #fff3cd; color: #856404; }
+    .kpi-wichtig.kritisch { background: #fde8e6; color: #c0392b; }
+
+    hr.div { border: none; border-top: 1px solid #eee; margin: 1.75rem 0; }
+
+    /* Ergebnis */
+    .ergebnis-bar-wrap {
+      background: #eee;
+      border-radius: 2px;
+      height: 8px;
+      margin-bottom: 0.5rem;
+    }
+    .ergebnis-bar-fill {
+      height: 8px;
+      border-radius: 2px;
+      background: #1c2b3a;
+      transition: width 0.5s ease;
+    }
+
+    .ergebnis-zeile {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: #6a8099;
+      margin-bottom: 1.25rem;
+    }
+    .ergebnis-zeile strong { color: #1c2b3a; }
+
+    .luecken-block {
+      background: #fdf1f0;
+      border-left: 4px solid #c0392b;
+      border-radius: 2px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .luecken-block.ok {
+      background: #edfaf2;
+      border-color: #27ae60;
+    }
+    .luecken-block .label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #c0392b;
+      margin-bottom: 0.5rem;
+    }
+    .luecken-block.ok .label { color: #27ae60; }
+    .luecken-block .text { font-size: 0.88rem; color: #1a1a1a; line-height: 1.5; }
+
+    .luecken-liste {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.6rem;
+    }
+    .luecken-tag {
+      font-size: 0.78rem;
+      padding: 0.25rem 0.65rem;
+      border-radius: 2rem;
+      background: #fde8e6;
+      color: #c0392b;
+      font-weight: 600;
+    }
+
+    .empfehlung-box {
+      background: #f0f7fb;
+      border-left: 4px solid #1c2b3a;
+      border-radius: 2px;
+      padding: 1rem 1.25rem;
+      font-size: 0.88rem;
+      color: #1a1a1a;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+    }
+    .empfehlung-box .label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #6a8099;
+      margin-bottom: 0.35rem;
+    }
+
+    .cta-block { display: flex; flex-direction: column; gap: 0.5rem; }
+    .cta-block p { font-size: 0.88rem; color: #555; }
+    .cta-btn {
+      display: inline-block;
+      background: #1c2b3a;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 3px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+      width: fit-content;
+    }
+    .cta-btn:hover { background: #2a4057; }
+
+    @media (max-width: 520px) {
+      .bk-header, .bk-body { padding: 1.5rem; }
+      .kpi-wichtig { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bk-widget">
+  <div class="bk-header">
+    <p class="eyebrow">Selbstcheck</p>
+    <h2>Kennzahlen-Selbstcheck</h2>
+    <p>Welche Kennzahlen erfassen Sie bereits? Haken Sie alles an, was Sie aktiv messen – und sehen Sie sofort, wo Lücken sind.</p>
+  </div>
+
+  <div class="bk-body">
+    <div class="cat-tabs" id="cat-tabs"></div>
+    <div class="kpi-list" id="kpi-list"></div>
+
+    <hr class="div">
+
+    <div id="ergebnis"></div>
+
+    <div class="cta-block">
+      <p>Wir zeigen Ihnen, welche Kennzahlen für Ihren Betrieb wirklich relevant sind.</p>
+      <a class="cta-btn" href="https://www.berater-kasten.de/kontakt.html">Kostenloses Erstgespräch →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const KPIS = [
+  // Produktion
+  { kat: "Produktion", name: "OEE (Gesamtanlageneffektivität)", desc: "Verfügbarkeit × Leistung × Qualität – der wichtigste einzelne Produktionskennwert.", wichtig: "kritisch" },
+  { kat: "Produktion", name: "Stückzahl (Ist vs. Soll)", desc: "Wie viele Teile wurden produziert – verglichen mit dem Plan?", wichtig: "kritisch" },
+  { kat: "Produktion", name: "Maschinenverfügbarkeit", desc: "Anteil der Zeit, in der die Maschine tatsächlich läuft.", wichtig: "wichtig" },
+  { kat: "Produktion", name: "Taktzeit", desc: "Zeit pro produzierter Einheit – Grundlage für Kapazitätsplanung.", wichtig: "wichtig" },
+  { kat: "Produktion", name: "Rüstzeiten", desc: "Zeit vom letzten Gutteil bis zum ersten Gutteil des nächsten Auftrags.", wichtig: "wichtig" },
+  { kat: "Produktion", name: "Auslastungsgrad", desc: "Wie stark werden Kapazitäten (Maschinen, Personal) genutzt?", wichtig: "basis" },
+
+  // Qualität
+  { kat: "Qualität", name: "Ausschussquote", desc: "Anteil nicht verwendbarer Teile an der Gesamtproduktion.", wichtig: "kritisch" },
+  { kat: "Qualität", name: "Nacharbeitsquote", desc: "Teile, die nachgebessert werden müssen, bevor sie in Ordnung sind.", wichtig: "wichtig" },
+  { kat: "Qualität", name: "Erstdurchlaufrate (FTT)", desc: "Anteil der Teile, die beim ersten Durchlauf korrekt produziert werden.", wichtig: "wichtig" },
+  { kat: "Qualität", name: "Reklamationsquote", desc: "Kundenbeschwerden oder Retouren bezogen auf die Liefermenge.", wichtig: "wichtig" },
+  { kat: "Qualität", name: "Interne Fehlerkosten", desc: "Kosten für Ausschuss und Nacharbeit in Euro.", wichtig: "basis" },
+
+  // Lieferung
+  { kat: "Lieferung", name: "Liefertreue (On-Time-Delivery)", desc: "Anteil der Aufträge, die pünktlich beim Kunden ankommen.", wichtig: "kritisch" },
+  { kat: "Lieferung", name: "Durchlaufzeit", desc: "Zeit von Auftragsstart bis zur Fertigstellung / Auslieferung.", wichtig: "wichtig" },
+  { kat: "Lieferung", name: "Rückstandsquote", desc: "Offene oder verspätete Aufträge als Anteil am Gesamtauftragsbestand.", wichtig: "basis" },
+  { kat: "Lieferung", name: "Auftragsbestand (Backlog)", desc: "Wie viele Aufträge warten auf Abarbeitung?", wichtig: "basis" },
+
+  // Kosten
+  { kat: "Kosten", name: "Maschinenstundensatz", desc: "Vollkosten je Maschinenstunde – Basis für Kalkulation und Preisgestaltung.", wichtig: "kritisch" },
+  { kat: "Kosten", name: "Herstellkosten pro Stück", desc: "Gesamtkosten (Material + Fertigungskosten) je produzierter Einheit.", wichtig: "wichtig" },
+  { kat: "Kosten", name: "Energiekosten je Stück", desc: "Stromverbrauch und Energiekosten in Relation zur Produktionsmenge.", wichtig: "basis" },
+  { kat: "Kosten", name: "Instandhaltungskosten", desc: "Monatliche oder jährliche Wartungs- und Reparaturkosten.", wichtig: "basis" },
+
+  // Personal
+  { kat: "Personal", name: "Krankenquote", desc: "Anteil krankheitsbedingter Ausfalltage an den Sollarbeitstagen.", wichtig: "wichtig" },
+  { kat: "Personal", name: "Überstundenquote", desc: "Geleistete Überstunden als Indikator für Planungs- oder Kapazitätsprobleme.", wichtig: "basis" },
+  { kat: "Personal", name: "Produktivität je Mitarbeiter", desc: "Output (Stück / Wert) bezogen auf die geleisteten Arbeitsstunden.", wichtig: "basis" },
+];
+
+const KATEGORIEN = [...new Set(KPIS.map(k => k.kat))];
+let aktiveKat = "Alle";
+let checked = new Set();
+
+function render() {
+  // Tabs
+  const tabDiv = document.getElementById('cat-tabs');
+  tabDiv.innerHTML = '';
+  ['Alle', ...KATEGORIEN].forEach(kat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-tab' + (aktiveKat === kat ? ' active' : '');
+    btn.textContent = kat;
+    btn.onclick = () => { aktiveKat = kat; render(); };
+    tabDiv.appendChild(btn);
+  });
+
+  // KPI-Liste
+  const listDiv = document.getElementById('kpi-list');
+  listDiv.innerHTML = '';
+  const gefiltert = aktiveKat === 'Alle' ? KPIS : KPIS.filter(k => k.kat === aktiveKat);
+  gefiltert.forEach((kpi, i) => {
+    const globalIdx = KPIS.indexOf(kpi);
+    const row = document.createElement('div');
+    row.className = 'kpi-row' + (checked.has(globalIdx) ? ' checked' : '');
+    row.onclick = () => {
+      if (checked.has(globalIdx)) checked.delete(globalIdx);
+      else checked.add(globalIdx);
+      render();
+    };
+    row.innerHTML = `
+      <div class="kpi-check">
+        <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+          <path d="M1 5L4.5 8.5L11 1" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="kpi-info">
+        <p class="kpi-name">${kpi.name}</p>
+        <p class="kpi-desc">${kpi.desc}</p>
+      </div>
+      <span class="kpi-wichtig ${kpi.wichtig}">${kpi.wichtig === 'kritisch' ? 'Kern-KPI' : kpi.wichtig === 'wichtig' ? 'Wichtig' : 'Basis'}</span>
+    `;
+    listDiv.appendChild(row);
+  });
+
+  renderErgebnis();
+}
+
+function renderErgebnis() {
+  const total = KPIS.length;
+  const n = checked.size;
+  const pct = Math.round((n / total) * 100);
+
+  // Kritische KPIs
+  const kritisch = KPIS.filter((k, i) => k.wichtig === 'kritisch' && !checked.has(i));
+  const kritischChecked = KPIS.filter((k, i) => k.wichtig === 'kritisch').length - kritisch.length;
+  const gesamtKritisch = KPIS.filter(k => k.wichtig === 'kritisch').length;
+
+  let empfehlung = '';
+  if (n === 0) {
+    empfehlung = 'Noch keine Angaben – haken Sie an, was Sie bereits messen.';
+  } else if (pct >= 70 && kritisch.length === 0) {
+    empfehlung = 'Sehr gute Datenbasis. Sie erfassen bereits die wichtigsten Kennzahlen. Jetzt geht es darum, diese systematisch auszuwerten und in Entscheidungen einfließen zu lassen.';
+  } else if (kritisch.length === 0) {
+    empfehlung = 'Alle Kern-KPIs sind abgedeckt – das ist entscheidend. Ergänzen Sie schrittweise die fehlenden Kennzahlen, um ein vollständigeres Bild zu erhalten.';
+  } else if (kritisch.length <= 2) {
+    empfehlung = `Fast vollständig. Schließen Sie die Lücken bei den Kern-KPIs – insbesondere ${kritisch.slice(0,2).map(k=>k.name).join(' und ')} – und Sie haben eine solide Steuerungsgrundlage.`;
+  } else {
+    empfehlung = 'Mehrere Kern-KPIs fehlen noch. Damit fehlt die Grundlage für fundierte Produktionsentscheidungen. Ein strukturierter Einstieg ins Kennzahlensystem bringt hier schnell Klarheit.';
+  }
+
+  let html = `
+    <div class="ergebnis-bar-wrap">
+      <div class="ergebnis-bar-fill" style="width: ${pct}%"></div>
+    </div>
+    <div class="ergebnis-zeile">
+      <span>Sie erfassen <strong>${n} von ${total} Kennzahlen</strong></span>
+      <span>Kern-KPIs: <strong>${kritischChecked} / ${gesamtKritisch}</strong></span>
+    </div>
+  `;
+
+  if (kritisch.length > 0 && n > 0) {
+    html += `
+      <div class="luecken-block">
+        <p class="label">Fehlende Kern-KPIs</p>
+        <p class="text">Diese Kennzahlen sind für eine fundierte Produktionssteuerung besonders wichtig:</p>
+        <div class="luecken-liste">
+          ${kritisch.map(k => `<span class="luecken-tag">${k.name}</span>`).join('')}
+        </div>
+      </div>
+    `;
+  } else if (n > 0 && kritisch.length === 0) {
+    html += `
+      <div class="luecken-block ok">
+        <p class="label">Kern-KPIs vollständig</p>
+        <p class="text">Sie haben alle besonders wichtigen Kennzahlen im Griff. Gut gemacht.</p>
+      </div>
+    `;
+  }
+
+  if (n > 0) {
+    html += `
+      <div class="empfehlung-box">
+        <p class="label">Einschätzung</p>
+        <p>${empfehlung}</p>
+      </div>
+    `;
+  }
+
+  document.getElementById('ergebnis').innerHTML = html;
+}
+
+render();
+</script>
+</body>
+</html>

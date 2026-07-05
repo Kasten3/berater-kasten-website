@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KPI-Bibliothek – Berater-Kasten</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f7f7f5;
+      color: #1a1a1a;
+      padding: 2rem 1rem;
+    }
+
+    .bk-widget {
+      max-width: 800px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .bk-header {
+      background: #1c2b3a;
+      color: #fff;
+      padding: 2rem 2.5rem;
+    }
+    .bk-header .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a8c4d8;
+      margin-bottom: 0.5rem;
+    }
+    .bk-header h2 { font-size: 1.55rem; font-weight: 700; }
+    .bk-header p { margin-top: 0.5rem; font-size: 0.9rem; color: #c8d8e4; line-height: 1.5; }
+
+    /* Search & Filter */
+    .toolbar {
+      padding: 1.5rem 2.5rem 0;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .search-wrap {
+      flex: 1;
+      min-width: 200px;
+      position: relative;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: 0.65rem 1rem 0.65rem 2.4rem;
+      border: 1.5px solid #d0d5da;
+      border-radius: 3px;
+      font-size: 0.92rem;
+      background: #f9f9f8;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-wrap input:focus { border-color: #1c2b3a; background: #fff; }
+    .search-wrap .icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .filter-tab {
+      padding: 0.4rem 0.85rem;
+      border-radius: 2rem;
+      border: 1.5px solid #d0d5da;
+      background: #f9f9f8;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .filter-tab.active { background: #1c2b3a; color: #fff; border-color: #1c2b3a; }
+
+    /* Count */
+    .result-count {
+      padding: 0.75rem 2.5rem 0;
+      font-size: 0.78rem;
+      color: #8a9aa8;
+    }
+
+    /* KPI Cards */
+    .kpi-grid {
+      padding: 1rem 2.5rem 2.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+
+    .kpi-card {
+      border: 1.5px solid #e5e9ec;
+      border-radius: 3px;
+      padding: 1.1rem 1.2rem;
+      background: #fafafa;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .kpi-card:hover { border-color: #1c2b3a; background: #f5f8fb; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .kpi-card.open { border-color: #1c2b3a; background: #fff; box-shadow: 0 3px 12px rgba(0,0,0,0.09); }
+
+    .kpi-card__top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .kpi-card__name {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      line-height: 1.3;
+      flex: 1;
+    }
+
+    .kpi-badge {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.5rem;
+      border-radius: 2rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .kpi-badge.kritisch { background: #fde8e6; color: #c0392b; }
+    .kpi-badge.wichtig { background: #fff3cd; color: #856404; }
+    .kpi-badge.basis { background: #edf2f5; color: #6a8099; }
+
+    .kpi-card__kat {
+      font-size: 0.72rem;
+      color: #9aaebc;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-top: 0.3rem;
+    }
+
+    /* Expanded detail */
+    .kpi-detail {
+      display: none;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e5e9ec;
+    }
+    .kpi-card.open .kpi-detail { display: block; }
+
+    .detail-row {
+      margin-bottom: 0.75rem;
+    }
+    .detail-row:last-child { margin-bottom: 0; }
+    .detail-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #6a8099;
+      margin-bottom: 0.25rem;
+    }
+    .detail-value {
+      font-size: 0.85rem;
+      color: #1a1a1a;
+      line-height: 1.5;
+    }
+    .detail-value.formel {
+      font-family: 'Courier New', monospace;
+      font-size: 0.82rem;
+      background: #f0f4f7;
+      padding: 0.4rem 0.65rem;
+      border-radius: 2px;
+      color: #1c2b3a;
+    }
+    .benchmark-pill {
+      display: inline-block;
+      background: #e8f4fd;
+      color: #1c4a6a;
+      border-radius: 2rem;
+      padding: 0.2rem 0.65rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    /* Empty state */
+    .empty-state {
+      padding: 3rem 2.5rem;
+      text-align: center;
+      color: #9aaebc;
+      font-size: 0.92rem;
+    }
+
+    /* CTA */
+    .bk-footer {
+      padding: 1.5rem 2.5rem 2rem;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .bk-footer p { font-size: 0.88rem; color: #555; flex: 1; }
+    .cta-btn {
+      display: inline-block;
+      background: #1c2b3a;
+      color: #fff;
+      padding: 0.7rem 1.4rem;
+      border-radius: 3px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .cta-btn:hover { background: #2a4057; }
+
+    @media (max-width: 600px) {
+      .bk-header, .toolbar, .result-count, .kpi-grid, .bk-footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .kpi-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bk-widget">
+  <div class="bk-header">
+    <p class="eyebrow">Wissensressource</p>
+    <h2>KPI-Bibliothek für produzierende Betriebe</h2>
+    <p>Formel, Beispiel und Benchmark – für alle relevanten Produktionskennzahlen. Klicken Sie auf eine Karte für Details.</p>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="icon">🔍</span>
+      <input type="text" id="search" placeholder="Kennzahl suchen …" oninput="renderGrid()">
+    </div>
+    <div class="filter-tabs" id="filter-tabs"></div>
+  </div>
+
+  <p class="result-count" id="result-count"></p>
+
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <div class="bk-footer">
+    <p>Welche Kennzahlen sind für Ihren Betrieb die wichtigsten? Wir beraten Sie gerne.</p>
+    <a class="cta-btn" href="https://www.berater-kasten.de/kontakt.html">Gespräch vereinbaren →</a>
+  </div>
+</div>
+
+<script>
+const KPIS = [
+  {
+    name: "OEE – Gesamtanlageneffektivität",
+    kat: "Produktion",
+    wichtig: "kritisch",
+    formel: "OEE = Verfügbarkeit × Leistungsgrad × Qualitätsrate",
+    beispiel: "Anlage läuft 7 von 8h (87,5 %), produziert 90 % der Sollstückzahl, davon 98 % Gutteile → OEE = 87,5 % × 90 % × 98 % = 77 %",
+    benchmark: "Weltklasse: ≥ 85 % | Gut: 65–85 % | Verbesserungsbedarf: < 65 %",
+    nutzen: "Der wichtigste Einzelwert für Produktionseffizienz – kombiniert drei Verlustarten in einer Kennzahl."
+  },
+  {
+    name: "Verfügbarkeit",
+    kat: "Produktion",
+    wichtig: "kritisch",
+    formel: "Verfügbarkeit = Betriebszeit / geplante Produktionszeit × 100 %",
+    beispiel: "Geplant: 8h, ungeplante Stopps: 45 min → Verfügbarkeit = 7,25 / 8 = 90,6 %",
+    benchmark: "Angestrebt: ≥ 90 %",
+    nutzen: "Zeigt, wie viel ungeplante Stillstandszeit die Anlage kostet."
+  },
+  {
+    name: "Leistungsgrad",
+    kat: "Produktion",
+    wichtig: "wichtig",
+    formel: "Leistungsgrad = (Ist-Stückzahl × Idealtaktzeit) / Betriebszeit × 100 %",
+    beispiel: "1.000 Teile produziert, Idealtakt 25 s, Betriebszeit 450 min → Leistungsgrad = (1.000 × 25) / 27.000 = 92,6 %",
+    benchmark: "Angestrebt: ≥ 95 %",
+    nutzen: "Misst Geschwindigkeitsverluste: Mikrostopps, reduzierte Geschwindigkeit, Anlaufverluste."
+  },
+  {
+    name: "Rüstzeit",
+    kat: "Produktion",
+    wichtig: "wichtig",
+    formel: "Rüstzeit = Zeit vom letzten Gutteil Auftrag A bis erstem Gutteil Auftrag B",
+    beispiel: "Auftragswechsel dauert 45 Minuten → Rüstzeit = 45 min",
+    benchmark: "Ziel: < 10 % der Auftragszeit (SMED-Methode: unter 10 Minuten)",
+    nutzen: "Direkte Kapazitätsverlustzeit – Senkung erhöht Flexibilität und Verfügbarkeit."
+  },
+  {
+    name: "Taktzeit",
+    kat: "Produktion",
+    wichtig: "wichtig",
+    formel: "Taktzeit = verfügbare Produktionszeit / Kundenbedarf (Stück)",
+    beispiel: "480 Minuten Schicht / 240 Teile Bedarf = 2 Minuten pro Teil",
+    benchmark: "Ist-Taktzeit sollte ≤ Kundentakt sein",
+    nutzen: "Gibt an, wie schnell produziert werden muss, um den Kundenbedarf zu erfüllen."
+  },
+  {
+    name: "Auslastungsgrad",
+    kat: "Produktion",
+    wichtig: "basis",
+    formel: "Auslastungsgrad = tatsächliche Produktionszeit / Kapazität × 100 %",
+    beispiel: "Anlage produziert 6 von 8 möglichen Stunden → Auslastung = 75 %",
+    benchmark: "Optimal: 75–90 % (100 % lässt keinen Puffer)",
+    nutzen: "Basis für Investitions- und Personalentscheidungen."
+  },
+  {
+    name: "Ausschussquote",
+    kat: "Qualität",
+    wichtig: "kritisch",
+    formel: "Ausschussquote = Ausschussteile / Gesamtproduktion × 100 %",
+    beispiel: "20 Ausschussteile von 1.000 produzierten → Quote = 2 %",
+    benchmark: "< 1 % angestrebt | > 3 % kritisch",
+    nutzen: "Direkte Materialkosten und Entsorgungskosten – oft unterschätzt."
+  },
+  {
+    name: "Erstdurchlaufrate (FTT)",
+    kat: "Qualität",
+    wichtig: "wichtig",
+    formel: "FTT = Gutteile beim ersten Durchlauf / Gesamtproduktion × 100 %",
+    beispiel: "950 von 1.000 Teilen sind direkt in Ordnung → FTT = 95 %",
+    benchmark: "Weltklasse: ≥ 99 % | Gut: 95–99 %",
+    nutzen: "Erfasst alle Qualitätsverluste – auch Nacharbeit, die im Ausschuss unsichtbar bleibt."
+  },
+  {
+    name: "Nacharbeitsquote",
+    kat: "Qualität",
+    wichtig: "wichtig",
+    formel: "Nacharbeitsquote = nachgearbeitete Teile / Gesamtproduktion × 100 %",
+    beispiel: "30 von 1.000 Teilen müssen nachgebessert werden → Quote = 3 %",
+    benchmark: "< 1 % angestrebt",
+    nutzen: "Nacharbeit kostet Maschinenzeit, Personalzeit und Energie – und ist oft unsichtbar."
+  },
+  {
+    name: "Reklamationsquote",
+    kat: "Qualität",
+    wichtig: "wichtig",
+    formel: "Reklamationsquote = reklamierte Einheiten / gelieferte Einheiten × 100 %",
+    beispiel: "5 Reklamationen auf 2.000 Lieferungen → 0,25 %",
+    benchmark: "< 0,5 % angestrebt | > 2 % kritisch",
+    nutzen: "Kundenzufriedenheit und Reputationsindikator – mit Folgekosten durch Kulanz und Bearbeitungsaufwand."
+  },
+  {
+    name: "Liefertreue (OTD)",
+    kat: "Lieferung",
+    wichtig: "kritisch",
+    formel: "OTD = pünktliche Lieferungen / Gesamtlieferungen × 100 %",
+    beispiel: "185 von 200 Aufträgen pünktlich → OTD = 92,5 %",
+    benchmark: "≥ 95 % angestrebt | < 90 % kritisch",
+    nutzen: "Direkter Kundenzufriedenheitswert – Basis für Kundenbindung und Folgeaufträge."
+  },
+  {
+    name: "Durchlaufzeit",
+    kat: "Lieferung",
+    wichtig: "wichtig",
+    formel: "Durchlaufzeit = Fertigstellungsdatum – Auftragsstart-Datum",
+    beispiel: "Auftrag startet am 01.06., ist am 05.06. fertig → Durchlaufzeit = 4 Tage",
+    benchmark: "Je kürzer, desto flexibler – Ziel: minimale Wartezeiten im Prozessablauf",
+    nutzen: "Langer Durchlauf bindet Kapital, erhöht Bestände und reduziert Flexibilität."
+  },
+  {
+    name: "Maschinenstundensatz",
+    kat: "Kosten",
+    wichtig: "kritisch",
+    formel: "Maschinenstundensatz = (Abschreibung + Energie + Wartung + Raumkosten) / Betriebsstunden p.a.",
+    beispiel: "Jährliche Maschinenkosten 48.000 € / 2.000 Betriebsstunden = 24 €/h",
+    benchmark: "Stark branchenabhängig – Abgleich mit Kalkulationsgrundlage entscheidend",
+    nutzen: "Grundlage für Angebotskalkulation und Make-or-Buy-Entscheidungen."
+  },
+  {
+    name: "Herstellkosten pro Stück",
+    kat: "Kosten",
+    wichtig: "wichtig",
+    formel: "Herstellkosten/Stück = (Materialkosten + Fertigungskosten) / produzierte Menge",
+    beispiel: "Material 500 €, Fertigung 300 €, 100 Stück → 8 €/Stück",
+    benchmark: "Sollte Grundlage jeder Preiskalkulation sein",
+    nutzen: "Ohne diesen Wert keine fundierte Preisgestaltung möglich."
+  },
+  {
+    name: "Instandhaltungskosten",
+    kat: "Kosten",
+    wichtig: "basis",
+    formel: "IH-Kosten-Quote = Instandhaltungskosten / Anlagenersatzwert × 100 %",
+    beispiel: "60.000 € IH-Kosten / 1.200.000 € Anlagenersatzwert = 5 %",
+    benchmark: "Branchenüblich: 2–6 % des Anlagenersatzwerts",
+    nutzen: "Zeigt, ob zu viel reaktive Wartung (teuer) statt vorbeugender Instandhaltung (günstiger) stattfindet."
+  },
+  {
+    name: "Krankenquote",
+    kat: "Personal",
+    wichtig: "wichtig",
+    formel: "Krankenquote = Krankheitstage / Sollarbeitstage × 100 %",
+    beispiel: "25 Krankheitstage / 250 Sollarbeitstage = 10 %",
+    benchmark: "Deutschland-Schnitt ca. 5–6 % | Ziel: unter 4 %",
+    nutzen: "Hohe Krankenquoten deuten auf Belastung, schlechte Ergonomie oder Führungsprobleme hin."
+  },
+  {
+    name: "Produktivität je Mitarbeiter",
+    kat: "Personal",
+    wichtig: "basis",
+    formel: "Produktivität = Output (Stück oder €) / geleistete Arbeitsstunden",
+    beispiel: "1.200 Stück in 160 Stunden = 7,5 Stück/Stunde",
+    benchmark: "Trendanalyse wichtiger als absoluter Wert – Vergleich über Zeit",
+    nutzen: "Zeigt Effizienzentwicklung und hilft bei der Personalplanung."
+  },
+  {
+    name: "Energiekosten je Stück",
+    kat: "Kosten",
+    wichtig: "basis",
+    formel: "Energiekosten/Stück = Energieverbrauch (kWh) × Strompreis / Stückzahl",
+    beispiel: "200 kWh × 0,22 €/kWh / 500 Stück = 0,088 €/Stück",
+    benchmark: "Benchmark branchenabhängig – Trendverfolgung wichtig",
+    nutzen: "Steigender Wert zeigt sinkende Energieeffizienz oder höhere Energiepreise."
+  },
+];
+
+const KATEGORIEN = [...new Set(KPIS.map(k => k.kat))];
+let aktiveKat = 'Alle';
+let openCard = null;
+
+function init() {
+  const tabDiv = document.getElementById('filter-tabs');
+  ['Alle', ...KATEGORIEN].forEach(kat => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-tab' + (kat === aktiveKat ? ' active' : '');
+    btn.textContent = kat;
+    btn.onclick = () => {
+      aktiveKat = kat;
+      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      openCard = null;
+      renderGrid();
+    };
+    tabDiv.appendChild(btn);
+  });
+  renderGrid();
+}
+
+function renderGrid() {
+  const q = document.getElementById('search').value.toLowerCase().trim();
+  const grid = document.getElementById('kpi-grid');
+  grid.innerHTML = '';
+
+  const gefiltert = KPIS.filter(k => {
+    const katOk = aktiveKat === 'Alle' || k.kat === aktiveKat;
+    const searchOk = !q || k.name.toLowerCase().includes(q) || k.kat.toLowerCase().includes(q) || k.nutzen.toLowerCase().includes(q);
+    return katOk && searchOk;
+  });
+
+  document.getElementById('result-count').textContent =
+    gefiltert.length === KPIS.length ? `${KPIS.length} Kennzahlen` : `${gefiltert.length} von ${KPIS.length} Kennzahlen`;
+
+  if (gefiltert.length === 0) {
+    grid.innerHTML = '<div class="empty-state">Keine Kennzahl gefunden. Andere Suchbegriffe versuchen?</div>';
+    grid.style.gridTemplateColumns = '1fr';
+    return;
+  }
+  grid.style.gridTemplateColumns = '';
+
+  gefiltert.forEach((kpi, i) => {
+    const card = document.createElement('div');
+    const isOpen = openCard === kpi.name;
+    card.className = 'kpi-card' + (isOpen ? ' open' : '');
+
+    const badgeLabel = kpi.wichtig === 'kritisch' ? 'Kern-KPI' : kpi.wichtig === 'wichtig' ? 'Wichtig' : 'Basis';
+
+    card.innerHTML = `
+      <div class="kpi-card__top">
+        <p class="kpi-card__name">${kpi.name}</p>
+        <span class="kpi-badge ${kpi.wichtig}">${badgeLabel}</span>
+      </div>
+      <p class="kpi-card__kat">${kpi.kat}</p>
+      <div class="kpi-detail">
+        <div class="detail-row">
+          <p class="detail-label">Formel</p>
+          <p class="detail-value formel">${kpi.formel}</p>
+        </div>
+        <div class="detail-row">
+          <p class="detail-label">Beispiel</p>
+          <p class="detail-value">${kpi.beispiel}</p>
+        </div>
+        <div class="detail-row">
+          <p class="detail-label">Benchmark</p>
+          <p class="detail-value"><span class="benchmark-pill">${kpi.benchmark}</span></p>
+        </div>
+        <div class="detail-row">
+          <p class="detail-label">Warum relevant?</p>
+          <p class="detail-value">${kpi.nutzen}</p>
+        </div>
+      </div>
+    `;
+
+    card.onclick = () => {
+      openCard = isOpen ? null : kpi.name;
+      renderGrid();
+    };
+
+    grid.appendChild(card);
+  });
+}
+
+init();
+</script>
+</body>
+</html>

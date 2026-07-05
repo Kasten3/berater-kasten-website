@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verschwendungs-Check – Berater-Kasten</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f7f7f5;
+      color: #1a1a1a;
+      padding: 2rem 1rem;
+    }
+
+    .bk-widget {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    /* Header */
+    .bk-header {
+      background: #1c2b3a;
+      color: #fff;
+      padding: 2rem 2.5rem;
+    }
+    .bk-header .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a8c4d8;
+      margin-bottom: 0.5rem;
+    }
+    .bk-header h2 { font-size: 1.55rem; font-weight: 700; }
+    .bk-header p { margin-top: 0.5rem; font-size: 0.9rem; color: #c8d8e4; line-height: 1.5; }
+
+    /* Progress Bar */
+    .progress-bar-wrap {
+      background: #e8edf1;
+      height: 5px;
+    }
+    .progress-bar-fill {
+      height: 5px;
+      background: #1c2b3a;
+      transition: width 0.35s ease;
+    }
+
+    /* Body */
+    .bk-body { padding: 2rem 2.5rem; }
+
+    /* Step indicator */
+    .step-indicator {
+      font-size: 0.75rem;
+      color: #8a9aa8;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    .step-indicator strong { color: #1c2b3a; }
+
+    /* Question */
+    .question-block { margin-bottom: 1.75rem; }
+    .question-text {
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      line-height: 1.45;
+      margin-bottom: 0.35rem;
+    }
+    .question-hint {
+      font-size: 0.82rem;
+      color: #7a8f9e;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+
+    /* Options */
+    .options { display: flex; flex-direction: column; gap: 0.55rem; }
+    .option-btn {
+      padding: 0.75rem 1.1rem;
+      border: 1.5px solid #d0d5da;
+      border-radius: 3px;
+      background: #f9f9f8;
+      font-size: 0.92rem;
+      color: #1a1a1a;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s;
+      line-height: 1.35;
+    }
+    .option-btn:hover { border-color: #1c2b3a; background: #f0f5f9; }
+    .option-btn.selected { background: #1c2b3a; color: #fff; border-color: #1c2b3a; font-weight: 600; }
+
+    /* Navigation */
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+    .nav-btn {
+      padding: 0.65rem 1.4rem;
+      border-radius: 3px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s;
+    }
+    .nav-btn.back { background: #eee; color: #555; }
+    .nav-btn.back:hover { background: #e0e0e0; }
+    .nav-btn.next { background: #1c2b3a; color: #fff; }
+    .nav-btn.next:hover { background: #2a4057; }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* Divider */
+    hr.div { border: none; border-top: 1px solid #eee; margin: 1.75rem 0; }
+
+    /* Results */
+    .result-hidden { display: none; }
+
+    .result-header {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1c2b3a;
+      margin-bottom: 0.4rem;
+    }
+    .result-sub {
+      font-size: 0.88rem;
+      color: #555;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .potenzial-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .potenzial-card {
+      border-radius: 3px;
+      padding: 1rem 1.1rem;
+      border-left: 4px solid #ccc;
+    }
+    .potenzial-card.hoch { border-color: #c0392b; background: #fdf1f0; }
+    .potenzial-card.mittel { border-color: #e67e22; background: #fef6ed; }
+    .potenzial-card.gering { border-color: #27ae60; background: #edfaf2; }
+
+    .potenzial-card .thema {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+    .potenzial-card.hoch .thema { color: #c0392b; }
+    .potenzial-card.mittel .thema { color: #e67e22; }
+    .potenzial-card.gering .thema { color: #27ae60; }
+
+    .potenzial-card .label { font-size: 0.88rem; font-weight: 600; color: #1a1a1a; }
+    .potenzial-card .detail { font-size: 0.78rem; color: #666; margin-top: 0.2rem; line-height: 1.35; }
+
+    .score-bar-wrap { background: #eee; border-radius: 2px; height: 6px; margin-top: 0.5rem; }
+    .score-bar-fill { height: 6px; border-radius: 2px; transition: width 0.5s ease; }
+    .hoch .score-bar-fill { background: #c0392b; }
+    .mittel .score-bar-fill { background: #e67e22; }
+    .gering .score-bar-fill { background: #27ae60; }
+
+    .gesamtbewertung {
+      background: #f0f7fb;
+      border-left: 4px solid #1c2b3a;
+      border-radius: 2px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .gesamtbewertung .label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6a8099;
+      margin-bottom: 0.3rem;
+    }
+    .gesamtbewertung .text {
+      font-size: 0.92rem;
+      color: #1a1a1a;
+      line-height: 1.5;
+    }
+
+    .cta-block { display: flex; flex-direction: column; gap: 0.5rem; }
+    .cta-block p { font-size: 0.88rem; color: #555; }
+    .cta-btn {
+      display: inline-block;
+      background: #1c2b3a;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 3px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+      width: fit-content;
+    }
+    .cta-btn:hover { background: #2a4057; }
+
+    .restart-btn {
+      background: none;
+      border: none;
+      color: #8a9aa8;
+      font-size: 0.82rem;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 520px) {
+      .bk-header, .bk-body { padding: 1.5rem; }
+      .potenzial-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bk-widget">
+  <div class="bk-header">
+    <p class="eyebrow">Selbstcheck</p>
+    <h2>Verschwendungs-Check</h2>
+    <p>12 Fragen – 3 Minuten – klares Ergebnis: Wo steckt das größte Potenzial in Ihrem Betrieb?</p>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+  </div>
+
+  <div class="bk-body">
+    <div id="quiz-area">
+      <p class="step-indicator">Frage <strong id="q-num">1</strong> von 12</p>
+
+      <div class="question-block">
+        <p class="question-text" id="q-text"></p>
+        <p class="question-hint" id="q-hint"></p>
+        <div class="options" id="q-options"></div>
+      </div>
+
+      <div class="nav-row">
+        <button class="nav-btn back" id="btn-back" onclick="goBack()">← Zurück</button>
+        <button class="nav-btn next" id="btn-next" onclick="goNext()" disabled>Weiter →</button>
+      </div>
+    </div>
+
+    <div id="result-area" class="result-hidden"></div>
+  </div>
+</div>
+
+<script>
+const FRAGEN = [
+  {
+    thema: "Rüstzeiten",
+    text: "Wie lange dauert ein typischer Rüstvorgang bei Ihrer wichtigsten Maschine / Anlage?",
+    hint: "Gemeint ist die Zeit von letztem Gutteil bis erstem Gutteil.",
+    optionen: ["Unter 15 Minuten", "15–30 Minuten", "30–60 Minuten", "Über 60 Minuten"],
+    punkte: [0, 1, 2, 3]
+  },
+  {
+    thema: "Rüstzeiten",
+    text: "Sind Rüstvorgänge standardisiert und dokumentiert?",
+    hint: "Gibt es Checklisten oder Rüstanweisungen, die tatsächlich genutzt werden?",
+    optionen: ["Ja, vollständig", "Teilweise", "Kaum", "Nein, läuft aus dem Kopf"],
+    punkte: [0, 1, 2, 3]
+  },
+  {
+    thema: "Bestände",
+    text: "Wie schätzen Sie Ihren durchschnittlichen Lagerbestand (Material / Halbfertigteile) ein?",
+    hint: "Verglichen mit dem, was Sie für eine reibungslose Produktion wirklich brauchen.",
+    optionen: ["Genau richtig", "Leicht zu hoch", "Deutlich zu hoch", "Sehr hoch – oft suchen wir Platz"],
+    punkte: [0, 1, 2, 3]
+  },
+  {
+    thema: "Bestände",
+    text: "Wissen Sie jederzeit, wo welche Materialien oder Halbfertigteile lagern?",
+    hint: "Oder wird manchmal gesucht, bevor produziert werden kann?",
+    optionen: ["Immer", "Meistens", "Manchmal", "Häufig nicht"],
+    punkte: [0, 1, 2, 3]
+  },
+  {
+    thema: "Qualität",
+    text: "Wie hoch ist Ihre Ausschuss- oder Nacharbeitsquote?",
+    hint: "Teile, die nicht beim ersten Durchlauf in Ordnung sind.",
+    optionen: ["Unter 1 %", "1–3 %", "3–8 %", "Über 8 %"],
+    punkte: [0, 1, 2, 3]
+  },
+  {
+    thema: "Qualität",
+    text: "Werden Fehler an der Quelle erkannt und sofort gestoppt?",
+    hint: "Oder werden Fehler erst am Ende oder durch den Kunden entdeckt?",
+    optionen: ["Ja, konsequent", "Meistens", "Manchmal", "Selten – Fehler fliegen oft durch"],
+    punkte: [0, 1, 2, 3]
+  },
+  {
+    thema: "Prozesse",
+    text: "Wie oft kommt es zu ungeplanten Maschinenstillständen?",
+    hint: "Störungen, die den Produktionsplan durcheinanderbringen.",
+    optionen: ["Selten (< 1× pro Woche)", "Gelegentlich", "Regelmäßig", "Fast täglich"],
+    punkte: [0, 1, 2, 3]
+  },
+  {
+    thema: "Prozesse",
+    text: "Wie gut laufen Übergaben zwischen Schichten oder Abteilungen?",
+    hint: "Gehen Informationen verloren? Gibt es Reibungsverluste beim Wechsel?",
+    optionen: ["Sehr gut – strukturiert", "In Ordnung", "Lückenhaft", "Schlecht – viel geht verloren"],
+    punkte: [0, 1, 2, 3]
+  },
+  {
+    thema: "Kennzahlen",
+    text: "Wissen Sie, wie hoch Ihre OEE (Gesamtanlageneffektivität) ist?",
+    hint: "OEE kombiniert Verfügbarkeit, Leistung und Qualität zu einem Wert.",
+    optionen: ["Ja, wird regelmäßig gemessen", "Ungefähr", "Schätze nur grob", "Nein, unbekannt"],
+    punkte: [0, 1, 2, 3]
+  },
+  {
+    thema: "Kennzahlen",
+    text: "Haben Sie einen klaren Überblick über Ihre Produktionskennzahlen?",
+    hint: "Stückzahlen, Durchlaufzeiten, Auslastung – strukturiert und aktuell.",
+    optionen: ["Ja, täglich im Blick", "Wöchentlich / monatlich", "Selten", "Kein System vorhanden"],
+    punkte: [0, 1, 2, 3]
+  },
+  {
+    thema: "Organisation",
+    text: "Wie klar sind Verantwortlichkeiten und Aufgaben im Produktionsbereich geregelt?",
+    hint: "Weiß jeder, was er wann zu tun hat – auch ohne Nachfragen?",
+    optionen: ["Sehr klar", "Überwiegend klar", "Oft unklar", "Häufige Abstimmungsprobleme"],
+    punkte: [0, 1, 2, 3]
+  },
+  {
+    thema: "Organisation",
+    text: "Werden Verbesserungsideen aus dem Team systematisch aufgenommen und umgesetzt?",
+    hint: "Gibt es einen KVP-Prozess, ein Ideen-Board oder ähnliches?",
+    optionen: ["Ja, aktiver Prozess", "Gelegentlich", "Selten", "Kaum – Ideen verpuffen"],
+    punkte: [0, 1, 2, 3]
+  }
+];
+
+const THEMEN = ["Rüstzeiten", "Bestände", "Qualität", "Prozesse", "Kennzahlen", "Organisation"];
+
+let current = 0;
+let answers = new Array(FRAGEN.length).fill(null);
+
+function renderQuestion() {
+  const q = FRAGEN[current];
+  document.getElementById('q-num').textContent = current + 1;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('q-hint').textContent = q.hint;
+
+  const optDiv = document.getElementById('q-options');
+  optDiv.innerHTML = '';
+  q.optionen.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (answers[current] === i ? ' selected' : '');
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(i);
+    optDiv.appendChild(btn);
+  });
+
+  document.getElementById('btn-back').disabled = current === 0;
+  document.getElementById('btn-next').disabled = answers[current] === null;
+  document.getElementById('btn-next').textContent = current === FRAGEN.length - 1 ? 'Auswertung →' : 'Weiter →';
+
+  const pct = (current / FRAGEN.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function selectAnswer(i) {
+  answers[current] = i;
+  document.querySelectorAll('.option-btn').forEach((b, idx) => {
+    b.classList.toggle('selected', idx === i);
+  });
+  document.getElementById('btn-next').disabled = false;
+}
+
+function goNext() {
+  if (current < FRAGEN.length - 1) {
+    current++;
+    renderQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function goBack() {
+  if (current > 0) { current--; renderQuestion(); }
+}
+
+function showResults() {
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('quiz-area').style.display = 'none';
+
+  // Punkte pro Thema
+  const themaScores = {};
+  const themaMax = {};
+  THEMEN.forEach(t => { themaScores[t] = 0; themaMax[t] = 0; });
+  FRAGEN.forEach((q, i) => {
+    themaScores[q.thema] += q.punkte[answers[i]];
+    themaMax[q.thema] += 3;
+  });
+
+  // Normieren 0–100
+  const themaProz = {};
+  THEMEN.forEach(t => { themaProz[t] = Math.round((themaScores[t] / themaMax[t]) * 100); });
+
+  // Sortieren
+  const sorted = THEMEN.slice().sort((a, b) => themaProz[b] - themaProz[a]);
+
+  function stufe(p) {
+    if (p >= 60) return 'hoch';
+    if (p >= 30) return 'mittel';
+    return 'gering';
+  }
+
+  function stufenText(p) {
+    if (p >= 60) return 'Hohes Potenzial';
+    if (p >= 30) return 'Mittleres Potenzial';
+    return 'Gering';
+  }
+
+  function detailText(thema, p) {
+    const texte = {
+      "Rüstzeiten": ["Ihre Rüstzeiten sind bereits gut optimiert.", "Es gibt Spielraum – strukturierte Rüstblätter und SMED-Methoden könnten helfen.", "Rüstzeiten kosten Sie täglich bares Geld. Hier liegt ungenutztes Potenzial."],
+      "Bestände": ["Bestände sind gut im Griff.", "Zu viel gebundenes Kapital im Lager – überschaubar, aber adressierbar.", "Hohe Bestände binden Kapital und verbergen Probleme. Dringend analysieren."],
+      "Qualität": ["Ihre Qualitätsquoten sind stark.", "Ausschuss und Nacharbeit kosten mehr als sichtbar. Ursachenanalyse lohnt.", "Fehler kosten mehrfach – Material, Zeit, Kundenvertrauen. Priorität 1."],
+      "Prozesse": ["Ihre Prozesse laufen stabil.", "Störungen und Übergabeverluste bremsen die Effizienz spürbar.", "Ungeplante Stopps und schlechte Übergaben vernichten täglich Kapazität."],
+      "Kennzahlen": ["Gute Datenbasis – Sie wissen, was in Ihrer Produktion passiert.", "Lückenhaftes Bild: Entscheidungen laufen teils ohne solide Grundlage.", "Ohne Kennzahlen steuern Sie im Blindflug. Transparenz ist der erste Schritt."],
+      "Organisation": ["Klare Strukturen und gelebte Verbesserungskultur – vorbildlich.", "Verantwortlichkeiten und KVP-Prozesse haben Lücken.", "Unklare Zuständigkeiten und fehlende Verbesserungskultur kosten Energie täglich."]
+    };
+    const idx = p >= 60 ? 2 : p >= 30 ? 1 : 0;
+    return texte[thema][idx];
+  }
+
+  // Gesamtpunkte
+  const gesamt = Object.values(themaScores).reduce((a, b) => a + b, 0);
+  const gesamtMax = 36;
+  const gesamtProz = Math.round((gesamt / gesamtMax) * 100);
+
+  let gesamtText = '';
+  if (gesamtProz >= 60) {
+    gesamtText = 'In Ihrem Betrieb schlummert erhebliches Optimierungspotenzial – in mehreren Bereichen gleichzeitig. Ein strukturierter Ansatz kann hier schnell spürbare Ergebnisse bringen. Wir empfehlen ein persönliches Erstgespräch, um Prioritäten zu setzen.';
+  } else if (gesamtProz >= 35) {
+    gesamtText = 'Ihr Betrieb läuft solide, aber einzelne Bereiche bremsen das Gesamtergebnis messbar. Mit gezielten Maßnahmen – ohne große Investitionen – lässt sich hier einiges herausholen.';
+  } else {
+    gesamtText = 'Ihr Betrieb ist bereits gut aufgestellt. Der Verschwendungscheck zeigt kaum kritische Baustellen. Ein Feinschliff in einzelnen Bereichen kann die Effizienz weiter steigern.';
+  }
+
+  let html = `
+    <p class="result-header">Ihre Auswertung</p>
+    <p class="result-sub">So sieht Ihr Betrieb aus – geordnet nach Optimierungspotenzial:</p>
+    <div class="potenzial-grid">
+  `;
+
+  sorted.forEach(thema => {
+    const p = themaProz[thema];
+    const s = stufe(p);
+    html += `
+      <div class="potenzial-card ${s}">
+        <p class="thema">${stufenText(p)}</p>
+        <p class="label">${thema}</p>
+        <p class="detail">${detailText(thema, p)}</p>
+        <div class="score-bar-wrap">
+          <div class="score-bar-fill" style="width: ${p}%"></div>
+        </div>
+      </div>
+    `;
+  });
+
+  html += `</div>
+    <div class="gesamtbewertung">
+      <p class="label">Gesamtbild</p>
+      <p class="text">${gesamtText}</p>
+    </div>
+    <hr class="div">
+    <div class="cta-block">
+      <p>Wir gehen Ihre Ergebnisse gerne gemeinsam durch – kostenlos und ohne Verbindlichkeit.</p>
+      <a class="cta-btn" href="https://www.berater-kasten.de/kontakt.html">Jetzt Erstgespräch vereinbaren →</a>
+      <button class="restart-btn" onclick="restart()">Nochmal von vorne</button>
+    </div>
+  `;
+
+  const ra = document.getElementById('result-area');
+  ra.innerHTML = html;
+  ra.classList.remove('result-hidden');
+}
+
+function restart() {
+  current = 0;
+  answers = new Array(FRAGEN.length).fill(null);
+  document.getElementById('result-area').classList.add('result-hidden');
+  document.getElementById('result-area').innerHTML = '';
+  document.getElementById('quiz-area').style.display = '';
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+</body>
+</html>
