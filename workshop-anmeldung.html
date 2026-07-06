@@ -30,6 +30,11 @@
     .toggle-option input { display: none; }
     #firmaFeld { max-height: 0; overflow: hidden; transition: max-height .3s ease; }
     #firmaFeld.show { max-height: 120px; }
+    #gruppeFelder { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
+    #gruppeFelder.show { max-height: 400px; }
+    #firmeninternFeld { max-height: 0; overflow: hidden; transition: max-height .3s ease; }
+    #firmeninternFeld.show { max-height: 200px; }
+    .teilnehmer-hinweis { font-size: 12px; color: var(--textlight); margin-top: 4px; }
   </style>
 </head>
 <body>
@@ -65,9 +70,56 @@
         <div class="form-group">
           <label for="workshop">Workshop</label>
           <select id="workshop" name="workshop">
-            <option value="Power BI Werkzeugkasten">Power BI Werkzeugkasten – Start 06.07.2026 (149&thinsp;€)</option>
-            <option value="Power BI Werkstatt">Power BI Werkstatt – Start 07.07.2026 (229&thinsp;€)</option>
+            <option value="Power BI Werkzeugkasten">Power BI Werkzeugkasten (149&thinsp;€)</option>
+            <option value="Power BI Werkstatt">Power BI Werkstatt (229&thinsp;€)</option>
           </select>
+        </div>
+
+        <!-- Anmeldetyp -->
+        <div class="form-group">
+          <label>Anmeldetyp *</label>
+          <div class="toggle-group">
+            <label class="toggle-option active" id="optEinzel">
+              <input type="radio" name="anmeldetyp" value="Einzelanmeldung" checked>
+              Einzelanmeldung
+            </label>
+            <label class="toggle-option" id="optGruppe">
+              <input type="radio" name="anmeldetyp" value="Gruppenanmeldung">
+              Gruppenanmeldung
+            </label>
+          </div>
+        </div>
+
+        <!-- Gruppenfelder (nur bei Gruppenanmeldung) -->
+        <div id="gruppeFelder">
+          <div class="form-group">
+            <label for="weiterePersonen">Weitere Teilnehmer</label>
+            <textarea id="weiterePersonen" name="weitere_teilnehmer" rows="4"
+              placeholder="Eine Person pro Zeile, z. B.:&#10;Max Mustermann · max@firma.de&#10;Erika Muster · erika@firma.de"
+              style="width:100%; padding:12px 14px; border:1.5px solid #dce3ea; border-radius:var(--radius); font-size:14px; font-family:inherit; resize:vertical;"></textarea>
+            <p class="teilnehmer-hinweis">Maximal 15 Teilnehmer pro Gruppe. Name und E-Mail genügen.</p>
+          </div>
+          <div class="form-group">
+            <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
+              <input type="checkbox" id="firmeninternCheck" name="firmenintern"
+                style="width:18px; height:18px; margin-top:2px; flex-shrink:0; accent-color:var(--petrolblau);"
+                onchange="toggleFirmenintern(this.checked)">
+              <span style="font-size:14px; font-weight:600; color:var(--text);">Wir möchten den Workshop firmenintern durchführen</span>
+            </label>
+          </div>
+          <div id="firmeninternFeld">
+            <div class="form-group">
+              <label for="firmeninternUnternehmen">Unternehmen</label>
+              <input type="text" id="firmeninternUnternehmen" name="firmenintern_unternehmen"
+                placeholder="Name des Unternehmens" autocomplete="organization">
+            </div>
+            <div class="form-group">
+              <label for="teilnehmeranzahl">Gewünschte Teilnehmerzahl</label>
+              <input type="number" id="teilnehmeranzahl" name="teilnehmeranzahl"
+                placeholder="z. B. 8" min="2" max="15">
+              <p class="teilnehmer-hinweis">Wir melden uns zur Terminabstimmung bei Ihnen.</p>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -199,6 +251,24 @@ function setMode(isFirma) {
 }
 optPrivat.addEventListener('click', () => setMode(false));
 optFirma.addEventListener('click', () => setMode(true));
+
+// Toggle Einzel / Gruppe
+const optEinzel = document.getElementById('optEinzel');
+const optGruppe = document.getElementById('optGruppe');
+const gruppeFelder = document.getElementById('gruppeFelder');
+
+function setAnmeldetyp(isGruppe) {
+  optEinzel.classList.toggle('active', !isGruppe);
+  optGruppe.classList.toggle('active', isGruppe);
+  gruppeFelder.classList.toggle('show', isGruppe);
+}
+optEinzel.addEventListener('click', () => setAnmeldetyp(false));
+optGruppe.addEventListener('click', () => setAnmeldetyp(true));
+
+// Toggle Firmenintern
+function toggleFirmenintern(checked) {
+  document.getElementById('firmeninternFeld').classList.toggle('show', checked);
+}
 </script>
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
