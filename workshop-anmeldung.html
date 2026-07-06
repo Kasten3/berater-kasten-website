@@ -33,7 +33,7 @@
     #gruppeFelder { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
     #gruppeFelder.show { max-height: 400px; }
     #firmeninternFeld { max-height: 0; overflow: hidden; transition: max-height .3s ease; }
-    #firmeninternFeld.show { max-height: 200px; }
+    #firmeninternFeld.show { max-height: 280px; }
     .teilnehmer-hinweis { font-size: 12px; color: var(--textlight); margin-top: 4px; }
   </style>
 </head>
@@ -92,13 +92,7 @@
 
         <!-- Gruppenfelder (nur bei Gruppenanmeldung) -->
         <div id="gruppeFelder">
-          <div class="form-group">
-            <label for="weiterePersonen">Weitere Teilnehmer</label>
-            <textarea id="weiterePersonen" name="weitere_teilnehmer" rows="4"
-              placeholder="Eine Person pro Zeile, z. B.:&#10;Max Mustermann · max@firma.de&#10;Erika Muster · erika@firma.de"
-              style="width:100%; padding:12px 14px; border:1.5px solid #dce3ea; border-radius:var(--radius); font-size:14px; font-family:inherit; resize:vertical;"></textarea>
-            <p class="teilnehmer-hinweis">Maximal 15 Teilnehmer pro Gruppe. Name und E-Mail genügen.</p>
-          </div>
+
           <div class="form-group">
             <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
               <input type="checkbox" id="firmeninternCheck" name="firmenintern"
@@ -116,8 +110,11 @@
             <div class="form-group">
               <label for="teilnehmeranzahl">Gewünschte Teilnehmerzahl</label>
               <input type="number" id="teilnehmeranzahl" name="teilnehmeranzahl"
-                placeholder="z. B. 8" min="2" max="15">
-              <p class="teilnehmer-hinweis">Wir melden uns zur Terminabstimmung bei Ihnen.</p>
+                placeholder="z. B. 8" min="2" max="15"
+                style="width:100%; padding:12px 14px; border:1.5px solid #dce3ea; border-radius:var(--radius); font-size:14px; font-family:inherit;"
+                oninput="updatePreis()">
+              <p class="teilnehmer-hinweis">Maximal 15 Teilnehmer pro Gruppe.</p>
+              <div id="preisHinweis" style="display:none; margin-top:10px; padding:12px 14px; background:#e8f4fa; border-left:3px solid var(--petrolblau); border-radius:6px; font-size:14px; color:var(--dunkelblau); line-height:1.5;"></div>
             </div>
           </div>
         </div>
@@ -163,7 +160,8 @@
           </label>
         </div>
 
-        <button type="submit" class="btn-primary" style="width:100%; font-size:16px; padding:15px;">Verbindlich anmelden</button>
+        <div id="submitPreisHinweis" style="display:none; margin-bottom:12px; padding:12px 16px; background:#f0f7fb; border-radius:8px; font-size:14px; color:var(--dunkelblau); text-align:center;"></div>
+        <button type="submit" class="btn-primary" style="width:100%; font-size:16px; padding:15px;" id="submitBtn">Verbindlich anmelden</button>
         <p id="workshopError" style="color:#c0392b; font-size:13px; margin-top:12px; display:none; text-align:center;">Bitte alle Pflichtfelder (*) ausfüllen und der Datenschutzerklärung zustimmen.</p>
         <p style="font-size:12px; color:var(--textlight); text-align:center; margin-top:14px;">
           Ein Workshop findet ab mindestens 3 Teilnehmern statt. Sollte das nicht erreicht werden, informieren wir Sie rechtzeitig vor Beginn.
@@ -268,7 +266,52 @@ optGruppe.addEventListener('click', () => setAnmeldetyp(true));
 // Toggle Firmenintern
 function toggleFirmenintern(checked) {
   document.getElementById('firmeninternFeld').classList.toggle('show', checked);
+  updatePreis();
 }
+
+// Preise je Workshop
+const PREISE = {
+  'Power BI Werkzeugkasten': 149,
+  'Power BI Werkstatt': 229
+};
+
+function updatePreis() {
+  const workshopVal = document.getElementById('workshop').value;
+  const preis = PREISE[workshopVal] || 0;
+  const isGruppe = document.getElementById('optGruppe').classList.contains('active');
+  const isFirmenintern = document.getElementById('firmeninternCheck') && document.getElementById('firmeninternCheck').checked;
+  const anzahlEl = document.getElementById('teilnehmeranzahl');
+  const anzahl = parseInt(anzahlEl ? anzahlEl.value : '') || 0;
+
+  const preisHinweis = document.getElementById('preisHinweis');
+  const submitHinweis = document.getElementById('submitPreisHinweis');
+  const submitBtn = document.getElementById('submitBtn');
+
+  if (isGruppe && isFirmenintern && anzahl >= 2) {
+    const gesamt = anzahl * preis;
+    const gesamtFmt = gesamt.toLocaleString('de-DE') + ' €';
+    const einzelFmt = preis.toLocaleString('de-DE') + ' €';
+    const txt = anzahl + ' Teilnehmer × ' + einzelFmt + ' = <strong>' + gesamtFmt + ' gesamt</strong>';
+    preisHinweis.innerHTML = txt;
+    preisHinweis.style.display = 'block';
+    submitHinweis.innerHTML = 'Gesamtbetrag: <strong>' + gesamtFmt + '</strong> (' + anzahl + ' Pers. × ' + einzelFmt + ')';
+    submitHinweis.style.display = 'block';
+    submitBtn.textContent = 'Verbindlich anmelden – ' + gesamtFmt;
+  } else if (!isGruppe && preis > 0) {
+    preisHinweis.style.display = 'none';
+    submitHinweis.style.display = 'none';
+    submitBtn.textContent = 'Verbindlich anmelden – ' + preis.toLocaleString('de-DE') + ' €';
+  } else {
+    preisHinweis.style.display = 'none';
+    submitHinweis.style.display = 'none';
+    submitBtn.textContent = 'Verbindlich anmelden';
+  }
+}
+
+// Workshop-Dropdown Listener
+document.getElementById('workshop').addEventListener('change', updatePreis);
+// Initial aufrufen
+updatePreis();
 </script>
 <script>
 window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
