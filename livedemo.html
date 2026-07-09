@@ -447,6 +447,14 @@ function setMainTab(id, btn) {
   document.getElementById('mainpanel-' + id).classList.add('active');
 }
 
+// ===== Deep-Link per ?tab=powerbi|logger|personalplanung =====
+(function(){
+  const wanted = new URLSearchParams(location.search).get('tab');
+  if (!wanted) return;
+  const btn = document.querySelector('.tool-main-btn[onclick*="' + wanted + '"]');
+  if (btn) { setMainTab(wanted, btn); btn.scrollIntoView({ behavior:'smooth', block:'start' }); }
+})();
+
 // ===== POWER BI SUB-TABS =====
 document.querySelectorAll('.dash-tab-btn').forEach(btn => {
   btn.addEventListener('click', () => {

@@ -163,6 +163,14 @@ function setToolTab(id, btn) {
   btn.classList.add('active');
   document.getElementById('toolpanel-' + id).classList.add('active');
 }
+
+// ===== Deep-Link per ?tool=verschwendung|kennzahlen|kpi =====
+(function(){
+  const wanted = new URLSearchParams(location.search).get('tool');
+  if (!wanted) return;
+  const btn = document.querySelector('.tools-tab-btn[onclick*="' + wanted + '"]');
+  if (btn) { setToolTab(wanted, btn); btn.scrollIntoView({ behavior:'smooth', block:'start' }); }
+})();
 </script>
 
 
