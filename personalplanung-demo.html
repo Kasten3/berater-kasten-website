@@ -20,8 +20,11 @@
   .schicht-btn{padding:4px 13px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:2px solid rgba(255,255,255,0.3);font-family:inherit;background:transparent;color:white;transition:all .15s;}
   .schicht-btn.active{background:white;color:var(--blau);border-color:white;}
   .schicht-btn:hover:not(.active){background:rgba(255,255,255,0.15);}
-  .btn-calc{margin-left:auto;padding:6px 16px;border-radius:8px;border:none;background:var(--gelb);color:var(--blau);font-weight:700;font-size:12px;cursor:pointer;font-family:inherit;}
-  .btn-calc:hover{filter:brightness(0.93);}
+  /* Gewerbemodus-Umschalter */
+  .bkr-modus-switch{margin-left:auto;display:flex;background:rgba(255,255,255,0.12);border-radius:8px;padding:3px;gap:2px;}
+  .bkr-modus-btn{padding:5px 12px;border:none;border-radius:6px;background:transparent;color:white;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;}
+  .bkr-modus-btn.active{background:white;color:var(--blau);}
+  .bkr-modus-btn:hover:not(.active){background:rgba(255,255,255,0.15);}
   .body{background:white;border:1px solid #ddd;border-top:none;border-radius:0 0 10px 10px;padding:14px;}
   .kpi-strip{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
   .kpi-chip{flex:1;min-width:70px;background:var(--grau);border-radius:8px;padding:8px 12px;border:1px solid #e0ddd9;text-align:center;}
@@ -33,7 +36,12 @@
   .banner.warn{background:#fff8e1;color:#e65100;border:1px solid #ffe082;}
   .banner.crit{background:#ffebee;color:#c62828;border:1px solid #ef9a9a;}
   .banner.idle{background:var(--grau);color:#888;border:1px solid #e0ddd9;}
-  .plan-wrap{overflow-x:auto;}
+  .plan-wrap{overflow-x:auto;background:
+    linear-gradient(to right,#fff 30%,rgba(255,255,255,0)),
+    linear-gradient(to right,rgba(255,255,255,0),#fff 70%) 100% 0,
+    radial-gradient(farthest-side at 0 50%,rgba(0,0,0,.16),transparent),
+    radial-gradient(farthest-side at 100% 50%,rgba(0,0,0,.16),transparent) 100% 0;
+    background-repeat:no-repeat;background-size:40px 100%,40px 100%,14px 100%,14px 100%;background-attachment:local,local,scroll,scroll;}
   .plan-table{border-collapse:collapse;width:100%;min-width:560px;}
   .plan-table th{background:var(--blau);color:white;padding:8px 6px;font-size:11px;font-weight:700;text-align:center;white-space:nowrap;}
   .plan-table th.col-name{text-align:left;min-width:130px;padding-left:10px;}
@@ -109,6 +117,22 @@
   .toast{position:fixed;bottom:20px;right:20px;background:var(--blau);color:white;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,0.2);animation:slideUp .3s ease;z-index:300;}
   @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
   .disc{font-size:11px;color:#888;text-align:center;margin-top:8px;font-style:italic;}
+  /* Mobile / Touch */
+  .bkr-swipe-hint{display:none;font-size:11px;color:#aaa;text-align:center;margin:0 0 6px;}
+  .bkr-legend{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px;font-size:11px;color:#666;align-items:center;}
+  .bkr-legend .shift-badge{cursor:default;}
+  @media (max-width:600px){
+    .bkr-swipe-hint{display:block;}
+    .toast{left:16px;right:16px;bottom:16px;text-align:center;}
+  }
+  @media (pointer:coarse){
+    .shift-badge{min-width:34px;padding:10px 6px;font-size:12px;}
+    .ctx-item{padding:13px 14px;}
+    .schicht-btn{padding:8px 15px;}
+    .bkr-modus-btn{padding:9px 12px;}
+    .btn{padding:10px 16px;}
+    .ersatz-opt{padding:12px;}
+  }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 </head>
@@ -119,14 +143,17 @@
       <div class="hdr-title">KA&middot;ST&middot;EN Personalplanung</div>
       <div class="hdr-sub">Schichtplan KW 27 &middot; 30.06.&ndash;06.07.2026</div>
     </div>
-    <div style="font-size:11px;opacity:0.6;">Beispielwerk GmbH (Demo)</div>
+    <div style="font-size:11px;opacity:0.6;" id="firmaLbl">Beispielwerk GmbH (Demo)</div>
   </div>
   <div class="toolbar">
     <span style="font-size:12px;opacity:.7;">Schicht:</span>
     <button class="schicht-btn active" onclick="setSchicht('F',this)">Fr&uuml;h</button>
     <button class="schicht-btn" onclick="setSchicht('S',this)">Sp&auml;t</button>
     <button class="schicht-btn" onclick="setSchicht('N',this)">Nacht</button>
-    <button class="btn-calc" onclick="berechne()">&#9889; Planung berechnen</button>
+    <div class="bkr-modus-switch" title="Gewerbemodus umschalten">
+      <button class="bkr-modus-btn active" id="modusBtnProd" onclick="setModus('prod',this)">&#127981; Produktion</button>
+      <button class="bkr-modus-btn" id="modusBtnDl" onclick="setModus('dl',this)">&#129309; Dienstleistung</button>
+    </div>
   </div>
   <div class="body">
     <div class="kpi-strip">
@@ -136,14 +163,15 @@
       <div class="kpi-chip"><div class="kpi-num" id="kMin">6</div><div class="kpi-lbl">Minimum</div></div>
       <div class="kpi-chip"><div class="kpi-num" id="kAmpel">&mdash;</div><div class="kpi-lbl">Status</div></div>
     </div>
-    <div class="banner warn" id="banner" style="background:#eaf3fb;color:#1D6996;border-color:#A9D6E5;">&#8505; Klicken Sie auf <strong>&nbsp;&#9889; Planung berechnen&nbsp;</strong> oben rechts, um den Besetzungsstatus zu pr&uuml;fen. Danach k&ouml;nnen Sie Krankmeldungen erfassen.</div>
+    <div class="banner idle" id="banner"></div>
+    <div class="bkr-swipe-hint">&#8596; Tabelle seitlich wischbar</div>
     <div class="plan-wrap">
       <table class="plan-table">
         <thead>
           <tr>
             <th class="col-name">Mitarbeiter</th>
             <th class="col-qual">Qual.</th>
-            <th style="min-width:72px;">Anlage</th>
+            <th style="min-width:72px;" id="thAnlage">Anlage</th>
             <th>Mo<br><small style="font-weight:400;opacity:.8;">30.06.</small></th>
             <th>Di<br><small style="font-weight:400;opacity:.8;">01.07.</small></th>
             <th>Mi<br><small style="font-weight:400;opacity:.8;">02.07.</small></th>
@@ -156,13 +184,21 @@
         <tbody id="planBody"></tbody>
       </table>
     </div>
+    <div class="bkr-legend">
+      <span><span class="shift-badge sf">F</span> Fr&uuml;h</span>
+      <span><span class="shift-badge ss">S</span> Sp&auml;t</span>
+      <span><span class="shift-badge sn">N</span> Nacht</span>
+      <span><span class="shift-badge sk">K</span> Krank</span>
+      <span><span class="shift-badge se">E</span> Ersatz</span>
+      <span><span class="shift-badge su">U</span> Urlaub</span>
+    </div>
     <div class="ersatz-box" id="ersatzBox">
       <div class="ersatz-title" id="ersatzTitle">Ersatz f&uuml;r:</div>
       <div class="ersatz-hint" id="ersatzHint">Verf&uuml;gbare Mitarbeiter f&uuml;r diesen Tag:</div>
       <div class="ersatz-opts" id="ersatzOpts"></div>
       <div class="ersatz-btns">
         <button class="btn btn-ok" onclick="ersatzOK()">&#10003; Auswahl &uuml;bernehmen</button>
-        <button class="btn" id="btnOhneErsatz" onclick="ersatzOhneErsatz()" style="display:none;background:#fff3cd;color:#856404;border:1px solid #ffe082;">&#9888; Ohne Ersatz &ndash; Anlage ungeplant</button>
+        <button class="btn" id="btnOhneErsatz" onclick="ersatzOhneErsatz()" style="display:none;background:#fff3cd;color:#856404;border:1px solid #ffe082;">&#9888; Ohne Ersatz &ndash; ungeplant</button>
         <button class="btn btn-gh" onclick="ersatzAbbrechen()">Abbrechen</button>
       </div>
     </div>
@@ -207,7 +243,8 @@
 </div>
 
 <script>
-const SCHICHTEN = {
+// ===== BEISPIELDATEN: PRODUZIERENDES GEWERBE =====
+const SCHICHTEN_PROD = {
   F:[
     {id:1,name:'Anna Meier',    qual:'Q1',anlage:'Linie 1',plan:['F','F','F','F','F','-','-'],krankTage:[],ersatzTage:{},springer:false},
     {id:2,name:'Klaus Bauer',   qual:'Q2',anlage:'Linie 1',plan:['F','F','F','-','F','F','-'],krankTage:[0],ersatzTage:{},springer:false},
@@ -233,30 +270,84 @@ const SCHICHTEN = {
     {id:18,name:'Ute Fischer',   qual:'Q3',anlage:'Linie 4',plan:['N','N','-','N','N','-','-'],krankTage:[],ersatzTage:{},springer:false},
   ]
 };
-const SPRINGER_POOL = [
-  {name:'Werner Hof',   qual:'Q2', info:'Springerpool'},
-  {name:'Gabi Stein',   qual:'Q1', info:'Springerpool'},
-  {name:'Thomas Lenz',  qual:'Q2', info:'Springerpool (Teilzeit)'},
-  {name:'Nina Krause',  qual:'Q1', info:'Springerpool'},
-  {name:'Bernd Huber',  qual:'Q3', info:'Springerpool'},
-  {name:'Sandra Wolff', qual:'Q2', info:'Springerpool'},
-];
-const TAGE = ['Mo','Di','Mi','Do','Fr','Sa','So'];
-const SCHICHT_LABELS = {F:'Fr\u00fchschicht',S:'Sp\u00e4tschicht',N:'Nachtschicht'};
 
+// ===== BEISPIELDATEN: DIENSTLEISTUNG (Kundenservice / Beratung, ohne Anlagen) =====
+const SCHICHTEN_DL = {
+  F:[
+    {id:101,name:'Julia Hartmann', qual:'Q1',plan:['F','F','F','F','F','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:102,name:'Peter Schmid',   qual:'Q2',plan:['F','F','-','F','F','F','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:103,name:'Nadine Weiss',   qual:'Q1',plan:['F','F','F','F','-','-','-'],krankTage:[1],ersatzTage:{},springer:false},
+    {id:104,name:'Oliver Frank',   qual:'Q3',plan:['-','F','F','F','F','F','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:105,name:'Katrin Lorenz',  qual:'Q2',plan:['F','-','F','F','F','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:106,name:'Sven Albrecht',  qual:'Q1',plan:['F','F','-','F','-','F','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:107,name:'Miriam Busch',   qual:'Q2',plan:['-','F','F','-','F','F','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:108,name:'Jan Peters',     qual:'Q3',plan:['F','F','F','F','-','-','-'],krankTage:[],ersatzTage:{},springer:false},
+  ],
+  S:[
+    {id:109,name:'Carina Voss',    qual:'Q2',plan:['S','S','S','-','S','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:110,name:'Leon Brandt',    qual:'Q1',plan:['S','-','S','S','S','S','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:111,name:'Elena Kraus',    qual:'Q1',plan:['-','S','S','S','S','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:112,name:'Tim Sommer',     qual:'Q2',plan:['S','S','-','S','S','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:113,name:'Anja Roth',      qual:'Q3',plan:['S','S','S','-','-','S','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:114,name:'Marco Diehl',    qual:'Q1',plan:['-','S','S','S','S','-','-'],krankTage:[],ersatzTage:{},springer:false},
+  ],
+  N:[
+    {id:115,name:'Birgit Sauer',   qual:'Q2',plan:['N','N','-','N','N','-','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:116,name:'Felix Horn',     qual:'Q1',plan:['-','N','N','N','-','N','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:117,name:'Sonja Beck',     qual:'Q2',plan:['N','-','N','-','N','N','-'],krankTage:[],ersatzTage:{},springer:false},
+    {id:118,name:'David Kern',     qual:'Q3',plan:['N','N','N','N','-','-','-'],krankTage:[],ersatzTage:{},springer:false},
+  ]
+};
+
+const SPRINGER_POOLS = {
+  prod: [
+    {name:'Werner Hof',   qual:'Q2', info:'Springerpool'},
+    {name:'Gabi Stein',   qual:'Q1', info:'Springerpool'},
+    {name:'Thomas Lenz',  qual:'Q2', info:'Springerpool (Teilzeit)'},
+    {name:'Nina Krause',  qual:'Q1', info:'Springerpool'},
+    {name:'Bernd Huber',  qual:'Q3', info:'Springerpool'},
+    {name:'Sandra Wolff', qual:'Q2', info:'Springerpool'},
+  ],
+  dl: [
+    {name:'Carla Winter', qual:'Q2', info:'Springerpool'},
+    {name:'Nils Baumann', qual:'Q1', info:'Springerpool'},
+    {name:'Heike Vogt',   qual:'Q2', info:'Springerpool (Teilzeit)'},
+    {name:'Timo Engel',   qual:'Q1', info:'Springerpool'},
+    {name:'Rita Falk',    qual:'Q3', info:'Springerpool'},
+    {name:'Paul Marx',    qual:'Q2', info:'Springerpool'},
+  ]
+};
+
+const TAGE = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+const DATEN = ['30.06.','01.07.','02.07.','03.07.','04.07.','05.07.','06.07.'];
+const SCHICHT_LABELS = {F:'Frühschicht',S:'Spätschicht',N:'Nachtschicht'};
+
+let modus = 'prod';               // 'prod' | 'dl'
+let SCHICHTEN = SCHICHTEN_PROD;   // aktiver Datensatz
 let akt = 'F';
 let ctxMaId = null, ctxTagIdx = null;
 let ersatzFuerMaId = null, ersatzFuerTag = null, ersatzGewaehlt = null;
-let planBerechnet = false;
+
+// ===== GEWERBEMODUS =====
+function setModus(m, btn) {
+  if (m === modus) return;
+  modus = m;
+  SCHICHTEN = (m === 'dl') ? SCHICHTEN_DL : SCHICHTEN_PROD;
+  document.querySelectorAll('.bkr-modus-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('thAnlage').style.display = (m === 'dl') ? 'none' : '';
+  document.getElementById('firmaLbl').textContent = (m === 'dl') ? 'Beispiel-Service GmbH (Demo)' : 'Beispielwerk GmbH (Demo)';
+  closeErsatz(); closeCtx();
+  renderTable(); updateKPIs(); berechne();
+}
 
 // ===== SCHICHT =====
 function setSchicht(s, btn) {
-  akt = s; planBerechnet = false;
-  document.querySelectorAll('.schicht-btn').forEach(b => b.classList.remove('active'));
+  akt = s;
+  document.querySelectorAll('.schicht-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
   closeErsatz(); closeCtx();
-  renderTable(); updateKPIs();
-  setBanner('idle','Planung berechnen um Besetzungsstatus zu pr\u00fcfen');
+  renderTable(); updateKPIs(); berechne();
 }
 
 // ===== RENDER =====
@@ -272,7 +363,6 @@ function renderTable() {
 
     // Name
     const tdN = document.createElement('td');
-    const anyErsatz = Object.keys(ma.ersatzTage).length > 0;
     tdN.innerHTML = `<div class="name-cell">
       <span class="name-txt${anyKrank?' krank':''}">${ma.name}</span>
       ${ma.springer ? '<span class="springer-badge">Springer</span>' : ''}
@@ -285,11 +375,13 @@ function renderTable() {
     tdQ.innerHTML = `<div style="padding:6px 8px;text-align:center;"><span class="qual ${ma.qual.toLowerCase()}">${ma.qual}</span></div>`;
     tr.appendChild(tdQ);
 
-    // Anlage
-    const tdA = document.createElement('td');
-    tdA.className = 'col-anlage';
-    tdA.textContent = ma.anlage || (ma.springer ? 'Springer' : '–');
-    tr.appendChild(tdA);
+    // Anlage (nur im Produktionsmodus)
+    if (modus === 'prod') {
+      const tdA = document.createElement('td');
+      tdA.className = 'col-anlage';
+      tdA.textContent = ma.anlage || (ma.springer ? 'Springer' : '–');
+      tr.appendChild(tdA);
+    }
 
     // Tage
     TAGE.forEach((tag, i) => {
@@ -302,14 +394,14 @@ function renderTable() {
       if (isKrank) {
         td.innerHTML = `<span class="shift-badge sk" title="Krank">K</span>`;
       } else if (isErsatz) {
-        td.innerHTML = `<span class="shift-badge se" title="Ersatz f\u00fcr ${ma.ersatzTage[i]}">E</span>`;
+        td.innerHTML = `<span class="shift-badge se" title="Ersatz für ${ma.ersatzTage[i]}">E</span>`;
       } else if (s === '-') {
-        td.innerHTML = `<span class="s-">\u2013</span>`;
+        td.innerHTML = `<span class="s-">–</span>`;
       } else if (s === 'U') {
         td.innerHTML = `<span class="shift-badge su">U</span>`;
       } else {
         const cls = s==='F'?'sf':s==='S'?'ss':s==='N'?'sn':'sf';
-        td.innerHTML = `<span class="shift-badge ${cls} clickable-shift" title="Klicken f\u00fcr Aktionen">${s}</span>`;
+        td.innerHTML = `<span class="shift-badge ${cls} clickable-shift" title="Klicken für Aktionen">${s}</span>`;
         td.querySelector('.clickable-shift').addEventListener('click', (e) => {
           e.stopPropagation();
           openCtx(e, ma.id, i);
@@ -333,7 +425,6 @@ function updateKPIs() {
   document.getElementById('kVerf').textContent = verf;
   document.getElementById('kKrank').textContent = krank;
   document.getElementById('kMin').textContent = min;
-  if (!planBerechnet) { document.getElementById('kAmpel').textContent = '\u2014'; document.getElementById('kAmpel').className = 'kpi-num'; }
 }
 
 // ===== BANNER =====
@@ -343,28 +434,23 @@ function setBanner(cls, txt) {
   b.textContent = txt;
 }
 
-// ===== BERECHNEN =====
+// ===== BESETZUNGSSTATUS (laeuft automatisch) =====
 function berechne() {
-  planBerechnet = true;
-  // Reset banner to idle after first calculation so it doesn't persist as instruction
-  const b = document.getElementById('banner');
-  if (b && b.style.background) { b.style.background=''; b.style.color=''; b.style.borderColor=''; }
   const mas = SCHICHTEN[akt].filter(m => !m.springer);
   const krank = mas.reduce((n,m) => n + (m.krankTage.length > 0 ? 1 : 0), 0);
   const verf = mas.length - krank;
   const min = Math.ceil(mas.length * 0.75);
   const a = document.getElementById('kAmpel');
   if (verf >= mas.length) {
-    setBanner('ok','\u2705 Vollst\u00e4ndig besetzt \u2013 alle Mitarbeiter verf\u00fcgbar');
-    a.textContent = '\uD83D\uDFE2'; a.className = 'kpi-num g';
+    setBanner('ok','✅ Vollständig besetzt – alle Mitarbeiter verfügbar');
+    a.textContent = '🟢'; a.className = 'kpi-num g';
   } else if (verf >= min) {
-    setBanner('warn','\u26A0\uFE0F Mindestbesetzung erreicht \u2013 ' + verf + ' von ' + mas.length + ' verf\u00fcgbar');
-    a.textContent = '\uD83D\uDFE1'; a.className = 'kpi-num o';
+    setBanner('warn','⚠️ Mindestbesetzung erreicht – ' + verf + ' von ' + mas.length + ' verfügbar');
+    a.textContent = '🟡'; a.className = 'kpi-num o';
   } else {
-    setBanner('crit','\uD83D\uDD34 Unterbesetzt! Nur ' + verf + ' von ' + mas.length + ' \u2013 Minimum ' + min);
-    a.textContent = '\uD83D\uDD34'; a.className = 'kpi-num r';
+    setBanner('crit','🔴 Unterbesetzt! Nur ' + verf + ' von ' + mas.length + ' – Minimum ' + min);
+    a.textContent = '🔴'; a.className = 'kpi-num r';
   }
-  toast('Planung berechnet: ' + SCHICHT_LABELS[akt]);
 }
 
 // ===== KONTEXT-MENU =====
@@ -373,10 +459,31 @@ function openCtx(e, maId, tagIdx) {
   const ma = getMa(maId);
   const menu = document.getElementById('ctxMenu');
   document.getElementById('ctxHead').textContent = ma.name;
-  document.getElementById('ctxSub').textContent = TAGE[tagIdx] + ', ' + ['30.06.','01.07.','02.07.','03.07.','04.07.','05.07.','06.07.'][tagIdx];
-  menu.style.top = (e.clientY + window.scrollY - 10) + 'px';
-  menu.style.left = Math.min(e.clientX + 4, window.innerWidth - 200) + 'px';
+  document.getElementById('ctxSub').textContent = TAGE[tagIdx] + ', ' + DATEN[tagIdx];
+
+  // Erst sichtbar machen, dann messen: nur so liefert offsetHeight die echte Menuhoehe
   menu.classList.add('open');
+  const menuH = menu.offsetHeight;
+  const menuW = Math.max(menu.offsetWidth, 180);
+  const abstand = 10;
+
+  // Vertikal: passt das Menu unterhalb der Klickposition noch in den Viewport?
+  // (position:fixed -> clientY ist bereits viewport-relativ, kein scrollY noetig)
+  let top;
+  if (e.clientY + abstand + menuH <= window.innerHeight) {
+    top = e.clientY + abstand;                 // genug Platz unten: unterhalb oeffnen
+  } else {
+    top = e.clientY - menuH - abstand;         // sonst oberhalb der Klickposition
+  }
+  // Sicherheitsklammer, falls weder oben noch unten voll passt (sehr kleine Viewports)
+  top = Math.max(4, Math.min(top, window.innerHeight - menuH - 4));
+
+  // Horizontal: wie bisher gegen rechten Rand, zusaetzlich gegen linken Rand
+  let left = Math.min(e.clientX + 4, window.innerWidth - menuW - 4);
+  left = Math.max(4, left);
+
+  menu.style.top = top + 'px';
+  menu.style.left = left + 'px';
 }
 function closeCtx() { document.getElementById('ctxMenu').classList.remove('open'); }
 document.addEventListener('click', closeCtx);
@@ -388,8 +495,7 @@ function ctxKrank() {
   ma.krankTage.push(ctxTagIdx);
   ersatzFuerMaId = ctxMaId;
   ersatzFuerTag = ctxTagIdx;
-  renderTable(); updateKPIs();
-  if (planBerechnet) berechne();
+  renderTable(); updateKPIs(); berechne();
   zeigeErsatz(ma, ctxTagIdx);
 }
 
@@ -397,14 +503,14 @@ function ctxUrlaub() {
   closeCtx();
   const ma = getMa(ctxMaId);
   ma.plan[ctxTagIdx] = 'U';
-  renderTable();
-  toast(ma.name + ': Urlaub f\u00fcr ' + TAGE[ctxTagIdx] + ' eingetragen');
+  renderTable(); updateKPIs(); berechne();
+  toast(ma.name + ': Urlaub für ' + TAGE[ctxTagIdx] + ' eingetragen');
 }
 
 // ===== ERSATZ =====
 function zeigeErsatz(ma, tagIdx) {
   const box = document.getElementById('ersatzBox');
-  document.getElementById('ersatzTitle').textContent = 'Ersatz f\u00fcr: ' + ma.name + ' (' + TAGE[tagIdx] + ')';
+  document.getElementById('ersatzTitle').textContent = 'Ersatz für: ' + ma.name + ' (' + TAGE[tagIdx] + ')';
   document.getElementById('ersatzHint').textContent = 'Wer hat an diesem Tag frei und kann einspringen?';
   box.classList.add('open');
   ersatzGewaehlt = null;
@@ -413,15 +519,15 @@ function zeigeErsatz(ma, tagIdx) {
   // Kollegen die an diesem Tag frei haben (plan[tagIdx] === '-') und nicht krank
   const kandidaten = SCHICHTEN[akt]
     .filter(m => m.id !== ma.id && !m.springer && m.plan[tagIdx] === '-' && !m.krankTage.includes(tagIdx) && qNum[m.qual] >= qNum[ma.qual])
-    .map(m => ({name:m.name, qual:m.qual, info:'Hat ' + TAGE[tagIdx] + ' frei \u00b7 gleiche Schicht', maId:m.id, isSpringer:false}));
+    .map(m => ({name:m.name, qual:m.qual, info:'Hat ' + TAGE[tagIdx] + ' frei · gleiche Schicht', maId:m.id, isSpringer:false}));
 
-  // Springer auffuellen – nur wenn noch nicht in dieser Schicht eingeplant
+  // Springer auffuellen - nur wenn noch nicht in dieser Schicht eingeplant
   const springerBereitsEingeplant = new Set(
     SCHICHTEN[akt].filter(m => m.springer).map(m => m.name)
   );
-  const springerOpts = SPRINGER_POOL
+  const springerOpts = SPRINGER_POOLS[modus]
     .filter(sp => qNum[sp.qual] >= qNum[ma.qual] && !springerBereitsEingeplant.has(sp.name))
-    .slice(0, 4 - kandidaten.length)
+    .slice(0, Math.max(0, 4 - kandidaten.length))
     .map(sp => ({name:sp.name, qual:sp.qual, info:sp.info, maId:null, isSpringer:true}));
 
   const alle = [...kandidaten, ...springerOpts].slice(0, 4);
@@ -429,8 +535,7 @@ function zeigeErsatz(ma, tagIdx) {
   const opts = document.getElementById('ersatzOpts');
   opts.innerHTML = '';
   if (alle.length === 0) {
-    opts.innerHTML = '<div style="padding:10px 10px 6px;font-size:12px;color:#c62828;font-weight:600;">&#9888; Kein Ersatz verf\u00fcgbar</div><div style="padding:0 10px 10px;font-size:11px;color:#888;">Alle Mitarbeiter sind eingeplant oder ebenfalls krank. Die Anlage muss ggf. ungeplant stillstehen.</div>';
-    // Show confirm-without-replacement button
+    opts.innerHTML = '<div style="padding:10px 10px 6px;font-size:12px;color:#c62828;font-weight:600;">&#9888; Kein Ersatz verfügbar</div><div style="padding:0 10px 10px;font-size:11px;color:#888;">Alle Mitarbeiter sind eingeplant oder ebenfalls krank.</div>';
     document.getElementById('btnOhneErsatz').style.display = 'inline-block';
     return;
   }
@@ -438,10 +543,10 @@ function zeigeErsatz(ma, tagIdx) {
   alle.forEach(k => {
     const d = document.createElement('div');
     d.className = 'ersatz-opt';
-    d.innerHTML = `<div class="eo-name">${k.name} <span class="qual ${k.qual.toLowerCase()}">${k.qual}</span></div><div class="eo-info">${k.info}</div><span class="eo-chk">\u25CB</span>`;
+    d.innerHTML = `<div class="eo-name">${k.name} <span class="qual ${k.qual.toLowerCase()}">${k.qual}</span></div><div class="eo-info">${k.info}</div><span class="eo-chk">○</span>`;
     d.onclick = () => {
-      document.querySelectorAll('.ersatz-opt').forEach(o => { o.classList.remove('sel'); o.querySelector('.eo-chk').textContent = '\u25CB'; });
-      d.classList.add('sel'); d.querySelector('.eo-chk').textContent = '\u2713';
+      document.querySelectorAll('.ersatz-opt').forEach(o => { o.classList.remove('sel'); o.querySelector('.eo-chk').textContent = '○'; });
+      d.classList.add('sel'); d.querySelector('.eo-chk').textContent = '✓';
       ersatzGewaehlt = k;
     };
     opts.appendChild(d);
@@ -450,24 +555,25 @@ function zeigeErsatz(ma, tagIdx) {
 }
 
 function ersatzOK() {
-  if (!ersatzGewaehlt) { toast('Bitte zuerst einen Ersatz ausw\u00e4hlen'); return; }
+  if (!ersatzGewaehlt) { toast('Bitte zuerst einen Ersatz auswählen'); return; }
   const ma = getMa(ersatzFuerMaId);
   const tagIdx = ersatzFuerTag;
   const e = ersatzGewaehlt;
 
   if (e.isSpringer) {
-    // Springer: neue Zeile anlegen – nur einmal pro Schicht
+    // Springer: neue Zeile anlegen - nur einmal pro Schicht
     const existing = SCHICHTEN[akt].find(m => m.springer && m.name === e.name);
     if (existing) {
       existing.ersatzTage[tagIdx] = ma.name;
     } else {
-      const newId = 900 + SCHICHTEN[akt].length;
+      const newId = (modus === 'dl' ? 1900 : 900) + SCHICHTEN[akt].length;
       const newPlan = ['-','-','-','-','-','-','-'];
-      SCHICHTEN[akt].push({
+      const neu = {
         id: newId, name: e.name, qual: e.qual,
-        anlage: ma.anlage || '–',
         plan: newPlan, krankTage: [], ersatzTage: {[tagIdx]: ma.name}, springer: true
-      });
+      };
+      if (modus === 'prod') neu.anlage = ma.anlage || '–';
+      SCHICHTEN[akt].push(neu);
     }
   } else {
     // Kollege: dessen Zelle fuer diesen Tag auf Ersatz setzen
@@ -476,9 +582,8 @@ function ersatzOK() {
   }
 
   closeErsatz();
-  renderTable(); updateKPIs();
-  if (planBerechnet) berechne();
-  toast(e.name + ' als Ersatz f\u00fcr ' + ma.name + ' (' + TAGE[tagIdx] + ') eingeplant \u2713');
+  renderTable(); updateKPIs(); berechne();
+  toast(e.name + ' als Ersatz für ' + ma.name + ' (' + TAGE[tagIdx] + ') eingeplant ✓');
 }
 
 function ersatzAbbrechen() {
@@ -488,11 +593,11 @@ function ersatzAbbrechen() {
     ma.krankTage = ma.krankTage.filter(t => t !== ersatzFuerTag);
   }
   closeErsatz();
-  renderTable(); updateKPIs();
+  renderTable(); updateKPIs(); berechne();
 }
 
 function ersatzOhneErsatz() {
-  // Confirm sick without replacement - mark shift as unplanned
+  // Krank ohne Ersatz bestaetigen - Tag bleibt ungeplant
   const ma = getMa(ersatzFuerMaId);
   const tagIdx = ersatzFuerTag;
   if (ma && tagIdx !== null) {
@@ -500,9 +605,8 @@ function ersatzOhneErsatz() {
     ma.ungeplantTage.push(tagIdx);
   }
   closeErsatz();
-  renderTable(); updateKPIs();
-  if (planBerechnet) berechne();
-  toast('\u26A0 Anlage ungeplant am ' + TAGE[tagIdx] + ' \u2013 bitte Produktionsplanung informieren!', true);
+  renderTable(); updateKPIs(); berechne();
+  toast('⚠ ' + TAGE[tagIdx] + ' bleibt ungeplant – bitte Planung informieren!');
 }
 
 function closeErsatz() {
@@ -519,7 +623,7 @@ function openDruck() {
     const cells = ma.plan.map((s, i) => {
       if (ma.krankTage.includes(i)) return '<span class="pshift pk">K</span>';
       if (ma.ersatzTage[i] !== undefined) return '<span class="pshift pe">E</span>';
-      if (s === '-') return '<span style="color:#ccc;">\u2013</span>';
+      if (s === '-') return '<span style="color:#ccc;">–</span>';
       const cls = s==='F'?'pf':s==='S'?'ps':s==='N'?'pn':'pe';
       return `<span class="pshift ${cls}">${s}</span>`;
     });
@@ -543,8 +647,19 @@ function toast(msg) {
   document.body.appendChild(t); setTimeout(() => t.remove(), 2800);
 }
 
-// INIT
-renderTable(); updateKPIs();
+// INIT: Status sofort berechnen, kein Button-Klick noetig
+renderTable(); updateKPIs(); berechne();
+
+// ===== IFRAME-HOEHE an livedemo.html melden (Isolation bleibt erhalten) =====
+(function(){
+  function postHeight(){
+    if (window.parent === window) return;
+    window.parent.postMessage({bkrDemo:'personalplanung-demo', bkrDemoHeight: document.documentElement.scrollHeight}, '*');
+  }
+  if ('ResizeObserver' in window) { new ResizeObserver(postHeight).observe(document.body); }
+  window.addEventListener('load', postHeight);
+  window.addEventListener('resize', postHeight);
+})();
 </script>
 </body>
 </html>

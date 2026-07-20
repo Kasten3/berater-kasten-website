@@ -117,11 +117,24 @@
   .mbtns { display: flex; gap: 8px; margin-top: 14px; justify-content: flex-end; }
   .disc { font-size: 11px; color: #888; text-align: center; margin-top: 8px; font-style: italic; }
 
+  /* ── Inline-Fehler statt alert() ── */
+  .bkr-form-err { display: none; background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; border-radius: 6px; padding: 7px 10px; font-size: 12px; font-weight: 600; margin-top: 8px; }
+  .bkr-form-err.show { display: block; }
+  /* ── Abschluss-Banner ── */
+  .bkr-done-banner { display: none; background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; border-radius: 8px; padding: 10px 14px; font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+  .bkr-done-banner.show { display: block; }
+
   @media (max-width: 520px) {
     .kpi-row { grid-template-columns: repeat(2, 1fr); }
     .cols { grid-template-columns: 1fr; }
     .kv { font-size: 20px; }
     .auf-form { grid-template-columns: 1fr; }
+  }
+  /* ── Touch: groessere Tap-Ziele ── */
+  @media (pointer: coarse) {
+    .btn { min-height: 42px; padding: 10px 16px; }
+    .btn-start-auftrag { min-height: 46px; }
+    .fg select, .fg input, .auf-group input, .auf-group select { min-height: 42px; }
   }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
@@ -162,19 +175,19 @@
           <div class="auf-group">
             <label>Sollmenge</label>
             <input type="number" id="aufSollMenge" value="240" min="50" max="999">
-            <p class="auf-hint">Stück</p>
+            <p class="auf-hint">St&uuml;ck</p>
           </div>
           <div class="auf-group">
             <label>Takte pro Minute</label>
             <input type="number" id="aufTakteMin" value="20" min="1" max="120">
-            <p class="auf-hint">z. B. 20 = 3 s/Takt</p>
+            <p class="auf-hint">z.&nbsp;B. 20 = 3 s/Takt</p>
           </div>
           <div class="auf-group">
             <label>Schicht</label>
             <select id="aufSchicht">
-              <option>Frühschicht 06:00–14:00</option>
-              <option>Spätschicht 14:00–22:00</option>
-              <option>Nachtschicht 22:00–06:00</option>
+              <option>Fr&uuml;hschicht 06:00&ndash;14:00</option>
+              <option>Sp&auml;tschicht 14:00&ndash;22:00</option>
+              <option>Nachtschicht 22:00&ndash;06:00</option>
             </select>
           </div>
         </div>
@@ -184,26 +197,27 @@
 
     <!-- Produktionsansicht (nach Auftragsanmeldung) -->
     <div id="produktionsScreen" style="display:none;">
+      <div class="bkr-done-banner" id="doneBanner">&#9989; Auftrag abgeschlossen &ndash; Sollmenge erreicht! &Uuml;ber &bdquo;+ Neuer Auftrag&ldquo; geht es weiter.</div>
       <div class="kpi-row">
         <div class="kpi">
           <div class="kv g" id="kVerfueg">&mdash;</div>
-          <div class="kl">Verfügbarkeit</div>
-          <div class="ks" id="ksVerfueg">–</div>
+          <div class="kl">Verf&uuml;gbarkeit</div>
+          <div class="ks" id="ksVerfueg">&ndash;</div>
         </div>
         <div class="kpi">
           <div class="kv" id="kLeistung">&mdash;</div>
           <div class="kl">Leistung</div>
-          <div class="ks" id="ksLeistung">–</div>
+          <div class="ks" id="ksLeistung">&ndash;</div>
         </div>
         <div class="kpi oee-kpi">
           <span class="kpi-oee-label">OEE</span>
           <div class="kv" id="kOee">&mdash;</div>
           <div class="kl">OEE gesamt</div>
-          <div class="ks">Verf. × Leist.</div>
+          <div class="ks">Verf. &times; Leist.</div>
         </div>
         <div class="kpi">
           <div class="kv" id="kStoer">0</div>
-          <div class="kl">Störungen</div>
+          <div class="kl">St&ouml;rungen</div>
           <div class="ks">heute</div>
         </div>
       </div>
@@ -212,12 +226,12 @@
         <div class="card">
           <div class="cl">Maschinenstatus</div>
           <div class="mstate laufen" id="mBox">
-            <span class="dot g" id="mDot"></span><span id="mLbl">Läuft</span>
+            <span class="dot g" id="mDot"></span><span id="mLbl">L&auml;uft</span>
           </div>
           <div id="stagWrap" style="display:none;"><span class="stag" id="stagTxt"></span></div>
           <div class="brow">
             <button class="btn btn-s" id="btnSt" onclick="doStart()" disabled>&#9654; Start</button>
-            <button class="btn btn-d" id="btnSt2" onclick="openM('stoer')">&#9632; Störung</button>
+            <button class="btn btn-d" id="btnSt2" onclick="openM('stoer')">&#9632; St&ouml;rung</button>
             <button class="btn btn-gh" onclick="openM('pause')">&#9646;&#9646; Pause</button>
           </div>
           <div style="margin-top:12px;">
@@ -227,10 +241,10 @@
 
         <div class="card">
           <div class="cl">Aktueller Auftrag</div>
-          <div class="ar"><span class="al">Auftragsnr.</span><span class="av" id="aufNrDisp">–</span></div>
-          <div class="ar"><span class="al">Artikel</span><span class="av" id="aufArtDisp">–</span></div>
-          <div class="ar"><span class="al">Soll-Takt</span><span class="av" id="aufTaktDisp">–</span></div>
-          <div class="ar"><span class="al">Menge</span><span class="av"><span id="aufIstDisp">0</span> / <span id="aufSollDisp">–</span> Stk</span></div>
+          <div class="ar"><span class="al">Auftragsnr.</span><span class="av" id="aufNrDisp">&ndash;</span></div>
+          <div class="ar"><span class="al">Artikel</span><span class="av" id="aufArtDisp">&ndash;</span></div>
+          <div class="ar"><span class="al">Soll-Takt</span><span class="av" id="aufTaktDisp">&ndash;</span></div>
+          <div class="ar"><span class="al">Menge</span><span class="av"><span id="aufIstDisp">0</span> / <span id="aufSollDisp">&ndash;</span> Stk</span></div>
           <div class="pbar"><div class="pfill" id="aufProg" style="width:0%;background:var(--orange);"></div></div>
           <div class="brow">
             <button class="btn btn-w" onclick="neuerAuftrag()" style="font-size:11px;">+ Neuer Auftrag</button>
@@ -243,17 +257,18 @@
   <div class="disc">Beispieldaten &middot; keine echte Maschine &middot; Demo berater-kasten.de</div>
 </div>
 
-<!-- Störung -->
+<!-- Stoerung -->
 <div class="overlay" id="stoerModal">
   <div class="modal">
-    <h3>Störung erfassen</h3>
-    <div class="fg"><label>Störungsgrund</label>
+    <h3>St&ouml;rung erfassen</h3>
+    <div class="fg"><label>St&ouml;rungsgrund</label>
       <select id="sGrund">
-        <option value="">-- bitte wählen --</option>
+        <option value="">-- bitte w&auml;hlen --</option>
         <option>Materialstau</option><option>Folie gerissen</option>
-        <option>Sensor ausgelöst</option><option>Wartung / Reinigung</option>
+        <option>Sensor ausgel&ouml;st</option><option>Wartung / Reinigung</option>
         <option>Werkzeugwechsel</option><option>Sonstiges</option>
       </select>
+      <div class="bkr-form-err" id="sGrundErr">&#9888; Bitte St&ouml;rungsgrund w&auml;hlen.</div>
     </div>
     <div class="fg"><label>Bemerkung (optional)</label><input type="text" id="sBem" placeholder="z. B. Station 3"></div>
     <div class="mbtns">
@@ -269,8 +284,8 @@
     <h3>Pause erfassen</h3>
     <div class="fg"><label>Pausenart</label>
       <select id="pGrund">
-        <option>Frühstückspause</option><option>Mittagspause</option>
-        <option>Schichtwechsel</option><option>Rüsten</option>
+        <option>Fr&uuml;hst&uuml;ckspause</option><option>Mittagspause</option>
+        <option>Schichtwechsel</option><option>R&uuml;sten</option>
       </select>
     </div>
     <div class="mbtns">
@@ -307,7 +322,7 @@
     aufNr++;
     aufSoll = soll;
     aufIst  = 0;
-    sollTaktSek = 60 / takteMin;   // z. B. 20 T/min → 3 s/Takt
+    sollTaktSek = 60 / takteMin;   // z. B. 20 T/min -> 3 s/Takt
     stueck  = 0;
     stoerCount = 0;
     betriebMs = 0; stillstandMs = 0;
@@ -315,16 +330,18 @@
     RSTART = Date.now();
     lastT  = Date.now();
 
-    // UI befüllen
+    // UI befuellen
     document.getElementById('aufNrDisp').textContent   = 'AU-2026-0' + aufNr;
     document.getElementById('aufArtDisp').textContent  = produkt;
     document.getElementById('aufTaktDisp').textContent = sollTaktSek.toFixed(1) + ' s/Stk (Soll)';
     document.getElementById('aufSollDisp').textContent = soll;
     document.getElementById('aufIstDisp').textContent  = 0;
     document.getElementById('aufProg').style.width = '0%';
+    document.getElementById('aufProg').style.background = 'var(--orange)';
     document.getElementById('headerSub').textContent   = produkt + ' · ' + schicht.split(' ')[0];
     document.getElementById('kStoer').textContent = '0';
     document.getElementById('kStoer').className  = 'kv';
+    document.getElementById('doneBanner').classList.remove('show');
 
     document.getElementById('auftragsScreen').style.display  = 'none';
     document.getElementById('produktionsScreen').style.display = '';
@@ -339,7 +356,8 @@
 
   function neuerAuftrag() {
     laeuft = false;
-    if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
+    if (tickInterval) { clearTimeout(tickInterval); tickInterval = null; }
+    document.getElementById('doneBanner').classList.remove('show');
     document.getElementById('produktionsScreen').style.display = 'none';
     document.getElementById('auftragsScreen').style.display   = '';
     document.getElementById('headerSub').textContent = 'Verpackungslinie 1 · Bitte Auftrag anmelden';
@@ -348,7 +366,7 @@
 
   // ── Tick-Engine: Intervall = sollTaktSek ± 10% in Millisekunden ──
   function startTicking() {
-    if (tickInterval) clearInterval(tickInterval);
+    if (tickInterval) clearTimeout(tickInterval);
     function tick() {
       const now = Date.now(), dt = (now - lastT) / 1000; lastT = now;
       if (laeuft) {
@@ -362,6 +380,9 @@
           setZ('pause');
           document.getElementById('btnSt').disabled  = false;
           document.getElementById('btnSt2').disabled = true;
+          // Deutliches Abschluss-Feedback
+          document.getElementById('doneBanner').classList.add('show');
+          document.getElementById('aufProg').style.background = 'var(--gruen)';
         }
       } else {
         stillstandMs += dt * 1000;
@@ -378,14 +399,14 @@
   function updateKPIs() {
     const totalMs = betriebMs + stillstandMs;
 
-    // Verfügbarkeit = Betriebszeit / Gesamtzeit
+    // Verfuegbarkeit = Betriebszeit / Gesamtzeit
     const verf = totalMs > 0 ? Math.min(99, Math.round(betriebMs / totalMs * 100)) : 100;
 
-    // Leistung = (Ist-Stückzahl × Soll-Takt) / Betriebszeit
+    // Leistung = (Ist-Stueckzahl x Soll-Takt) / Betriebszeit
     const sollZeit = stueck * sollTaktSek * 1000; // ms wenn alles im Soll
     const leist = betriebMs > 0 ? Math.min(110, Math.round(sollZeit / betriebMs * 100)) : 100;
 
-    // OEE = Verfügbarkeit × Leistung (Qualität hier 100% angenommen)
+    // OEE = Verfuegbarkeit x Leistung (Qualitaet hier 100% angenommen)
     const oee = Math.round(verf * leist / 100);
 
     // Ist-Taktzeit Durchschnitt
@@ -393,7 +414,7 @@
       ? (istTakte.reduce((a,b)=>a+b,0) / istTakte.length).toFixed(1)
       : sollTaktSek.toFixed(1);
 
-    // Verfügbarkeit
+    // Verfuegbarkeit
     const kVEl = document.getElementById('kVerfueg');
     kVEl.textContent = verf + ' %';
     kVEl.className = 'kv ' + (verf >= 90 ? 'g' : verf >= 75 ? 'o' : 'r');
@@ -412,7 +433,7 @@
     kOEl.textContent = oee + ' %';
     kOEl.className = 'kv ' + (oee >= 85 ? 'g' : oee >= 65 ? 'o' : 'r');
 
-    // Stückzahl
+    // Stueckzahl
     document.getElementById('aufIstDisp').textContent = aufIst;
     document.getElementById('aufProg').style.width = (aufIst / aufSoll * 100) + '%';
   }
@@ -453,11 +474,19 @@
   }
 
   function openM(id) { document.getElementById(id + 'Modal').classList.add('open'); }
-  function closeM(id) { document.getElementById(id + 'Modal').classList.remove('open'); }
+  function closeM(id) {
+    document.getElementById(id + 'Modal').classList.remove('open');
+    if (id === 'stoer') document.getElementById('sGrundErr').classList.remove('show');
+  }
+
+  // Fehlerhinweis ausblenden, sobald ein Grund gewaehlt wurde
+  document.getElementById('sGrund').addEventListener('change', function() {
+    if (this.value) document.getElementById('sGrundErr').classList.remove('show');
+  });
 
   function doStoer() {
     const g = document.getElementById('sGrund').value;
-    if (!g) { alert('Bitte Störungsgrund wählen.'); return; }
+    if (!g) { document.getElementById('sGrundErr').classList.add('show'); return; }
     laeuft = false; stoerCount++;
     document.getElementById('kStoer').textContent = stoerCount;
     document.getElementById('kStoer').className   = 'kv r';
@@ -489,6 +518,17 @@
     a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
     a.download = 'log.csv'; a.click();
   }
+
+  // ── IFRAME-Hoehe an livedemo.html melden (Isolation bleibt erhalten) ──
+  (function(){
+    function postHeight(){
+      if (window.parent === window) return;
+      window.parent.postMessage({bkrDemo:'logger-demo', bkrDemoHeight: document.documentElement.scrollHeight}, '*');
+    }
+    if ('ResizeObserver' in window) { new ResizeObserver(postHeight).observe(document.body); }
+    window.addEventListener('load', postHeight);
+    window.addEventListener('resize', postHeight);
+  })();
 </script>
 </body>
 </html>
