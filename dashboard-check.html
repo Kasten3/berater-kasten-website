@@ -494,12 +494,28 @@ function showResults() {
   ra.innerHTML = html;
   ra.classList.remove('result-hidden');
 
+  // Ergebnis und alle Antworten als Hidden-Felder ins Formular schreiben
+  const form = document.getElementById('checkForm');
+
+  const hiddenErgebnis = document.createElement('input');
+  hiddenErgebnis.type = 'hidden';
+  hiddenErgebnis.name = 'ergebnis';
+  hiddenErgebnis.value = r.stufe + ': ' + r.titel;
+  form.appendChild(hiddenErgebnis);
+
+  FRAGEN.forEach((q, i) => {
+    const hiddenA = document.createElement('input');
+    hiddenA.type = 'hidden';
+    hiddenA.name = 'Frage ' + (i + 1) + ': ' + q.text;
+    hiddenA.value = q.optionen[answers[i]];
+    form.appendChild(hiddenA);
+  });
+
   // Event-Listener NACH dem Einbauen ins DOM registrieren
-  document.getElementById('checkForm').addEventListener('submit', function(e) {
+  form.addEventListener('submit', function(e) {
     e.preventDefault();
     document.getElementById('form-error').style.display = 'none';
     const data = new FormData(this);
-    const form = this;
     fetch(form.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } })
       .then(res => {
         if (res.ok) {

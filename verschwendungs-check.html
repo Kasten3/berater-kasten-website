@@ -210,6 +210,29 @@
     }
     .cta-btn:hover { background: #2a4057; }
 
+
+    .inline-form { margin-top: 0; }
+    .form-intro { font-size: 0.88rem; color: #555; margin-bottom: 1.25rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 0.85rem; }
+    .form-group label { font-size: 0.8rem; font-weight: 600; color: #1c2b3a; }
+    .form-group input, .form-group textarea {
+      padding: 0.6rem 0.85rem;
+      border: 1.5px solid #d0d5da;
+      border-radius: 3px;
+      font-size: 0.88rem;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #1a1a1a;
+      background: #f9f9f8;
+      transition: border-color 0.15s;
+      resize: vertical;
+    }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #1c2b3a; background: #fff; }
+    .form-check { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 1rem; }
+    .form-check input { width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; accent-color: #1c2b3a; }
+    .form-check label { font-size: 0.78rem; color: #666; line-height: 1.4; }
+    .form-check label a { color: #1D6996; }
+    @media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } }
     .restart-btn {
       background: none;
       border: none;
@@ -484,9 +507,36 @@ function showResults() {
       <p class="text">${gesamtText}</p>
     </div>
     <hr class="div">
-    <div class="cta-block">
-      <p>Wir gehen Ihre Ergebnisse gerne gemeinsam durch – kostenlos und ohne Verbindlichkeit.</p>
-      <a class="cta-btn" href="https://www.berater-kasten.de/kontakt.html">Jetzt Erstgespräch vereinbaren →</a>
+<div class="inline-form">
+      <p class="form-intro">Wir gehen Ihre Situation gerne gemeinsam durch – kostenlos und ohne Verbindlichkeit.</p>
+      <form id="checkForm" action="https://formspree.io/f/xojovrqq" method="POST">
+        <input type="hidden" name="quelle" value="Verschwendungs-Check">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cf-name">Name *</label>
+            <input type="text" id="cf-name" name="name" placeholder="Ihr Name" required>
+          </div>
+          <div class="form-group">
+            <label for="cf-email">E-Mail *</label>
+            <input type="email" id="cf-email" name="email" placeholder="ihre@email.de" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="cf-unternehmen">Unternehmen</label>
+          <input type="text" id="cf-unternehmen" name="unternehmen" placeholder="Ihr Unternehmen">
+        </div>
+        <div class="form-group">
+          <label for="cf-nachricht">Nachricht (optional)</label>
+          <textarea id="cf-nachricht" name="nachricht" placeholder="Was beschäftigt Sie gerade?" rows="3"></textarea>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="cf-datenschutz" name="datenschutz" required>
+          <label for="cf-datenschutz">Ich habe die <a href="https://www.berater-kasten.de/datenschutz.html" target="_blank">Datenschutzerklärung</a> gelesen und stimme zu. *</label>
+        </div>
+        <button type="submit" class="nav-btn next" style="width:100%; padding:0.75rem; font-size:0.95rem; border:none; cursor:pointer;">Nachricht senden</button>
+        <p id="form-error" style="color:#c0392b; font-size:0.82rem; margin-top:8px; display:none;">Bitte alle Pflichtfelder ausfüllen und der Datenschutzerklärung zustimmen.</p>
+        <p id="form-ok" style="color:#27ae60; font-size:0.88rem; margin-top:8px; display:none;">Vielen Dank – wir melden uns bald bei Ihnen!</p>
+      </form>
       <button class="restart-btn" onclick="restart()">Nochmal von vorne</button>
     </div>
   `;
@@ -494,6 +544,39 @@ function showResults() {
   const ra = document.getElementById('result-area');
   ra.innerHTML = html;
   ra.classList.remove('result-hidden');
+
+  // Ergebnis und Antworten als Hidden-Felder
+  const form = document.getElementById('checkForm');
+  const hiddenErg = document.createElement('input');
+  hiddenErg.type = 'hidden';
+  hiddenErg.name = 'ergebnis';
+  hiddenErg.value = gesamtProz >= 60 ? 'Hohes Optimierungspotenzial' : gesamtProz >= 35 ? 'Mittleres Potenzial' : 'Gut aufgestellt';
+  form.appendChild(hiddenErg);
+
+  THEMEN.forEach(thema => {
+    const idx = FRAGEN.filter(q => q.thema === thema).map((q, i) => {
+      const gi = FRAGEN.indexOf(q);
+      return q.optionen[answers[gi]];
+    });
+    const h = document.createElement('input');
+    h.type = 'hidden';
+    h.name = thema;
+    h.value = idx.join(' / ');
+    form.appendChild(h);
+  });
+
+  // Event-Listener nach DOM-Einbau
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    document.getElementById('form-error').style.display = 'none';
+    const data = new FormData(this);
+    fetch(form.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } })
+      .then(res => {
+        if (res.ok) { form.style.display = 'none'; document.getElementById('form-ok').style.display = 'block'; }
+        else { document.getElementById('form-error').style.display = 'block'; }
+      })
+      .catch(() => { document.getElementById('form-error').style.display = 'block'; });
+  });
 }
 
 function restart() {

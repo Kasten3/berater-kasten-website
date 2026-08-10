@@ -215,6 +215,29 @@
       .bk-header, .bk-body { padding: 1.5rem; }
       .kpi-wichtig { display: none; }
     }
+
+    .inline-form { margin-top: 0; }
+    .form-intro { font-size: 0.88rem; color: #555; margin-bottom: 1.25rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 0.85rem; }
+    .form-group label { font-size: 0.8rem; font-weight: 600; color: #1c2b3a; }
+    .form-group input, .form-group textarea {
+      padding: 0.6rem 0.85rem;
+      border: 1.5px solid #d0d5da;
+      border-radius: 3px;
+      font-size: 0.88rem;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #1a1a1a;
+      background: #f9f9f8;
+      transition: border-color 0.15s;
+      resize: vertical;
+    }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #1c2b3a; background: #fff; }
+    .form-check { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 1rem; }
+    .form-check input { width: 16px; height: 16px; margin-top: 2px; flex-shrink: 0; accent-color: #1c2b3a; }
+    .form-check label { font-size: 0.78rem; color: #666; line-height: 1.4; }
+    .form-check label a { color: #1D6996; }
+    @media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -234,9 +257,37 @@
 
     <div id="ergebnis"></div>
 
-    <div class="cta-block">
-      <p>Wir zeigen Ihnen, welche Kennzahlen für Ihren Betrieb wirklich relevant sind.</p>
-      <a class="cta-btn" href="https://www.berater-kasten.de/kontakt.html">Kostenloses Erstgespräch →</a>
+<div class="inline-form">
+      <p class="form-intro">Wir gehen Ihre Situation gerne gemeinsam durch – kostenlos und ohne Verbindlichkeit.</p>
+      <form id="checkForm" action="https://formspree.io/f/xojovrqq" method="POST">
+        <input type="hidden" name="quelle" value="Kennzahlen-Selbstcheck">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cf-name">Name *</label>
+            <input type="text" id="cf-name" name="name" placeholder="Ihr Name" required>
+          </div>
+          <div class="form-group">
+            <label for="cf-email">E-Mail *</label>
+            <input type="email" id="cf-email" name="email" placeholder="ihre@email.de" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="cf-unternehmen">Unternehmen</label>
+          <input type="text" id="cf-unternehmen" name="unternehmen" placeholder="Ihr Unternehmen">
+        </div>
+        <div class="form-group">
+          <label for="cf-nachricht">Nachricht (optional)</label>
+          <textarea id="cf-nachricht" name="nachricht" placeholder="Was beschäftigt Sie gerade?" rows="3"></textarea>
+        </div>
+        <div class="form-check">
+          <input type="checkbox" id="cf-datenschutz" name="datenschutz" required>
+          <label for="cf-datenschutz">Ich habe die <a href="https://www.berater-kasten.de/datenschutz.html" target="_blank">Datenschutzerklärung</a> gelesen und stimme zu. *</label>
+        </div>
+        <button type="submit" class="nav-btn next" style="width:100%; padding:0.75rem; font-size:0.95rem; border:none; cursor:pointer;">Nachricht senden</button>
+        <p id="form-error" style="color:#c0392b; font-size:0.82rem; margin-top:8px; display:none;">Bitte alle Pflichtfelder ausfüllen und der Datenschutzerklärung zustimmen.</p>
+        <p id="form-ok" style="color:#27ae60; font-size:0.88rem; margin-top:8px; display:none;">Vielen Dank – wir melden uns bald bei Ihnen!</p>
+      </form>
+      <button class="restart-btn" onclick="restart()">Nochmal von vorne</button>
     </div>
   </div>
 </div>
