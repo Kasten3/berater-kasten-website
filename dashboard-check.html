@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard-Check – Berater-Kasten</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f7f7f5;
+      color: #1a1a1a;
+      padding: 2rem 1rem;
+    }
+
+    .bk-widget {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .bk-header {
+      background: #1c2b3a;
+      color: #fff;
+      padding: 2rem 2.5rem;
+    }
+    .bk-header .eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a8c4d8;
+      margin-bottom: 0.5rem;
+    }
+    .bk-header h2 { font-size: 1.55rem; font-weight: 700; }
+    .bk-header p { margin-top: 0.5rem; font-size: 0.9rem; color: #c8d8e4; line-height: 1.5; }
+
+    .progress-bar-wrap { background: #e8edf1; height: 5px; }
+    .progress-bar-fill {
+      height: 5px;
+      background: #1c2b3a;
+      transition: width 0.35s ease;
+    }
+
+    .bk-body { padding: 2rem 2.5rem; }
+
+    .step-indicator {
+      font-size: 0.75rem;
+      color: #8a9aa8;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    .step-indicator strong { color: #1c2b3a; }
+
+    .question-block { margin-bottom: 1.75rem; }
+    .question-text {
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: #1a1a1a;
+      line-height: 1.45;
+      margin-bottom: 0.35rem;
+    }
+    .question-hint {
+      font-size: 0.82rem;
+      color: #7a8f9e;
+      margin-bottom: 1rem;
+      line-height: 1.4;
+    }
+
+    .options { display: flex; flex-direction: column; gap: 0.55rem; }
+    .option-btn {
+      padding: 0.75rem 1.1rem;
+      border: 1.5px solid #d0d5da;
+      border-radius: 3px;
+      background: #f9f9f8;
+      font-size: 0.92rem;
+      color: #1a1a1a;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s;
+      line-height: 1.35;
+    }
+    .option-btn:hover { border-color: #1c2b3a; background: #f0f5f9; }
+    .option-btn.selected { background: #1c2b3a; color: #fff; border-color: #1c2b3a; font-weight: 600; }
+
+    .nav-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+    .nav-btn {
+      padding: 0.65rem 1.4rem;
+      border-radius: 3px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background 0.15s;
+    }
+    .nav-btn.back { background: #eee; color: #555; }
+    .nav-btn.back:hover { background: #e0e0e0; }
+    .nav-btn.next { background: #1c2b3a; color: #fff; }
+    .nav-btn.next:hover { background: #2a4057; }
+    .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    hr.div { border: none; border-top: 1px solid #eee; margin: 1.75rem 0; }
+
+    .result-hidden { display: none; }
+
+    .result-badge {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.75rem;
+    }
+    .result-header {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1c2b3a;
+      margin-bottom: 0.4rem;
+    }
+    .result-sub {
+      font-size: 0.92rem;
+      color: #555;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .ergebnis-card {
+      border-left: 4px solid #ccc;
+      border-radius: 2px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .ergebnis-card.rot { border-color: #c0392b; background: #fdf1f0; }
+    .ergebnis-card.orange { border-color: #e67e22; background: #fef6ed; }
+    .ergebnis-card.blau { border-color: #1D6996; background: #f0f7fb; }
+    .ergebnis-card.gruen { border-color: #27ae60; background: #edfaf2; }
+
+    .ergebnis-card .stufe {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+    .ergebnis-card.rot .stufe { color: #c0392b; }
+    .ergebnis-card.orange .stufe { color: #e67e22; }
+    .ergebnis-card.blau .stufe { color: #1D6996; }
+    .ergebnis-card.gruen .stufe { color: #27ae60; }
+
+    .ergebnis-card .titel { font-size: 1rem; font-weight: 700; color: #1a1a1a; margin-bottom: 0.4rem; }
+    .ergebnis-card .text { font-size: 0.88rem; color: #444; line-height: 1.55; }
+
+    .naechster-schritt {
+      background: #f0f7fb;
+      border-left: 4px solid #1c2b3a;
+      border-radius: 2px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .naechster-schritt .label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #6a8099;
+      margin-bottom: 0.3rem;
+    }
+    .naechster-schritt .text {
+      font-size: 0.92rem;
+      color: #1a1a1a;
+      line-height: 1.5;
+    }
+
+    .cta-block { display: flex; flex-direction: column; gap: 0.5rem; }
+    .cta-block p { font-size: 0.88rem; color: #555; }
+    .cta-btn {
+      display: inline-block;
+      background: #1c2b3a;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 3px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.2s;
+      width: fit-content;
+    }
+    .cta-btn:hover { background: #2a4057; }
+
+    .restart-btn {
+      background: none;
+      border: none;
+      color: #8a9aa8;
+      font-size: 0.82rem;
+      cursor: pointer;
+      text-decoration: underline;
+      padding: 0;
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 520px) {
+      .bk-header, .bk-body { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bk-widget">
+  <div class="bk-header">
+    <p class="eyebrow">Selbstcheck</p>
+    <h2>Dashboard-Check</h2>
+    <p>8 Fragen – 2 Minuten – klares Bild: Wie datengesteuert läuft Ihr Betrieb wirklich?</p>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+  </div>
+
+  <div class="bk-body">
+    <div id="quiz-area">
+      <p class="step-indicator">Frage <strong id="q-num">1</strong> von 8</p>
+      <div class="question-block">
+        <p class="question-text" id="q-text"></p>
+        <p class="question-hint" id="q-hint"></p>
+        <div class="options" id="q-options"></div>
+      </div>
+      <div class="nav-row">
+        <button class="nav-btn back" id="btn-back" onclick="goBack()">← Zurück</button>
+        <button class="nav-btn next" id="btn-next" onclick="goNext()" disabled>Weiter →</button>
+      </div>
+    </div>
+    <div id="result-area" class="result-hidden"></div>
+  </div>
+</div>
+
+<script>
+const FRAGEN = [
+  {
+    text: "Wie lange dauert es, bis Sie Ihre wichtigsten Betriebszahlen zusammen haben?",
+    hint: "Gemeint sind die Zahlen, die Sie für eine typische Leitungsentscheidung brauchen.",
+    optionen: [
+      "Ein Blick – ich hab eine feste Übersicht oder ein Dashboard",
+      "Eine halbe Stunde – ich weiß wo ich suchen muss",
+      "Mehrere Stunden – ich muss verschiedene Quellen zusammensuchen",
+      "Das machen wir eigentlich nicht regelmäßig"
+    ],
+    punkte: [3, 2, 1, 0]
+  },
+  {
+    text: "Wo leben Ihre Auswertungen und Zahlen gerade?",
+    hint: "",
+    optionen: [
+      "In einem System, das automatisch aktuell ist (Power BI, ERP-Auswertung o.ä.)",
+      "In gepflegten Excel-Dateien mit fester Struktur",
+      "Verteilt – verschiedene Excels, E-Mails, Ordner",
+      "Größtenteils im Kopf oder in einzelnen Dokumenten"
+    ],
+    punkte: [3, 2, 1, 0]
+  },
+  {
+    text: "Was passiert, wenn die Person, die normalerweise Auswertungen macht, krank ist oder das Unternehmen verlässt?",
+    hint: "",
+    optionen: [
+      "Nichts – die Daten liegen strukturiert vor, jeder kann sie aufrufen",
+      "Kleine Verzögerung – jemand anderes kann es mit etwas Einarbeitung",
+      "Größere Lücke – es dauert, bis jemand den Überblick hat",
+      "Das wäre ein echtes Problem"
+    ],
+    punkte: [3, 2, 1, 0]
+  },
+  {
+    text: "Wie treffen Sie wichtige Entscheidungen im Betrieb?",
+    hint: "Z.B. Investitionen, Personalplanung, Kapazitätssteuerung.",
+    optionen: [
+      "Auf Basis konkreter Zahlen – ich weiß genau welche KPIs ich dafür brauche",
+      "Meistens mit Zahlen, aber nicht immer vollständig",
+      "Oft aus Erfahrung und Bauchgefühl, Zahlen zur Bestätigung",
+      "Hauptsächlich aus Erfahrung – Zahlen spielen kaum eine Rolle"
+    ],
+    punkte: [3, 2, 1, 0]
+  },
+  {
+    text: "Können Sie auf einen Blick sehen, wie der Betrieb gerade läuft?",
+    hint: "",
+    optionen: [
+      "Ja – ich hab eine klare Übersicht mit den wichtigsten Kennzahlen",
+      "Meistens – ich muss manchmal kurz zusammensuchen",
+      "Eher nicht – ich bekomme Teilinfos aus verschiedenen Ecken",
+      "Nein – der Überblick fehlt mir oft"
+    ],
+    punkte: [3, 2, 1, 0]
+  },
+  {
+    text: "Wie aktuell sind Ihre Auswertungen, wenn Sie sie aufrufen?",
+    hint: "",
+    optionen: [
+      "Tagesaktuell oder in Echtzeit",
+      "Wöchentlich – das reicht für unsere Entscheidungen",
+      "Monatlich – wir schauen hauptsächlich beim Monatsabschluss",
+      "Unregelmäßig – je nachdem wann jemand Zeit hat"
+    ],
+    punkte: [3, 2, 1, 0]
+  },
+  {
+    text: "Merken Sie Probleme im Betrieb eher früh durch Zahlen – oder wenn es schon spürbar wird?",
+    hint: "",
+    optionen: [
+      "Früh – ich erkenne Abweichungen bevor sie eskalieren",
+      "Meistens früh, manchmal auch erst wenn es offensichtlich ist",
+      "Oft erst wenn es spürbar wird",
+      "Fast immer erst wenn es ein echtes Problem ist"
+    ],
+    punkte: [3, 2, 1, 0]
+  },
+  {
+    text: "Wie zufrieden sind Sie insgesamt mit Ihrer aktuellen Auswertungs-Situation?",
+    hint: "",
+    optionen: [
+      "Sehr zufrieden – es läuft gut",
+      "Größtenteils okay, aber es gibt Luft nach oben",
+      "Nicht wirklich – ich merke dass mir Überblick fehlt",
+      "Unzufrieden – ich weiß dass hier was geändert werden muss"
+    ],
+    punkte: [3, 2, 1, 0]
+  }
+];
+
+const ERGEBNISSE = [
+  {
+    min: 0, max: 8,
+    farbe: "rot",
+    stufe: "Bauchgefühl-Betrieb",
+    titel: "Der Betrieb läuft – aber niemand weiß so genau warum.",
+    text: "Entscheidungen laufen über Erfahrung, Zahlen kommen wenn überhaupt zu spät. Das funktioniert solange bis es nicht mehr funktioniert. Der erste Schritt ist nicht ein großes Dashboard-Projekt – sondern zu klären: Welche drei Zahlen müsste ich eigentlich täglich kennen?",
+    schritt: "Ein kurzes Gespräch mit uns reicht oft, um diese drei Zahlen zu identifizieren – und zu zeigen wie man sie schnell sichtbar macht. Ohne großes IT-Projekt, ohne große Investition."
+  },
+  {
+    min: 9, max: 14,
+    farbe: "orange",
+    stufe: "Excel-Sammler",
+    titel: "Die Daten sind da – sie arbeiten nur noch nicht für Sie.",
+    text: "Sie haben Zahlen, Tabellen, Auswertungen. Aber alles verteilt, manuell, personenabhängig. Der Aufwand ist da, der Nutzen noch nicht voll. Das Gute: Sie sind näher an einer guten Lösung als Sie denken.",
+    schritt: "Mit Power BI oder einer strukturierten Excel-Basis lässt sich das oft in ein bis zwei Tagen auf ein anderes Niveau heben. Wir zeigen Ihnen wie – in unserem Power BI Workshop oder einem direkten Beratungsgespräch."
+  },
+  {
+    min: 15, max: 20,
+    farbe: "blau",
+    stufe: "Auf dem Weg",
+    titel: "Erste Strukturen sind da – jetzt kommt der Feinschliff.",
+    text: "Sie arbeiten schon mit Zahlen und haben eine grundlegende Struktur. Was oft noch fehlt: Einheitlichkeit, Automatisierung und ein klares Bild was wirklich wichtig ist. Hier liegt das größte Optimierungspotenzial.",
+    schritt: "Ein Power BI Workshop oder eine gezielte Beratung kann hier den Unterschied zwischen 'ganz okay' und 'wirklich gut' machen – und den manuellen Aufwand deutlich reduzieren."
+  },
+  {
+    min: 21, max: 24,
+    farbe: "gruen",
+    stufe: "Datengesteuerter Betrieb",
+    titel: "Sie wissen was in Ihrem Betrieb los ist – das ist keine Selbstverständlichkeit.",
+    text: "Zahlen laufen, Entscheidungen laufen mit. Das ist mehr als die meisten KMU in Deutschland von sich sagen können. Jetzt geht es darum, diesen Vorsprung zu halten und gezielt weiter auszubauen – zum Beispiel durch tiefere Analysen oder mehr Automatisierung.",
+    schritt: "Wir helfen gern dabei, den nächsten Schritt zu identifizieren – ohne das aufzureißen was schon gut läuft."
+  }
+];
+
+let current = 0;
+let answers = new Array(FRAGEN.length).fill(null);
+
+function renderQuestion() {
+  const q = FRAGEN[current];
+  document.getElementById('q-num').textContent = current + 1;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('q-hint').textContent = q.hint;
+
+  const optDiv = document.getElementById('q-options');
+  optDiv.innerHTML = '';
+  q.optionen.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn' + (answers[current] === i ? ' selected' : '');
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(i);
+    optDiv.appendChild(btn);
+  });
+
+  document.getElementById('btn-back').disabled = current === 0;
+  document.getElementById('btn-next').disabled = answers[current] === null;
+  document.getElementById('btn-next').textContent = current === FRAGEN.length - 1 ? 'Auswertung →' : 'Weiter →';
+
+  const pct = (current / FRAGEN.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+function selectAnswer(i) {
+  answers[current] = i;
+  document.querySelectorAll('.option-btn').forEach((b, idx) => {
+    b.classList.toggle('selected', idx === i);
+  });
+  document.getElementById('btn-next').disabled = false;
+}
+
+function goNext() {
+  if (current < FRAGEN.length - 1) {
+    current++;
+    renderQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function goBack() {
+  if (current > 0) { current--; renderQuestion(); }
+}
+
+function showResults() {
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('quiz-area').style.display = 'none';
+
+  const score = answers.reduce((sum, a, i) => sum + FRAGEN[i].punkte[a], 0);
+  const r = ERGEBNISSE.find(e => score >= e.min && score <= e.max);
+
+  const html = `
+    <div class="result-badge" style="background:${r.farbe === 'rot' ? '#fdf1f0' : r.farbe === 'orange' ? '#fef6ed' : r.farbe === 'blau' ? '#f0f7fb' : '#edfaf2'}; color:${r.farbe === 'rot' ? '#c0392b' : r.farbe === 'orange' ? '#e67e22' : r.farbe === 'blau' ? '#1D6996' : '#27ae60'};">${r.stufe}</div>
+    <p class="result-header">${r.titel}</p>
+    <p class="result-sub">${r.text}</p>
+    <div class="naechster-schritt">
+      <p class="label">Nächster Schritt</p>
+      <p class="text">${r.schritt}</p>
+    </div>
+    <hr class="div">
+    <div class="cta-block">
+      <p>Wir gehen Ihre Situation gerne gemeinsam durch – kostenlos und ohne Verbindlichkeit.</p>
+      <a class="cta-btn" href="https://www.berater-kasten.de/kontakt.html">Jetzt Erstgespräch vereinbaren →</a>
+      <button class="restart-btn" onclick="restart()">Nochmal von vorne</button>
+    </div>
+  `;
+
+  const ra = document.getElementById('result-area');
+  ra.innerHTML = html;
+  ra.classList.remove('result-hidden');
+}
+
+function restart() {
+  current = 0;
+  answers = new Array(FRAGEN.length).fill(null);
+  document.getElementById('result-area').classList.add('result-hidden');
+  document.getElementById('result-area').innerHTML = '';
+  document.getElementById('quiz-area').style.display = '';
+  renderQuestion();
+}
+
+renderQuestion();
+</script>
+<script>
+window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>
