@@ -545,10 +545,6 @@ function showResults() {
   ra.innerHTML = html;
   ra.classList.remove('result-hidden');
 
-  // Custom Event: Check abgeschlossen
-  const ergebnisLabel = gesamtProz >= 60 ? 'Hohes Potenzial' : gesamtProz >= 35 ? 'Mittleres Potenzial' : 'Gut aufgestellt';
-  if (window.va) window.va('event', { name: 'check_abgeschlossen', data: { check: 'Verschwendungs-Check', ergebnis: ergebnisLabel } });
-
   // Ergebnis und Antworten als Hidden-Felder
   const form = document.getElementById('checkForm');
   const hiddenErg = document.createElement('input');
@@ -576,7 +572,7 @@ function showResults() {
     const data = new FormData(this);
     fetch(form.action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } })
       .then(res => {
-        if (res.ok) { form.style.display = 'none'; document.getElementById('form-ok').style.display = 'block'; if (window.va) window.va('event', { name: 'formular_abgesendet', data: { check: 'Verschwendungs-Check' } }); }
+        if (res.ok) { form.style.display = 'none'; document.getElementById('form-ok').style.display = 'block'; }
         else { document.getElementById('form-error').style.display = 'block'; }
       })
       .catch(() => { document.getElementById('form-error').style.display = 'block'; });

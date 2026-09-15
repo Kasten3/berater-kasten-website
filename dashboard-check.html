@@ -494,9 +494,6 @@ function showResults() {
   ra.innerHTML = html;
   ra.classList.remove('result-hidden');
 
-  // Custom Event: Check abgeschlossen
-  if (window.va) window.va('event', { name: 'check_abgeschlossen', data: { check: 'Dashboard-Check', ergebnis: r.stufe } });
-
   // Ergebnis und alle Antworten als Hidden-Felder ins Formular schreiben
   const form = document.getElementById('checkForm');
 
@@ -524,7 +521,6 @@ function showResults() {
         if (res.ok) {
           form.style.display = 'none';
           document.getElementById('form-ok').style.display = 'block';
-          if (window.va) window.va('event', { name: 'formular_abgesendet', data: { check: 'Dashboard-Check' } });
         } else {
           document.getElementById('form-error').style.display = 'block';
         }
