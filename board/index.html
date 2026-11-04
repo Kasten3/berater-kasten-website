@@ -31,7 +31,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 #lines .ep{pointer-events:all;cursor:grab}
 
 .item{position:absolute;z-index:3}
-.item .content{outline:none;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere}
+.item .content{outline:none;white-space:pre-wrap;word-break:normal;overflow-wrap:break-word}
 .item .content:empty::before{content:attr(data-ph);color:rgba(31,42,51,.38);font-weight:400}
 .item.editing .content{cursor:text;user-select:text;-webkit-user-select:text}
 
@@ -104,6 +104,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 #tools hr{border:0;border-top:1px solid var(--rand);margin:4px 6px}
 
 #ctx{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:8px 10px;z-index:20;max-width:calc(100vw - 24px);overflow-x:auto}
+@media (max-width:1500px) and (min-width:641px){ #ctx{bottom:72px} }
 #ctx .sw{width:26px;height:26px;border-radius:50%;border:2px solid rgba(0,0,0,.08);flex:none}
 #ctx .sw.on{box-shadow:0 0 0 2px #fff,0 0 0 4px var(--petrol)}
 #ctx .sep{width:1px;height:24px;background:var(--rand);margin:0 4px;flex:none}
@@ -112,6 +113,10 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 #ctx .tb.on{background:var(--hell)}
 #ctx .tb.del{color:#b03a2e}
 #ctx .tb svg{width:18px;height:18px}
+#ctx .tb.fb{font-weight:800;font-size:15px}
+#ctx .tb.fi{font-style:italic;font-family:Georgia,serif;font-size:16px}
+#ctx .tb.fu{text-decoration:underline;font-size:15px}
+#ctx .szl{min-width:30px;text-align:center;font-size:12px;font-weight:700;color:var(--dunkel)}
 
 #zoom{position:fixed;right:12px;bottom:16px;display:flex;align-items:center;padding:4px;z-index:20}
 #zoom button{height:34px;min-width:34px;border-radius:9px;font-weight:700;color:var(--dunkel);font-size:16px;display:flex;align-items:center;justify-content:center}
@@ -283,6 +288,7 @@ kbd{font:600 12px var(--ui);background:var(--grau);border:1px solid var(--rand);
       <dt>Karte</dt><dd>Werkzeug wählen und ins Board klicken – oder einfach doppelt auf eine freie Stelle klicken.</dd>
       <dt>Text ändern</dt><dd>Karte anklicken und noch einmal klicken (oder Doppelklick). Fertig mit <kbd>Esc</kbd> oder einem Klick daneben.</dd>
       <dt>Pfeil</dt><dd>Karte anklicken und am blauen Punkt rechts zu einer anderen Karte ziehen. Pfeile wandern mit, wenn Karten verschoben werden.</dd>
+      <dt>Formatieren</dt><dd>Karte oder Text auswählen und unten Schriftgröße, Fett, Kursiv, Unterstrichen, Aufzählung oder Ausrichtung wählen – gilt für den ganzen Text. Tipp: Größere Schrift hilft, wenn das Board weit herausgezoomt ist.</dd>
       <dt>Symbol</dt><dd>Smiley, Daumen oder Stern auswählen und ins Board klicken. Symbole lassen sich wie Karten verschieben, vergrößern und umfärben.</dd>
       <dt>Bereich</dt><dd>Rahmen aufziehen, z. B. für jede Gruppe. Wer den Titel zieht, nimmt alles im Bereich mit.</dd>
       <dt>Bewegen</dt><dd>Eine freie Fläche ziehen verschiebt das Board. Mit dem Mausrad oder zwei Fingern zoomen.</dd>
@@ -2609,7 +2615,8 @@ const roomTitle = () => String(room||'').replace(/[-_]+/g,' ');
 
 const CARD_COLORS = ['#FFD166','#F4A261','#A9D6E5','#C9DFB4','#F4C7C3','#D9C8EE','#E6D5BD','#FFFFFF'];
 const INK_COLORS  = ['#0B3C5D','#1D6996','#D9822B','#2E7D4F','#B03A2E','#6E4F9E','#8A6A4B','#1F2A33'];
-const TEXT_SIZES  = [[16,'S'],[22,'M'],[32,'L'],[46,'XL']];
+const FMT_SIZES = {card:[[12,'S'],[15,'M'],[20,'L'],[28,'XL'],[40,'XXL']], text:[[16,'S'],[22,'M'],[32,'L'],[46,'XL'],[72,'XXL']]};
+const BULLET = '• ';
 const TYPES = {card:1,text:1,box:1,line:1,icon:1};
 
 /* ================= symbole ================= */
@@ -2661,8 +2668,13 @@ function sanitize(type, d){
   if(type==='icon') return {x:num(d.x), y:num(d.y), w:Math.min(400,Math.max(16,num(d.w,56))),
     kind:(SYM[d.kind]?d.kind:'happy'), color:col(d.color,(SYM[d.kind]||SYM.happy).c)};
   const o = {x:num(d.x), y:num(d.y), w:Math.max(30,num(d.w,180)), text:String(d.text==null?'':d.text).slice(0,5000)};
-  if(type==='card'){ o.h=Math.max(30,num(d.h,110)); o.color=col(d.color,'#FFD166'); }
-  if(type==='text'){ o.size=Math.min(120,Math.max(8,num(d.size,22))); o.color=col(d.color,'#0B3C5D'); }
+  if(type==='card'){ o.h=Math.max(30,num(d.h,110)); o.color=col(d.color,'#FFD166'); o.size=Math.min(120,Math.max(8,num(d.size,15))); }
+  if(type==='text'){ o.size=Math.min(160,Math.max(8,num(d.size,22))); o.color=col(d.color,'#0B3C5D'); }
+  if(type==='card'||type==='text'){
+    o.bold = d.bold==null ? type==='text' : !!d.bold;
+    o.italic=!!d.italic; o.underline=!!d.underline; o.list=!!d.list;
+    o.align = d.align==='center' ? 'center' : 'left';
+  }
   if(type==='box'){ o.h=Math.max(40,num(d.h,240)); o.color=col(d.color,'#1D6996'); }
   return o;
 }
@@ -2862,6 +2874,10 @@ function renderItem(it){
   if(it.type==='box'){ el.style.height=d.h+'px'; el.style.borderColor=d.color; el.style.background=d.color+'0F'; el.firstChild.style.background=d.color; }
   if(it.type==='text'){ el.style.color=d.color; el.style.fontSize=d.size+'px'; }
   const c = el.firstChild;
+  if(it.type==='card'||it.type==='text'){
+    c.style.fontSize=d.size+'px'; c.style.fontWeight=d.bold?'700':'400'; c.style.fontStyle=d.italic?'italic':'normal';
+    c.style.textDecoration=d.underline?'underline':'none'; c.style.textAlign=d.align;
+  }
   if(it.type==='icon'){ el.style.height=d.w+'px'; const key=d.kind+d.color; if(c.dataset.k!==key){ c.dataset.k=key; c.innerHTML=symSvg(d.kind,d.color); } }
   else if(editingId!==it.id && c.innerText!==d.text) c.textContent = d.text;
   el.classList.toggle('sel', selected.has(it.id));
@@ -2984,6 +3000,8 @@ function duplicateSelected(){
 function wireContent(id, c){
   c.addEventListener('input',()=>{ if(editingId!==id) return; const it=items.get(id); if(!it) return;
     it.data.text=c.innerText.replace(/\n$/,''); save(it,600); renderLines(); });
+  c.addEventListener('keydown',e=>{ if(editingId!==id) return; const it=items.get(id);
+    if(e.key==='Enter' && !e.shiftKey && it && it.data.list){ e.preventDefault(); document.execCommand('insertText',false,'\n'+BULLET); } });
   c.addEventListener('paste',e=>{ if(editingId!==id) return; e.preventDefault();
     const t=(e.clipboardData||window.clipboardData).getData('text/plain'); document.execCommand('insertText',false,t); });
   c.addEventListener('blur',()=>{ setTimeout(()=>{ if(editingId===id && document.hasFocus() && document.activeElement!==c) stopEditing(); },0); });
@@ -3223,6 +3241,8 @@ viewport.addEventListener('contextmenu',e=>e.preventDefault());
 window.addEventListener('keydown',e=>{
   const ov=document.querySelector('.overlay:not([hidden])');
   if(ov){ if(e.key==='Escape' && ov.id!=='ov-name') ov.hidden=true; return; }
+  const fk = (e.ctrlKey||e.metaKey) && !e.altKey ? {b:'bold',i:'italic',u:'underline'}[e.key.toLowerCase()] : null;
+  if(fk && fmtTargets().length){ e.preventDefault(); runFmt(fk); return; }
   if(editingId){ if(e.key==='Escape'){ e.preventDefault(); stopEditing(); } return; }
   if(e.target && e.target.closest && e.target.closest('input,textarea')) return;
   const k=e.key.toLowerCase();
@@ -3241,6 +3261,38 @@ window.addEventListener('keydown',e=>{
 window.addEventListener('keyup',e=>{ if(e.key===' '){ spaceDown=false; viewport.classList.remove('grab'); } });
 window.addEventListener('blur',()=>{ spaceDown=false; viewport.classList.remove('grab'); });
 
+/* ================= text formatieren ================= */
+const isTextish = it => it && !it.deleted && (it.type==='card'||it.type==='text');
+function fmtTargets(){ const ids = editingId ? [editingId] : [...selected]; return ids.map(i=>items.get(i)).filter(isTextish); }
+function fmtApply(fn){
+  const list=fmtTargets(); if(!list.length) return;
+  const own=!tx; if(own) txBegin();
+  for(const it of list){ txTrack(it.id); fn(it);
+    if(editingId===it.id){ const c=els.get(it.id).firstChild; if(c.innerText.replace(/\n$/,'')!==it.data.text){ c.textContent=it.data.text; caretEnd(c); } }
+    renderItem(it); save(it,0); }
+  if(own) txCommit(); renderLines(); renderCtx();
+}
+function stepSize(it,dir){ const L=FMT_SIZES[it.type]; let i=L.findIndex(([v])=>v>=it.data.size); if(i<0) i=L.length-1;
+  if(dir<0 && L[i][0]>it.data.size) i--; i=Math.max(0,Math.min(L.length-1,i+dir));
+  const old=it.data.size, nw=L[i][0]; it.data.size=nw;
+  if(nw!==old){ const f=nw/old; // breite (und kartenhöhe) mitwachsen lassen, damit wörter nicht umbrechen
+    it.data.w=Math.round(Math.max(it.type==='text'?60:120, Math.min(1600, it.data.w*f))); } }
+function sizeLabel(it){ const L=FMT_SIZES[it.type]; let best=L[0]; for(const e of L) if(Math.abs(e[0]-it.data.size)<Math.abs(best[0]-it.data.size)) best=e; return best[1]; }
+function toggleList(it,on){
+  const lines=it.data.text.split('\n');
+  if(on){ it.data.text = it.data.text.trim()==='' ? BULLET : lines.map(l=>l.trim()===''||l.startsWith(BULLET)?l:BULLET+l).join('\n'); }
+  else it.data.text = lines.map(l=>l.startsWith(BULLET)?l.slice(BULLET.length):l).join('\n');
+  it.data.list=on;
+}
+const FMT_ACTIONS = {
+  smaller: it=>stepSize(it,-1), bigger: it=>stepSize(it,1),
+  bold: (it,v)=>{it.data.bold=v;}, italic:(it,v)=>{it.data.italic=v;}, underline:(it,v)=>{it.data.underline=v;},
+  list: (it,v)=>toggleList(it,v), left: it=>{it.data.align='left';}, center: it=>{it.data.align='center';}
+};
+function runFmt(name){ const t=fmtTargets(); if(!t.length) return; const f=t[0].data;
+  const v = name==='bold'?!f.bold : name==='italic'?!f.italic : name==='underline'?!f.underline : name==='list'?!f.list : null;
+  fmtApply(it=>FMT_ACTIONS[name](it,v)); }
+
 /* ================= kontextleiste ================= */
 const ICON = {
   none:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 12h16"/></svg>',
@@ -3248,6 +3300,11 @@ const ICON = {
   both:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M10 7l-5 5 5 5M14 7l5 5-5 5"/></svg>',
   dash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 12h3M10 12h4M18 12h3"/></svg>',
   dup:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>',
+  aminus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l4.5-11L12 18M4.6 14h5.8"/><path d="M15 12h6"/></svg>',
+  aplus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l4.5-11L12 18M4.6 14h5.8"/><path d="M15 12h6M18 9v6"/></svg>',
+  list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" stroke-width="3"/></svg>',
+  left:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 10h10M4 14h16M4 18h10"/></svg>',
+  center:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 10h10M4 14h16M7 18h10"/></svg>',
   del:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>'
 };
 function renderCtx(){
@@ -3259,7 +3316,15 @@ function renderCtx(){
   const palette = one==='card' ? CARD_COLORS : (one ? INK_COLORS : (types.has('card')?null:INK_COLORS));
   if(palette){ const cur=sel[0].data.color; palette.forEach(c=>{ h+=`<button class="sw${c===cur?' on':''}" data-c="${c}" style="background:${c}" title="Farbe"></button>`; }); h+='<span class="sep"></span>'; }
   if(one==='icon'){ Object.keys(SYM).forEach(k=>{ h+=`<button class="tb ic${sel[0].data.kind===k?' on':''}" data-kind="${k}" title="${SYM[k].name}">${symSvg(k,'#0B3C5D')}</button>`; }); h+='<span class="sep"></span>'; }
-  if(one==='text'){ TEXT_SIZES.forEach(([s,l])=>{ h+=`<button class="tb${sel[0].data.size===s?' on':''}" data-size="${s}">${l}</button>`; }); h+='<span class="sep"></span>'; }
+  if(sel.every(isTextish)){ const f=sel[0].data;
+    h+=`<button class="tb" data-fmt="smaller" title="Schrift kleiner">${ICON.aminus}</button><span class="szl" title="Schriftgröße">${sizeLabel(sel[0])}</span><button class="tb" data-fmt="bigger" title="Schrift größer">${ICON.aplus}</button><span class="sep"></span>`;
+    h+=`<button class="tb fb${f.bold?' on':''}" data-fmt="bold" title="Fett (Strg+B)">F</button>`;
+    h+=`<button class="tb fi${f.italic?' on':''}" data-fmt="italic" title="Kursiv (Strg+I)">K</button>`;
+    h+=`<button class="tb fu${f.underline?' on':''}" data-fmt="underline" title="Unterstrichen (Strg+U)">U</button>`;
+    h+=`<button class="tb${f.list?' on':''}" data-fmt="list" title="Aufzählung">${ICON.list}</button><span class="sep"></span>`;
+    h+=`<button class="tb${f.align==='left'?' on':''}" data-fmt="left" title="Linksbündig">${ICON.left}</button>`;
+    h+=`<button class="tb${f.align==='center'?' on':''}" data-fmt="center" title="Zentriert">${ICON.center}</button><span class="sep"></span>`;
+  }
   if(one==='line'){ ['none','end','both'].forEach(a=>{ h+=`<button class="tb${sel[0].data.arrow===a?' on':''}" data-arrow="${a}" title="Pfeilspitze">${ICON[a]}</button>`; });
     h+=`<button class="tb${sel[0].data.dash?' on':''}" data-dash="1" title="Gestrichelt">${ICON.dash}</button><span class="sep"></span>`; }
   if(!types.has('line') || types.size>1) h+=`<button class="tb" data-dup="1" title="Duplizieren (Strg+D)">${ICON.dup}</button>`;
@@ -3272,12 +3337,12 @@ $('#ctx').addEventListener('click',e=>{
   const sel=[...selected].map(id=>items.get(id)).filter(i=>i&&!i.deleted);
   if(b.dataset.del){ deleteSelected(); return; }
   if(b.dataset.dup){ duplicateSelected(); return; }
+  if(b.dataset.fmt){ runFmt(b.dataset.fmt); return; }
   txBegin();
   for(const it of sel){
     txTrack(it.id);
     if(b.dataset.c){ it.data.color=b.dataset.c; lastColor[it.type]=b.dataset.c; }
     if(b.dataset.kind && it.type==='icon'){ it.data.kind=b.dataset.kind; it.data.color=SYM[b.dataset.kind].c; }
-    if(b.dataset.size && it.type==='text') it.data.size=Number(b.dataset.size);
     if(b.dataset.arrow && it.type==='line') it.data.arrow=b.dataset.arrow;
     if(b.dataset.dash && it.type==='line') it.data.dash=!sel[0].data.dash;
     renderItem(it); save(it,0);
@@ -3324,9 +3389,14 @@ $('#b-png').onclick=()=>{
     c.beginPath(); c.moveTo(g.sa.x,g.sa.y); c.lineTo(g.sb.x,g.sb.y); c.stroke(); c.setLineDash([]);
     for(const p of g.heads){ c.beginPath(); c.moveTo(p[0].x,p[0].y); c.lineTo(p[1].x,p[1].y); c.lineTo(p[2].x,p[2].y); c.closePath(); c.fill(); } }
   for(const it of order){ if(it.type==='box'||it.type==='icon') continue; const r=rectOf(it.id), d=it.data; c.textBaseline='top';
+    const font=fam=>`${d.italic?'italic ':''}${d.bold?700:400} ${d.size}px ${fam}`;
+    const drawText=(x0,y0,w,lh)=>{ c.textAlign=d.align==='center'?'center':'left'; const x=d.align==='center'?x0+w/2:x0;
+      wrap(c,d.text,w).forEach((l,i)=>{ const y=y0+i*lh; c.fillText(l,x,y);
+        if(d.underline && l){ const tw=c.measureText(l).width, lx=d.align==='center'?x-tw/2:x; c.fillRect(lx,y+d.size*1.02,tw,Math.max(1,d.size/14)); } });
+      c.textAlign='left'; };
     if(it.type==='card'){ c.save(); c.shadowColor='rgba(11,60,93,.16)'; c.shadowBlur=14; c.shadowOffsetY=4; rr(c,r.x,r.y,r.w,r.h,6); c.fillStyle=d.color; c.fill(); c.restore();
-      c.fillStyle='#1F2A33'; c.font='15px "Open Sans", system-ui, sans-serif'; wrap(c,d.text,r.w-28).forEach((l,i)=>c.fillText(l,r.x+14,r.y+12+i*20.7)); }
-    else { c.fillStyle=d.color; c.font=`600 ${d.size}px Montserrat, system-ui, sans-serif`; wrap(c,d.text,r.w-12).forEach((l,i)=>c.fillText(l,r.x+6,r.y+4+i*d.size*1.25)); } }
+      c.fillStyle='#1F2A33'; c.font=font('"Open Sans", system-ui, sans-serif'); drawText(r.x+14,r.y+12,r.w-28,d.size*1.38); }
+    else { c.fillStyle=d.color; c.font=font('Montserrat, system-ui, sans-serif'); drawText(r.x+6,r.y+4,r.w-12,d.size*1.25); } }
   for(const it of order){ if(it.type!=='icon') continue; const r=rectOf(it.id), d=it.data, k=SYM[d.kind]; c.save();
     c.translate(r.x,r.y); c.scale(r.w/24,r.w/24); if(k.flip){ c.translate(24,24); c.rotate(Math.PI); }
     c.lineWidth=1.8; c.lineCap='round'; c.lineJoin='round'; c.strokeStyle=d.color; c.fillStyle=d.color;
