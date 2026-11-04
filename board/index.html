@@ -288,7 +288,7 @@ kbd{font:600 12px var(--ui);background:var(--grau);border:1px solid var(--rand);
       <dt>Karte</dt><dd>Werkzeug wählen und ins Board klicken – oder einfach doppelt auf eine freie Stelle klicken.</dd>
       <dt>Text ändern</dt><dd>Karte anklicken und noch einmal klicken (oder Doppelklick). Fertig mit <kbd>Esc</kbd> oder einem Klick daneben.</dd>
       <dt>Pfeil</dt><dd>Karte anklicken und am blauen Punkt rechts zu einer anderen Karte ziehen. Pfeile wandern mit, wenn Karten verschoben werden.</dd>
-      <dt>Formatieren</dt><dd>Karte oder Text auswählen und unten Schriftgröße, Fett, Kursiv, Unterstrichen, Aufzählung oder Ausrichtung wählen – gilt für den ganzen Text. Tipp: Größere Schrift hilft, wenn das Board weit herausgezoomt ist.</dd>
+      <dt>Formatieren</dt><dd>Karte, Text oder Bereichstitel auswählen und unten Schriftgröße, Fett, Kursiv, Unterstrichen, Aufzählung oder Ausrichtung wählen – gilt für den ganzen Text. Tipp: Größere Schrift hilft, wenn das Board weit herausgezoomt ist.</dd>
       <dt>Symbol</dt><dd>Smiley, Daumen oder Stern auswählen und ins Board klicken. Symbole lassen sich wie Karten verschieben, vergrößern und umfärben.</dd>
       <dt>Bereich</dt><dd>Rahmen aufziehen, z. B. für jede Gruppe. Wer den Titel zieht, nimmt alles im Bereich mit.</dd>
       <dt>Bewegen</dt><dd>Eine freie Fläche ziehen verschiebt das Board. Mit dem Mausrad oder zwei Fingern zoomen.</dd>
@@ -2615,7 +2615,7 @@ const roomTitle = () => String(room||'').replace(/[-_]+/g,' ');
 
 const CARD_COLORS = ['#FFD166','#F4A261','#A9D6E5','#C9DFB4','#F4C7C3','#D9C8EE','#E6D5BD','#FFFFFF'];
 const INK_COLORS  = ['#0B3C5D','#1D6996','#D9822B','#2E7D4F','#B03A2E','#6E4F9E','#8A6A4B','#1F2A33'];
-const FMT_SIZES = {card:[[12,'S'],[15,'M'],[20,'L'],[28,'XL'],[40,'XXL']], text:[[16,'S'],[22,'M'],[32,'L'],[46,'XL'],[72,'XXL']]};
+const FMT_SIZES = {card:[[12,'S'],[15,'M'],[20,'L'],[28,'XL'],[40,'XXL']], text:[[16,'S'],[22,'M'],[32,'L'],[46,'XL'],[72,'XXL']], box:[[11,'S'],[13,'M'],[18,'L'],[26,'XL'],[38,'XXL']]};
 const BULLET = '• ';
 const TYPES = {card:1,text:1,box:1,line:1,icon:1};
 
@@ -2670,12 +2670,12 @@ function sanitize(type, d){
   const o = {x:num(d.x), y:num(d.y), w:Math.max(30,num(d.w,180)), text:String(d.text==null?'':d.text).slice(0,5000)};
   if(type==='card'){ o.h=Math.max(30,num(d.h,110)); o.color=col(d.color,'#FFD166'); o.size=Math.min(120,Math.max(8,num(d.size,15))); }
   if(type==='text'){ o.size=Math.min(160,Math.max(8,num(d.size,22))); o.color=col(d.color,'#0B3C5D'); }
-  if(type==='card'||type==='text'){
-    o.bold = d.bold==null ? type==='text' : !!d.bold;
+  if(type==='card'||type==='text'||type==='box'){
+    o.bold = d.bold==null ? type!=='card' : !!d.bold;
     o.italic=!!d.italic; o.underline=!!d.underline; o.list=!!d.list;
     o.align = d.align==='center' ? 'center' : 'left';
   }
-  if(type==='box'){ o.h=Math.max(40,num(d.h,240)); o.color=col(d.color,'#1D6996'); }
+  if(type==='box'){ o.h=Math.max(40,num(d.h,240)); o.color=col(d.color,'#1D6996'); o.size=Math.min(80,Math.max(8,num(d.size,13))); }
   return o;
 }
 
@@ -2874,7 +2874,9 @@ function renderItem(it){
   if(it.type==='box'){ el.style.height=d.h+'px'; el.style.borderColor=d.color; el.style.background=d.color+'0F'; el.firstChild.style.background=d.color; }
   if(it.type==='text'){ el.style.color=d.color; el.style.fontSize=d.size+'px'; }
   const c = el.firstChild;
-  if(it.type==='card'||it.type==='text'){
+  if(it.type==='box'){ c.style.padding=`${Math.round(d.size*0.38)}px ${Math.round(d.size*0.85)}px`; c.style.borderRadius=Math.round(d.size*0.55)+'px';
+    c.style.left = d.align==='center' ? '50%' : '-2px'; c.style.transform = d.align==='center' ? 'translateX(-50%)' : 'none'; }
+  if(it.type==='card'||it.type==='text'||it.type==='box'){
     c.style.fontSize=d.size+'px'; c.style.fontWeight=d.bold?'700':'400'; c.style.fontStyle=d.italic?'italic':'normal';
     c.style.textDecoration=d.underline?'underline':'none'; c.style.textAlign=d.align;
   }
@@ -3074,7 +3076,8 @@ function bounds(){
   const add=(x,y)=>{x1=Math.min(x1,x);y1=Math.min(y1,y);x2=Math.max(x2,x);y2=Math.max(y2,y);};
   for(const it of items.values()){ if(it.deleted) continue;
     if(it.type==='line'){ const e=lineEnds(it.data); if(e){add(e[0].x,e[0].y);add(e[1].x,e[1].y);} }
-    else { const r=rectOf(it.id); if(r){ add(r.x, r.y - (it.type==='box'?32:0)); add(r.x+r.w,r.y+r.h); } } }
+    else { const r=rectOf(it.id); if(r){ const lh = it.type==='box' ? (els.get(it.id).firstChild.offsetHeight+8) : 0;
+      add(r.x, r.y-lh); add(r.x+r.w,r.y+r.h); if(it.type==='box') add(r.x+els.get(it.id).firstChild.offsetWidth, r.y); } } }
   return x1===Infinity ? null : {x:x1,y:y1,w:x2-x1,h:y2-y1};
 }
 function fitAll(initial){
@@ -3262,7 +3265,7 @@ window.addEventListener('keyup',e=>{ if(e.key===' '){ spaceDown=false; viewport.
 window.addEventListener('blur',()=>{ spaceDown=false; viewport.classList.remove('grab'); });
 
 /* ================= text formatieren ================= */
-const isTextish = it => it && !it.deleted && (it.type==='card'||it.type==='text');
+const isTextish = it => it && !it.deleted && (it.type==='card'||it.type==='text'||it.type==='box');
 function fmtTargets(){ const ids = editingId ? [editingId] : [...selected]; return ids.map(i=>items.get(i)).filter(isTextish); }
 function fmtApply(fn){
   const list=fmtTargets(); if(!list.length) return;
@@ -3275,7 +3278,7 @@ function fmtApply(fn){
 function stepSize(it,dir){ const L=FMT_SIZES[it.type]; let i=L.findIndex(([v])=>v>=it.data.size); if(i<0) i=L.length-1;
   if(dir<0 && L[i][0]>it.data.size) i--; i=Math.max(0,Math.min(L.length-1,i+dir));
   const old=it.data.size, nw=L[i][0]; it.data.size=nw;
-  if(nw!==old){ const f=nw/old; // breite (und kartenhöhe) mitwachsen lassen, damit wörter nicht umbrechen
+  if(nw!==old && it.type!=='box'){ const f=nw/old; // breite (und kartenhöhe) mitwachsen lassen, damit wörter nicht umbrechen
     it.data.w=Math.round(Math.max(it.type==='text'?60:120, Math.min(1600, it.data.w*f))); } }
 function sizeLabel(it){ const L=FMT_SIZES[it.type]; let best=L[0]; for(const e of L) if(Math.abs(e[0]-it.data.size)<Math.abs(best[0]-it.data.size)) best=e; return best[1]; }
 function toggleList(it,on){
@@ -3287,7 +3290,7 @@ function toggleList(it,on){
 const FMT_ACTIONS = {
   smaller: it=>stepSize(it,-1), bigger: it=>stepSize(it,1),
   bold: (it,v)=>{it.data.bold=v;}, italic:(it,v)=>{it.data.italic=v;}, underline:(it,v)=>{it.data.underline=v;},
-  list: (it,v)=>toggleList(it,v), left: it=>{it.data.align='left';}, center: it=>{it.data.align='center';}
+  list: (it,v)=>{ if(it.type!=='box') toggleList(it,v); }, left: it=>{it.data.align='left';}, center: it=>{it.data.align='center';}
 };
 function runFmt(name){ const t=fmtTargets(); if(!t.length) return; const f=t[0].data;
   const v = name==='bold'?!f.bold : name==='italic'?!f.italic : name==='underline'?!f.underline : name==='list'?!f.list : null;
@@ -3321,7 +3324,8 @@ function renderCtx(){
     h+=`<button class="tb fb${f.bold?' on':''}" data-fmt="bold" title="Fett (Strg+B)">F</button>`;
     h+=`<button class="tb fi${f.italic?' on':''}" data-fmt="italic" title="Kursiv (Strg+I)">K</button>`;
     h+=`<button class="tb fu${f.underline?' on':''}" data-fmt="underline" title="Unterstrichen (Strg+U)">U</button>`;
-    h+=`<button class="tb${f.list?' on':''}" data-fmt="list" title="Aufzählung">${ICON.list}</button><span class="sep"></span>`;
+    if(!sel.some(i=>i.type==='box')) h+=`<button class="tb${f.list?' on':''}" data-fmt="list" title="Aufzählung">${ICON.list}</button>`;
+    h+='<span class="sep"></span>';
     h+=`<button class="tb${f.align==='left'?' on':''}" data-fmt="left" title="Linksbündig">${ICON.left}</button>`;
     h+=`<button class="tb${f.align==='center'?' on':''}" data-fmt="center" title="Zentriert">${ICON.center}</button><span class="sep"></span>`;
   }
@@ -3382,8 +3386,11 @@ $('#b-png').onclick=()=>{
   const order=[...world.children].filter(n=>n.dataset&&n.dataset.id).map(n=>items.get(n.dataset.id)).filter(Boolean);
   for(const it of order){ if(it.type!=='box') continue; const r=rectOf(it.id), d=it.data;
     rr(c,r.x,r.y,r.w,r.h,14); c.fillStyle=d.color+'0F'; c.fill(); c.lineWidth=2; c.strokeStyle=d.color; c.stroke();
-    c.font='700 13px Montserrat, system-ui, sans-serif'; const tw=c.measureText(d.text).width;
-    rr(c,r.x-2,r.y-31,tw+22,25,7); c.fillStyle=d.color; c.fill(); c.fillStyle='#fff'; c.textBaseline='middle'; c.fillText(d.text,r.x+9,r.y-18.5); }
+    const lab=els.get(it.id).firstChild, lw=lab.offsetWidth, lh=lab.offsetHeight, px=Math.round(d.size*0.85);
+    const lx = d.align==='center' ? r.x + r.w/2 - lw/2 : r.x-2, ly = r.y - 6 - lh;
+    rr(c,lx,ly,lw,lh,Math.round(d.size*0.55)); c.fillStyle=d.color; c.fill();
+    c.font=`${d.italic?'italic ':''}${d.bold?700:400} ${d.size}px Montserrat, system-ui, sans-serif`; c.fillStyle='#fff'; c.textBaseline='middle';
+    c.fillText(d.text,lx+px,ly+lh/2); if(d.underline){ const tw=c.measureText(d.text).width; c.fillRect(lx+px,ly+lh/2+d.size*0.55,tw,Math.max(1,d.size/14)); } }
   for(const it of items.values()){ if(it.type!=='line'||it.deleted) continue; const g=lineGeom(it); if(!g) continue; const d=it.data;
     c.strokeStyle=d.color; c.fillStyle=d.color; c.lineWidth=d.width; c.lineCap='round'; c.setLineDash(d.dash?[d.width*3,d.width*2.6]:[]);
     c.beginPath(); c.moveTo(g.sa.x,g.sa.y); c.lineTo(g.sb.x,g.sb.y); c.stroke(); c.setLineDash([]);
