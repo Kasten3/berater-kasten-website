@@ -27,6 +27,12 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;paddin
 #viewport.t-card,#viewport.t-text,#viewport.t-box,#viewport.t-line,#viewport.t-arrow{cursor:crosshair}
 #world{position:absolute;left:0;top:0;width:0;height:0;transform-origin:0 0}
 #lines{position:absolute;left:0;top:0;overflow:visible;z-index:2;pointer-events:none}
+#guides{position:absolute;left:0;top:0;overflow:visible;z-index:6;pointer-events:none}
+#alignpop{position:fixed;z-index:30;display:grid;grid-template-columns:repeat(4,40px);gap:4px;padding:8px}
+#alignpop button{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--dunkel)}
+#alignpop button:hover{background:var(--grau)}
+#alignpop button:disabled{opacity:.3;cursor:default;background:none}
+#alignpop svg{width:20px;height:20px}
 #lines .lhit{pointer-events:stroke;cursor:pointer}
 #lines .ep{pointer-events:all;cursor:grab}
 
@@ -210,7 +216,7 @@ kbd{font:600 12px var(--ui);background:var(--grau);border:1px solid var(--rand);
   </div>
 </div>
 
-<div id="viewport"><div id="world"><svg id="lines" width="1" height="1" xmlns="http://www.w3.org/2000/svg"></svg></div></div>
+<div id="viewport"><div id="world"><svg id="lines" width="1" height="1" xmlns="http://www.w3.org/2000/svg"></svg><svg id="guides" width="1" height="1" xmlns="http://www.w3.org/2000/svg"></svg></div></div>
 <div id="loading" hidden>Board wird geladen …</div>
 
 <div id="topbar" hidden>
@@ -244,6 +250,7 @@ kbd{font:600 12px var(--ui);background:var(--grau);border:1px solid var(--rand);
 
 <div id="ctx" class="panel" hidden></div>
 <div id="picker" class="panel" hidden></div>
+<div id="alignpop" class="panel" hidden></div>
 
 <div id="zoom" class="panel" hidden>
   <button id="u-undo" title="Rückgängig (Strg+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
@@ -293,7 +300,8 @@ kbd{font:600 12px var(--ui);background:var(--grau);border:1px solid var(--rand);
       <dt>Bereich</dt><dd>Rahmen aufziehen, z. B. für jede Gruppe. Wer den Titel zieht, nimmt alles im Bereich mit.</dd>
       <dt>Bewegen</dt><dd>Eine freie Fläche ziehen verschiebt das Board. Mit dem Mausrad oder zwei Fingern zoomen.</dd>
       <dt>Rückgängig</dt><dd>Pfeil-Knöpfe unten rechts oder <kbd>Strg</kbd>+<kbd>Z</kbd> – nimmt deine eigenen letzten Schritte zurück.</dd>
-      <dt>Mehrere</dt><dd><kbd>Shift</kbd> + Klick wählt mehrere aus. <kbd>Entf</kbd> löscht, <kbd>Strg</kbd>+<kbd>D</kbd> dupliziert.</dd>
+      <dt>Ausrichten</dt><dd>Beim Ziehen rasten Objekte an den Kanten und Mitten anderer Objekte ein (orange Hilfslinie). <kbd>Alt</kbd> gedrückt halten schaltet das Einrasten aus. Bei mehreren ausgewählten Objekten gibt es unten den Knopf „Ausrichten“.</dd>
+      <dt>Mehrere</dt><dd><kbd>Shift</kbd> + Klick wählt mehrere aus, <kbd>Shift</kbd> + Ziehen auf freier Fläche zieht einen Auswahlrahmen auf. <kbd>Entf</kbd> löscht, <kbd>Strg</kbd>+<kbd>D</kbd> dupliziert.</dd>
       <dt>Tasten</dt><dd><kbd>V</kbd> Auswahl · <kbd>N</kbd> Karte · <kbd>T</kbd> Text · <kbd>S</kbd> Symbol · <kbd>R</kbd> Bereich · <kbd>L</kbd> Linie · <kbd>A</kbd> Pfeil · <kbd>Leertaste</kbd> halten zum Verschieben</dd>
     </dl>
   </div>
@@ -3142,7 +3150,8 @@ viewport.addEventListener('pointerdown',e=>{
   if(itEl){ const id=itEl.dataset.id; const was=selected.has(id);
     if(e.shiftKey){ was?selected.delete(id):selected.add(id); syncSelection(); } else if(!was) select([id]);
     startMove(w, was && !e.shiftKey && selected.size===1 ? id : false); return; }
-  if(!e.shiftKey) select([]);
+  if(e.shiftKey){ act={kind:'marquee',start:w,cur:w,base:new Set(selected)}; return; }
+  select([]);
   startPan(e);
 });
 function startPan(e){ act={kind:'pan',sx:e.clientX,sy:e.clientY,vx:view.x,vy:view.y}; viewport.classList.add('panning'); }
@@ -3162,7 +3171,36 @@ function startMove(w, editOnClick){
   const orig=new Map();
   txBegin();
   for(const id of ids){ const it=items.get(id); if(!it||it.deleted) continue; orig.set(id,JSON.parse(JSON.stringify(it.data))); busy.add(id); txTrack(id); }
-  act={kind:'move',start:w,orig,moved:false,editOnClick};
+  // hilfslinien: kanten & mitten der übrigen objekte sammeln
+  const movRects=[...orig.keys()].map(id=>{ const it=items.get(id); return it.type==='line'?null:rectOf(id); }).filter(Boolean);
+  let snap=null;
+  if(movRects.length){
+    const bb={x1:Math.min(...movRects.map(r=>r.x)), y1:Math.min(...movRects.map(r=>r.y)), x2:Math.max(...movRects.map(r=>r.x+r.w)), y2:Math.max(...movRects.map(r=>r.y+r.h))};
+    const others=[]; for(const it of items.values()){ if(it.deleted||it.type==='line'||orig.has(it.id)) continue; const r=rectOf(it.id); if(r) others.push(r); }
+    snap={bb, others};
+  }
+  act={kind:'move',start:w,orig,moved:false,editOnClick,snap};
+}
+const guidesSvg=$('#guides');
+function snapDelta(sn,dx,dy,off){
+  if(!sn || off || !sn.others.length){ guidesSvg.innerHTML=''; return [dx,dy]; }
+  const thr=7/view.s, b=sn.bb, W=b.x2-b.x1, H=b.y2-b.y1;
+  const mx=[b.x1+dx, b.x1+dx+W/2, b.x1+dx+W], my=[b.y1+dy, b.y1+dy+H/2, b.y1+dy+H];
+  let bx=null, by=null;
+  for(const r of sn.others){
+    const ox=[r.x, r.x+r.w/2, r.x+r.w], oy=[r.y, r.y+r.h/2, r.y+r.h];
+    for(const a of mx) for(const o of ox){ const d=o-a; if(Math.abs(d)<=thr && (!bx||Math.abs(d)<Math.abs(bx.d))) bx={d,pos:o}; }
+    for(const a of my) for(const o of oy){ const d=o-a; if(Math.abs(d)<=thr && (!by||Math.abs(d)<Math.abs(by.d))) by={d,pos:o}; }
+  }
+  if(bx) dx+=bx.d; if(by) dy+=by.d;
+  // linien zeichnen: alle objekte, die nach dem einrasten auf derselben linie liegen
+  const ex=1e-6+0.5; let h=''; const sw=1.5/view.s, dash=`${5/view.s} ${4/view.s}`;
+  const nb={x1:b.x1+dx,y1:b.y1+dy,x2:b.x2+dx,y2:b.y2+dy};
+  if(bx){ let y1=nb.y1, y2=nb.y2; for(const r of sn.others){ if([r.x,r.x+r.w/2,r.x+r.w].some(v=>Math.abs(v-bx.pos)<ex)){ y1=Math.min(y1,r.y); y2=Math.max(y2,r.y+r.h); } }
+    h+=`<path d="M${bx.pos} ${y1-16/view.s}V${y2+16/view.s}" stroke="#F4A261" stroke-width="${sw}" stroke-dasharray="${dash}"/>`; }
+  if(by){ let x1=nb.x1, x2=nb.x2; for(const r of sn.others){ if([r.y,r.y+r.h/2,r.y+r.h].some(v=>Math.abs(v-by.pos)<ex)){ x1=Math.min(x1,r.x); x2=Math.max(x2,r.x+r.w); } }
+    h+=`<path d="M${x1-16/view.s} ${by.pos}H${x2+16/view.s}" stroke="#F4A261" stroke-width="${sw}" stroke-dasharray="${dash}"/>`; }
+  guidesSvg.innerHTML=h; return [dx,dy];
 }
 window.addEventListener('pointermove',e=>{
   if(pointers.has(e.pointerId)) pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
@@ -3174,9 +3212,12 @@ window.addEventListener('pointermove',e=>{
   if(!act) return;
   const w=toWorld(e.clientX,e.clientY);
   if(act.kind==='pan'){ view.x=act.vx+e.clientX-act.sx; view.y=act.vy+e.clientY-act.sy; applyView(); return; }
+  if(act.kind==='marquee'){ act.cur=w; const x=Math.min(w.x,act.start.x), y=Math.min(w.y,act.start.y), mw=Math.abs(w.x-act.start.x), mh=Math.abs(w.y-act.start.y);
+    guidesSvg.innerHTML=`<rect x="${x}" y="${y}" width="${mw}" height="${mh}" fill="rgba(29,105,150,.08)" stroke="#1D6996" stroke-width="${1.5/view.s}" stroke-dasharray="${5/view.s} ${4/view.s}"/>`; return; }
   if(act.kind==='move'){
-    const dx=Math.round(w.x-act.start.x), dy=Math.round(w.y-act.start.y);
-    if(!act.moved && Math.hypot(dx,dy)*view.s<3) return; act.moved=true; $('#ctx').hidden=true;
+    let dx=w.x-act.start.x, dy=w.y-act.start.y;
+    if(!act.moved && Math.hypot(dx,dy)*view.s<3) return; act.moved=true; $('#ctx').hidden=true; hideAlign();
+    [dx,dy]=snapDelta(act.snap,dx,dy,e.altKey); dx=Math.round(dx); dy=Math.round(dy);
     for(const [id,o] of act.orig){ const it=items.get(id); if(!it) continue;
       if(it.type==='line'){ if(!o.from.id){it.data.from={x:o.from.x+dx,y:o.from.y+dy};} if(!o.to.id){it.data.to={x:o.to.x+dx,y:o.to.y+dy};} }
       else { it.data.x=o.x+dx; it.data.y=o.y+dy; renderItem(it); }
@@ -3209,7 +3250,15 @@ function endPointer(e){
   pointers.delete(e.pointerId);
   if(pinch){ if(pointers.size<2) pinch=null; return; }
   if(!act) return;
-  const a=act; act=null; viewport.classList.remove('panning'); markTarget(null);
+  const a=act; act=null; viewport.classList.remove('panning'); markTarget(null); guidesSvg.innerHTML='';
+  if(a.kind==='marquee'){
+    const x1=Math.min(a.cur.x,a.start.x), y1=Math.min(a.cur.y,a.start.y), x2=Math.max(a.cur.x,a.start.x), y2=Math.max(a.cur.y,a.start.y);
+    const ids=new Set(a.base);
+    for(const it of items.values()){ if(it.deleted) continue;
+      if(it.type==='line'){ const g=lineEnds(it.data); if(g && g.every(p=>p.x>=x1&&p.x<=x2&&p.y>=y1&&p.y<=y2)) ids.add(it.id); continue; }
+      const r=rectOf(it.id); if(r && r.x>=x1 && r.y>=y1 && r.x+r.w<=x2 && r.y+r.h<=y2) ids.add(it.id); }
+    select([...ids]); return;
+  }
   if(a.kind==='move'){
     for(const id of a.orig.keys()){ const it=items.get(id); if(it && a.moved) save(it,0); endBusy(id); }
     txCommit();
@@ -3296,6 +3345,48 @@ function runFmt(name){ const t=fmtTargets(); if(!t.length) return; const f=t[0].
   const v = name==='bold'?!f.bold : name==='italic'?!f.italic : name==='underline'?!f.underline : name==='list'?!f.list : null;
   fmtApply(it=>FMT_ACTIONS[name](it,v)); }
 
+/* ================= ausrichten & verteilen ================= */
+const AL_ICON = {
+  left:'<path d="M4 3v18"/><rect x="7" y="6" width="11" height="4" rx="1"/><rect x="7" y="14" width="7" height="4" rx="1"/>',
+  hcenter:'<path d="M12 3v18"/><rect x="5.5" y="6" width="13" height="4" rx="1"/><rect x="8" y="14" width="8" height="4" rx="1"/>',
+  right:'<path d="M20 3v18"/><rect x="6" y="6" width="11" height="4" rx="1"/><rect x="10" y="14" width="7" height="4" rx="1"/>',
+  hdist:'<path d="M3 4v16M21 4v16"/><rect x="6.5" y="8" width="4" height="8" rx="1"/><rect x="13.5" y="8" width="4" height="8" rx="1"/>',
+  top:'<path d="M3 4h18"/><rect x="6" y="7" width="4" height="11" rx="1"/><rect x="14" y="7" width="4" height="7" rx="1"/>',
+  vcenter:'<path d="M3 12h18"/><rect x="6" y="5.5" width="4" height="13" rx="1"/><rect x="14" y="8" width="4" height="8" rx="1"/>',
+  bottom:'<path d="M3 20h18"/><rect x="6" y="6" width="4" height="11" rx="1"/><rect x="14" y="10" width="4" height="7" rx="1"/>',
+  vdist:'<path d="M4 3h16M4 21h16"/><rect x="8" y="6.5" width="8" height="4" rx="1"/><rect x="8" y="13.5" width="8" height="4" rx="1"/>'
+};
+const AL_NAME = {left:'Links ausrichten',hcenter:'Waagerecht mittig',right:'Rechts ausrichten',hdist:'Waagerecht gleichmäßig verteilen',
+  top:'Oben ausrichten',vcenter:'Senkrecht mittig',bottom:'Unten ausrichten',vdist:'Senkrecht gleichmäßig verteilen'};
+const alignPop=$('#alignpop');
+function alignables(){ return [...selected].map(id=>items.get(id)).filter(i=>i&&!i.deleted&&i.type!=='line').map(i=>({it:i,r:rectOf(i.id)})).filter(o=>o.r); }
+function hideAlign(){ alignPop.hidden=true; }
+function showAlign(btn){
+  const n=alignables().length;
+  alignPop.innerHTML=Object.keys(AL_ICON).map(k=>`<button data-al="${k}" title="${AL_NAME[k]}"${(k.endsWith('dist')&&n<3)?' disabled':''}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${AL_ICON[k]}</svg></button>`).join('');
+  alignPop.hidden=false; const r=btn.getBoundingClientRect();
+  alignPop.style.left=Math.max(8,Math.min(innerWidth-alignPop.offsetWidth-8, r.left+r.width/2-alignPop.offsetWidth/2))+'px';
+  alignPop.style.top=(r.top-alignPop.offsetHeight-10)+'px';
+}
+function doAlign(k){
+  const L=alignables(); if(L.length<2) return;
+  const x1=Math.min(...L.map(o=>o.r.x)), x2=Math.max(...L.map(o=>o.r.x+o.r.w)), y1=Math.min(...L.map(o=>o.r.y)), y2=Math.max(...L.map(o=>o.r.y+o.r.h));
+  txBegin();
+  const setPos=(o,x,y)=>{ txTrack(o.it.id); o.it.data.x=Math.round(x); o.it.data.y=Math.round(y); renderItem(o.it); save(o.it,0); };
+  if(k==='left')    L.forEach(o=>setPos(o,x1,o.r.y));
+  if(k==='right')   L.forEach(o=>setPos(o,x2-o.r.w,o.r.y));
+  if(k==='hcenter') L.forEach(o=>setPos(o,(x1+x2)/2-o.r.w/2,o.r.y));
+  if(k==='top')     L.forEach(o=>setPos(o,o.r.x,y1));
+  if(k==='bottom')  L.forEach(o=>setPos(o,o.r.x,y2-o.r.h));
+  if(k==='vcenter') L.forEach(o=>setPos(o,o.r.x,(y1+y2)/2-o.r.h/2));
+  if(k==='hdist' && L.length>=3){ L.sort((a,b)=>a.r.x-b.r.x); const gap=(x2-x1-L.reduce((s,o)=>s+o.r.w,0))/(L.length-1); let x=x1; L.forEach(o=>{ setPos(o,x,o.r.y); x+=o.r.w+gap; }); }
+  if(k==='vdist' && L.length>=3){ L.sort((a,b)=>a.r.y-b.r.y); const gap=(y2-y1-L.reduce((s,o)=>s+o.r.h,0))/(L.length-1); let y=y1; L.forEach(o=>{ setPos(o,o.r.x,y); y+=o.r.h+gap; }); }
+  txCommit(); renderLines(); renderCtx();
+}
+alignPop.addEventListener('pointerdown',e=>e.preventDefault());
+alignPop.addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b||b.disabled) return; doAlign(b.dataset.al); });
+document.addEventListener('pointerdown',e=>{ if(!e.target.closest('#alignpop,[data-alignbtn]')) hideAlign(); },true);
+
 /* ================= kontextleiste ================= */
 const ICON = {
   none:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 12h16"/></svg>',
@@ -3303,6 +3394,7 @@ const ICON = {
   both:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M10 7l-5 5 5 5M14 7l5 5-5 5"/></svg>',
   dash:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 12h3M10 12h4M18 12h3"/></svg>',
   dup:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></svg>',
+  align:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v18"/><rect x="7" y="6" width="11" height="4" rx="1"/><rect x="7" y="14" width="7" height="4" rx="1"/></svg>',
   aminus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l4.5-11L12 18M4.6 14h5.8"/><path d="M15 12h6"/></svg>',
   aplus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l4.5-11L12 18M4.6 14h5.8"/><path d="M15 12h6M18 9v6"/></svg>',
   list:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 6h10M10 12h10M10 18h10"/><path d="M4.5 6h.01M4.5 12h.01M4.5 18h.01" stroke-width="3"/></svg>',
@@ -3313,7 +3405,7 @@ const ICON = {
 function renderCtx(){
   const box=$('#ctx');
   const sel=[...selected].map(id=>items.get(id)).filter(i=>i&&!i.deleted);
-  if(!sel.length || (act && act.moved)){ box.hidden=true; return; }
+  if(!sel.length || (act && act.moved)){ box.hidden=true; hideAlign(); return; }
   const types=new Set(sel.map(i=>i.type)); const one=types.size===1?[...types][0]:null;
   let h='';
   const palette = one==='card' ? CARD_COLORS : (one ? INK_COLORS : (types.has('card')?null:INK_COLORS));
@@ -3331,6 +3423,7 @@ function renderCtx(){
   }
   if(one==='line'){ ['none','end','both'].forEach(a=>{ h+=`<button class="tb${sel[0].data.arrow===a?' on':''}" data-arrow="${a}" title="Pfeilspitze">${ICON[a]}</button>`; });
     h+=`<button class="tb${sel[0].data.dash?' on':''}" data-dash="1" title="Gestrichelt">${ICON.dash}</button><span class="sep"></span>`; }
+  if(sel.filter(i=>i.type!=='line').length>=2) h+=`<button class="tb" data-alignbtn="1" title="Ausrichten &amp; verteilen">${ICON.align}</button><span class="sep"></span>`;
   if(!types.has('line') || types.size>1) h+=`<button class="tb" data-dup="1" title="Duplizieren (Strg+D)">${ICON.dup}</button>`;
   h+=`<button class="tb del" data-del="1" title="Löschen (Entf)">${ICON.del}</button>`;
   box.innerHTML=h; box.hidden=false;
@@ -3341,6 +3434,7 @@ $('#ctx').addEventListener('click',e=>{
   const sel=[...selected].map(id=>items.get(id)).filter(i=>i&&!i.deleted);
   if(b.dataset.del){ deleteSelected(); return; }
   if(b.dataset.dup){ duplicateSelected(); return; }
+  if(b.dataset.alignbtn){ alignPop.hidden ? showAlign(b) : hideAlign(); return; }
   if(b.dataset.fmt){ runFmt(b.dataset.fmt); return; }
   txBegin();
   for(const it of sel){
